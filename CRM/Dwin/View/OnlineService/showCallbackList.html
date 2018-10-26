@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户满意度调查-数据表格</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+        <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        tbody td{  cursor:pointer;  }
+	.cus-24{ color:red;}
+	.selected{
+            background-color: yellow !important;
+        }
+    .chosen-customer-type {
+        color : blue;
+    }
+    .ibox-title {
+        padding-top: 7px;
+    }
+    .chosen-select{
+        width : 100%;
+    }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+
+		            <input type="hidden" name="k" id="k" value="1">
+                    <!--<div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        <div class="fa-hover col-sm-2 col-sm-1">
+                            <a href="javascript:;" id="cusAdd">
+                            <button type="button" class="btn btn-warning btn-sm">
+                              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 新客户添加
+                            </button>
+                            </a>
+                        </div>
+                    </div>-->
+                </div>
+                <div class="ibox-content" id="table-cus-div">
+                    <div class="fa-hover col-sm-4 col-sm-2">
+                        <select class='chosen-select  chosen-customer-type' id="cus-type-selecter">
+                            <option value="2,3">本次回访调查</option>
+                            <option value="2">&emsp;&emsp;待回访客户</option>
+                            <option value="3">&emsp;&emsp;已回访客户</option>
+                            <option value="4">以往回访记录</option>
+                        </select>
+                    </div>
+                    <div class="fa-hover col-sm-4 col-sm-2">
+                        <select class='chosen-select  chosen-customer-type' id="cus-res-selecter">
+                            <option value="">所有</option>
+                            <volist name="data" id="vol">
+                                <option value="{$vol.id}">{$vol.level|str_repeat="&emsp;",###*2}{$vol.name}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <span style="color:red" id="information"></span></br>
+                    <span id="resets"></span>
+                    <table class="table table-striped table-bordered table-hover dataTables-Callback">
+                        <tbody>
+                        <tr class="gradeX">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    var k = $("#k").val();
+    var dataTablesCallback = $(".dataTables-Callback");
+    var callbackTBody = $(".dataTables-Callback tbody");
+    var cusTypeSel = $("#cus-type-selecter");//回访类型
+    var callbackResSel = $("#cus-res-selecter");// 回访客服负责人选择
+    var oTable;
+    var oTables;
+    var tableCusDiv = $("#table-cus-div");
+    function msgTable()
+    {
+        dataTablesCallback.dataTable({
+            "destroy"      : true,
+            "paging"       : true,
+            "autoWidth"	   : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 15, 20, 100],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true, //开启服务器获取数据
+            "ajax"         :{ // 获取数据
+                "url"   : controller + "/showCallbackList",
+                "type"  : 'post',
+                "data"  : {
+                    "type_limit": function () {
+                        return document.getElementById('cus-type-selecter').value;
+                    },
+                    "uid_limit" : function () {
+                        return document.getElementById('cus-res-selecter').value;
+                    }
+                }
+            },
+            "columns"      :[ //定义列数据来源
+                {'title' : "客户名称", 'data' : "cus_name", 'class' : "mouseOn cusDetail"},
+                {'title' : "业务员", 'data':"u_name"},
+                {'title' : "回访客服专员", 'data' : "online_name"},
+                {'title' : "回访分配时间", 'data' : "callback_time"},
+                {'title' : "回访进度", 'data' : "callback_flag"}
+                /* {'title':"负责人",'data':null,'class':"align-center"} // 自定义列   {'title':"负责人",'data':null,'class':"align-center"} // 自定义列*/
+            ],
+            "language"     : { // 定义语言
+                "sProcessing"     : "加载中...",
+                "sLengthMenu"     : "每页显示 _MENU_ 条记录",
+                "sZeroRecords"    : "没有匹配的结果",
+                "sInfo"           : "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty"      : "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered"   : "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix"    : "",
+                "sSearch"         : "搜索:",
+                "sUrl"            : "",
+                "sEmptyTable"     : "表中数据为空",
+                "sLoadingRecords" : "载入中...",
+                "sInfoThousands"  : ",",
+                "oPaginate"       : {
+                    "sFirst"    : "首页",
+                    "sPrevious" : "上一页",
+                    "sNext"     : "下一页",
+                    "sLast"     : "末页"
+                },
+                "oAria"           : {
+                    "sSortAscending"  : ": 以升序排列此列",
+                    "sSortDescending" : ": 以降序排列此列"
+                }
+            }
+        });//table end
+    }
+    $(document).ready(function() {
+        $.fn.dataTable.ext.errMode = 'none';
+
+        oTables = msgTable();
+        $("tbody span .unCheck").css('color','red');
+        $("tbody span .allRecord").css('color','blue');
+    }); //inintTable END
+
+// 点击获取对应数据
+    callbackResSel.on('change', function () {
+        oTable = dataTablesCallback.DataTable();
+        oTable.ajax.reload();
+    });
+    cusTypeSel.on('change', function () {
+        oTable = dataTablesCallback.DataTable();
+        oTable.ajax.reload();
+    });
+    function showDetail(dataTable, id, tr, url)
+    {
+        var table = dataTable.DataTable();
+        var row = table.row(tr);
+        if (row.child.isShown()) {
+            row.child.hide();
+        } else {
+            table.$('tr.show').removeClass('shown');
+            $(".dataTables-Callback tbody tr").removeClass('shown');
+            var sonTable;
+            $.ajax({
+                type : 'post',
+                url  : url,
+                data : {
+                    callbackId : id
+                },
+                success :function (ajaxData) {
+                    if (ajaxData['status'] == 200) {
+                        sonTable =
+                            '<table class="table table-condensed table-striped table-hover">' +
+                            '<tbody>';
+                        sonTable += "<tr>" +
+                                "<td>联系人："   + ajaxData['data']['contact']['name']  + "</td>" +
+                                "<td>联系方式：" + ajaxData['data']['contact']['phone'] + "</td>" +
+                            "</tr>";
+                        for(var i = 0; i < ajaxData['data']['record'].length; i ++)
+                        {
+                            sonTable +=
+                                '<tr>' +
+                                '<td rowspan="5" width="25%"><b>联系时间</b>：' + ajaxData['data']['record'][i]['posttime'] + '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                '<td><b>主题</b>：' + ajaxData['data']['record'][i]['theme'] + '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                '<td><b>类型</b>：' + ajaxData['data']['record'][i]['ctype'] + '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                '<td><b>时间</b>：' + ajaxData['data']['record'][i]['posttime'] + '</td>' +
+                                '</tr>' +
+                                '<tr>' +
+                                '<td><b>联系内容</b>：' + ajaxData['data']['record'][i]['content'] + '</td>'+
+                                '</tr>';
+                        }
+                        sonTable += "</table>";
+                        row.child(sonTable).show();
+                        tr.addClass('shown');
+                    } else {
+
+                    }
+
+                }
+            });
+        }
+    }
+    dataTablesCallback.delegate('tbody tr', 'click', function () {
+        var id = $(this).attr('id');
+        var tr = $(this).children('td').closest('tr');
+        showDetail(dataTablesCallback, id, tr, "__CONTROLLER__/getCusMsg");
+    });
+
+</script>
+</body>
+</html>

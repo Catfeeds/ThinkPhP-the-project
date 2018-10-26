@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>用户满意度反馈</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body{
+            padding: 20px 20px 20px 50px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <el-row>
+        查找方式:
+        <el-radio v-model="flag" label="1" @change="changeFlag">按期查看</el-radio>
+        <el-radio v-model="flag" label="2" @change="changeFlag">按时间区间查看</el-radio>
+    </el-row>
+    <el-row>
+        <el-col v-if="flag == 1">
+            <el-select v-model="where.assign_times" @change="getData" placeholder="请选择时间批次">
+                <el-option
+                        v-for="item in timeBatch"
+                        :key="item.assign_times"
+                        :label="item.assign_times"
+                        :value="item.assign_times">
+                </el-option>
+            </el-select>
+        </el-col>
+        <el-col v-if="flag == 2">
+            <el-date-picker
+                    @change="getData"
+                    v-model="where.start"
+                    type="date"
+                    value-format="yyyy-MM-dd"
+                    placeholder="开始时间">
+            </el-date-picker>
+            <el-date-picker
+                    @change="getData"
+                    v-model="where.end"
+                    type="date"
+                    value-format="yyyy-MM-dd"
+                    placeholder="结束时间">
+            </el-date-picker>
+        </el-col>
+    </el-row>
+    <div style="display: flex; justify-content: space-between;flex-wrap: wrap">
+        <div class="item" v-for="(item,index) in questions">
+            <div :id="'main' + index" style="width: 400px;height:400px;"></div>
+            <label>{{item.title.text}}</label><br>
+            <span>样本总数： {{item.totalNumber}}</span>
+        </div>
+    </div>
+    <div>
+        <h3 class="text-center" v-if="questions.length == 0">请选择搜索条件</h3>
+    </div>
+</div>
+
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0.rc2/echarts.js"></script>
+<script>
+    var batch = {$assignT | json_encode};
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                timeBatch: batch,
+                flag: '1',
+                where: {},
+                questions: [],
+                loading: false
+            }
+        },
+        methods: {
+            getData: function () {
+                this.loading = true
+                var vm = this
+                this.where.flag = this.flag
+                $.post('', {
+                    data: this.where
+                }, function (res) {
+                    console.log(res);
+                    vm.processData(res.data)
+                })
+            },
+            processData: function(data){
+                for (var i = 0; i < data.length; i++){
+                    data[i].data = []
+                    if (!data[i].name) {
+                        this.loading = false
+                        return false
+                    }
+                    for (var j = 0; j < data[i].name.length; j++){
+                        var obj = {
+                            name: data[i].name[j],
+                            value: data[i].value[j]
+                        }
+                        data[i].data.push(obj)
+                    }
+                }
+                this.questions = data
+                function Item(question) {
+                    this.title = {
+                        text: question.question
+                    }
+                    this.tooltip = {}
+                    this.series = [{
+                        // name: '满意度',
+                        type: 'pie',
+                        data: question.data
+                    }]
+                    this.totalNumber = +question.total_num
+                }
+                this.questions.forEach(function (v, i, arr) {
+                    arr[i] = new Item(v)
+                })
+                this.render()
+            },
+            render: function(){
+                var vm = this
+                var obj = []
+                // 此处获取dom节点必须要异步
+                setTimeout(function () {
+                    for (var i = 0; i < vm.questions.length; i ++){
+                        console.log('main' + i);
+                        var item  = {
+                            dom: document.getElementById('main' + i),
+                            data: vm.questions[i]
+                        }
+                        obj.push(item)
+                    }
+                    obj.forEach(function (value) {
+                        echarts.init(value.dom).setOption(value.data)
+                    })
+                    vm.loading = false
+                })
+            },
+            changeFlag: function (){
+                if (this.flag == 1){
+                    this.where = {
+                        assign_times : ''
+                    }
+                }
+                if (this.flag == 2){
+                    this.where = {
+                        start: '',
+                        end: ''
+                    }
+                }
+            }
+        }
+    })
+
+
+</script>
+</body>
+</html>

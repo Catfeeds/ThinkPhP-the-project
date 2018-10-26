@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户列表-数据表格</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        td{
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+			<div class="ibox float-e-margins">
+				<div class="ibox-content">
+				    <div id="file-pretty">
+					    <form name='cusImport' id='cusImport' action="__CONTROLLER__/importCus" method="post" enctype="multipart/form-data">
+					        <div class="form-group">
+					            <label class="font-noraml">文件选择</label>
+					            <input type="file"  name='excelFile' class="form-control">
+					            <input class="btn btn-outline btn-success" type="button" value="导入" id="submitButton">
+					        </div>
+					    </form>    
+				    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script type="text/javascript">
+
+$('#file-pretty input[type="file"]').prettyFile();
+
+
+$("#submitButton").on('click', function () {
+    $("#submitButton").attr('disabled', true);
+	$("#cusImport").ajaxSubmit({
+		url: '__CONTROLLER__/importCus',
+        type: "post",
+        success: function (data) {
+            switch (data['status']) {
+                case 1 :
+                    layer.msg('导入成功，上传至数据库失败');
+                    $("#submitButton").attr('disabled', false);
+                    break;
+                case 2 : 
+                    layer.msg('已上传至临时数据库，跳转至导入详情页面',
+                    {
+                        icon : 5,
+                        time : 500
+                    },function () {
+                        window.location.href = "__CONTROLLER__/showTempCusList/cusInfo/" + data['info'];
+                    }); 
+                    break;
+                case 3 : 
+                    layer.msg('excel导入失败');
+                    $("#submitButton").attr('disabled', false);
+                    break;
+            }
+        },
+        error: function (error) {
+        	console.log(error); 
+        },
+    });
+});
+</script>
+</body>
+</html>

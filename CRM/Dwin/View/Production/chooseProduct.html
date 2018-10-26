@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存管理</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .selected{
+            background: #fbec88 !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="ibox-content" style="margin-top: 15px;">
+    <table id="table" class="table table-striped table-bordered table-full-width" width="100%">
+        <thead>
+        <tr>
+            <th>物料代码</th>
+            <th>型号</th>
+            <!--<th>库房名</th>-->
+            <th>剩余库存</th>
+            <th>待入库</th>
+            <th>锁库数量</th>
+            <th>在生产数量</th>
+            <th>在返工数量</th>
+            <th>更新时间</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var table = $('#table').DataTable({
+        serverSide: true,
+        ajax: {
+            type: 'post'
+        },
+        order: [[4, 'desc']],
+        columns: [
+            {data: 'product_no', searchable: true},
+            {data: 'product_name', searchable: true},
+//            {data: 'warehouse_id', searchable: false},
+            {data: 'stock_number', searchable: false},
+            {data: 'i_audit', searchable: false},
+            {data: 'o_audit', searchable: false},
+            {data: 'production_number', searchable: false},
+            {data: 'rework_number', searchable: false},
+            {data: 'update_time', searchable: false}
+        ]
+    });
+    $("#table tbody").on("click", "tr", function () {
+        var tr = document.querySelectorAll('tr');
+        $.each(tr, function (k, v) {
+            $(v).removeClass('selected')
+        });
+        $(this).addClass('selected');
+        var productInfo = table.row(this).data();
+        var pid = table.row(this).data().product_id;
+        var productName  = table.row(this).data().product_name;
+        var cate = table.row(this).data().cate;
+        var price = table.row(this).data().price;
+        var obj = {
+            id: pid,
+            name: productName,
+            cate: cate,
+            price: price
+        };
+        parent.productInfo = productInfo;
+        localStorage.product = JSON.stringify(obj);
+    })
+
+</script>
+</body>
+</html>

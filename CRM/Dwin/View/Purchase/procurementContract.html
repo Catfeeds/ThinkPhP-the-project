@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        input {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+        .el-table .warning-row {
+             background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" style="text-align: center">
+        <h1>湖南迪文科技有限公司采购合同</h1>
+        <br><br><br>
+        <el-form ref="form" :rules="rules" :model="form" label-width="100px" :inline="true" @submit.native.prevent v-loading="loading">
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="供方：" prop="supplier">
+                        <el-input v-model="form.supplier"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="合同编号：" prop="contractCumber:">
+                        <el-input v-model="form.contractCumber"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -4%;">需方：湖南迪文科技有限公司</span>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="签订时间：" prop="timeToSign:">
+                        <el-input v-model="form.timeToSign"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: 10%;">一、产品名称、型号、单位、金额、供货时间及数量</span>
+                </el-col>
+                <el-col :span="12">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">签订地点：湖南</span>
+                </el-col>
+            </el-row>
+            <br><br>
+            <el-row>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">序号</span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">产品名称</span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">型号 </span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">单位</span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">数量</span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">单价(元）</span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">金额（元）</span>
+                </el-col>
+                <el-col :span="3">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">交货日期</span>
+                </el-col>
+            </el-row><br>
+            <table style=" width: 100%;height: 48px; border: 1px solid #ebeef5;">
+            <tr style="width: 100%;" v-for="(item, index) in arr" :key="index">
+                <td class="td_02"><input type="text" v-model="item.serialNumber"></td>
+                <td class="td_02"><input type="text" v-model="item.name"></td>
+                <td class="td_02"><input type="text" v-model="item.model"></td>
+                <td class="td_02"><input type="text" v-model="item.unit"></td>
+                <td class="td_02"><input type="text" v-model="item.mount"></td>
+                <td class="td_02"><input type="text" v-model="item.unitPrice"></td>
+                <td class="td_02"><input type="text" v-model="item.amount"></td>
+                <td class="td_02"><input type="text" v-model="item.dateOfDelivery"></td>
+            </tr>
+    </table>
+    <br>
+    <div style="margin-left: -90%"><el-button @click="adds" type="primary">添加</el-button> </div>
+    <br>
+    <h3 style="margin-right:60%;">备注：含税16%</h3>
+            <el-row>
+             <el-col :span="12">
+                    <el-form-item label="合计金额:" prop="totalMoney">
+                        <el-input v-model="form.totalMoneyUppercase"></el-input>
+                    </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+             <el-col :span="12">
+                    <el-form-item label="合计金额（大写）:" prop="supplier">
+                        <el-input v-model="form.supplier"></el-input>
+                    </el-form-item>
+              </el-col>
+            </el-row>
+            <el-table style="text-align: left"
+                :data="tableData2"
+                 style="width: 100%"
+                :row-class-name="tableRowClassName">
+                <el-table-column
+                prop="treaty"
+                label="">
+                </el-table-column>
+            </el-table>
+            <br>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="供方：" prop="supplier">
+                        <el-input v-model="form.supplier"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="需方：" prop="buyer">
+                        <el-input v-model="form.buyer"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="单位名称：" prop="CompnanyName:">
+                        <el-input v-model="form.CompnanyName"></el-input>
+                    </el-form-item>
+                </el-col>
+                 <el-col :span="12">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -4%;">单位名称：湖南迪文科技有限公司</span>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="单位地址：" prop="CompnanyAddress:">
+                        <el-input v-model="form.CompnanyAddress"></el-input>
+                    </el-form-item>
+                </el-col>
+                 <el-col :span="12">
+                    <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -4%;">单位地址：湖南省常德市桃源县漳江创业园创业大道8号</span>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="法定代表：" prop="legalRepresentative">
+                        <el-input v-model="form.legalRepresentative"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="法定代表：" prop="legalRepresentative_n:">
+                        <el-input v-model="form.legalRepresentative_n"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="签字人及盖章：" prop="signatory">
+                        <el-input v-model="form.signatory"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="签字人及盖章：" prop="signatory_n:">
+                        <el-input v-model="form.signatory_n"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="电话：" prop="phone">
+                        <el-input v-model="form.phone"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="电话：" prop="phone_n:">
+                        <el-input v-model="form.phone_n"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    <el-form-item label="传真：" prop="fax">
+                        <el-input v-model="form.fax"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item label="传真：" prop="fax_n:">
+                        <el-input v-model="form.fax_n"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <br><br>
+            <el-button type="success" @click>成功按钮</el-button>
+            <br><br>
+        </el-form>
+    </div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data : function(){
+            return {
+                arr:[{serialNumber:'', name:'', model:'',unit:'', mount:'', unitPrice:'', amount:'', dateOfDelivery:''}],
+                tableData2: [{
+                    treaty: '二、交货期限：供方使用特快专递按交货期供货，若有延误须在下单当天内与需方协商，如未经需方同意而无法交货或供货时断时续，超出时间按每日扣除合同总金额的0.5%计算，并追究供方由此给需方造成的影响，如需方需延迟交货当以书面形式通知供方。',
+                    }, {
+                    treaty: '三、运输方式及运输费用：供方负责运输以及运输费用。'
+                    }, {
+                    treaty: '四、交货地点及收货人：湖南省桃源县漳江创业园湖南迪文科技有限公司 何青华（收）电话：15211211065',
+                    }, {
+                    treaty: '五、包装方式：由供方负责，需保证需方收到货后物品无损；包装物不回收。'
+                    },{
+                    treaty: '六、质量要求及验收标准：供方对产品提供合格证、需方提供验收标准和技术标准文档。经需方检验合格之日起算，质保期为一年。'
+                    },{
+                    treaty: '七、返修规定：需方按规定判定的不良品由供方负责维修，不能修理的下次订单补齐或者进行退换，返修发生的一切费用都由供方承担；供方应保证十个工作日内将返修品送到需方加工厂，如超过期限，每日扣除货款总额的3%；超过期限五个工作日的视为供方的违约，需方可视情况解除合同并要求供方赔偿损失。'
+                    },{
+                    treaty: '八、结算方式：款到发货。'
+                    },{
+                    treaty: '九、售后服务及承诺：供方产品质保期内产品出现质量问题，供方无偿负责退换，终身维护。因产品的质量问题导致需方蒙受损失，需方有权向供方主张一切赔偿。'
+                    },{
+                    treaty: '十、违约责任：违约方应主动协商解决，并承担违约责任赔偿另一方的经济损失；若供方违约，自愿承担合同总金额10%的违约金。'
+                    },{
+                    treaty: '十一、解决纠纷方式：合同发生争议时，双方协商解决；协商不成的由合同签订地法院受理管辖。'
+                    },{
+                    treaty: '十二、其他约定事项：本合同未规定的内容，双方协商觉得有必要增加合同条款的，可以增加合同条款，其效力等同于该合同。'
+                    },{
+                    treaty: '十三、本合同一式两份，经双方签字盖章后生效，传真件或扫描件均有效。'
+                    }],
+                form :{
+                    supplier: '',
+                    contractCumber: '',
+                    timeToSign: '',
+                    loading: 'false',
+                    buyer: '',
+                    CompnanyName: '',
+                    CompnanyAddress: '',
+                    legalRepresentative:'',
+                    legalRepresentative_n: '',
+                    signatory: '',
+                    signatory_n: '',
+                    phone: '',
+                    phone_n: '',
+                    fax: '',
+                    fax_n: '',
+                }
+            }
+        },
+        methods :{
+            adds: function () {
+                var lastObj = this.arr[this.arr.length - 1];
+                for(var i in lastObj) {
+                if(lastObj[i] === '') {
+                    alert('必须填写完整');
+                    return false
+                }
+                }
+                this.arr.push({aptitudeName: '',issuingAgency: '',startAndStopTime: ''})
+            },
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex === 1) {
+                return 'warning-row';
+                } else if (rowIndex === 3) {
+                return 'success-row';
+                }
+                return '';
+            },
+            //点击按钮打印表单且数据合法
+        }
+    })
+</script>
+</html>

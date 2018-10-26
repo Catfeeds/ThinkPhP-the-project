@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>导入产品数据</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        input[type=file] {
+            display: none;
+        }
+        .selected{
+            background: #d0d27e!important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="title">
+                <h4>导入产品数据</h4>
+                <div id="app" v-loading="loading">
+                    <el-row>
+                        <el-col :span="4">
+                            <el-upload
+                                    class="uploadResume"
+                                    action="{:U('productExcelUploadEx')}"
+                                    :on-success="uploadSuccess"
+                                    :before-upload="beforeUpload"
+                                    :limit="1"
+                            >
+                                <el-button size="small" type="primary">点击上传Excel</el-button>
+                            </el-upload>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-select v-model="batch" placeholder="请选择批次" v-if="batchLength !== 0" @change="changeBatch">
+                                <el-option
+                                        v-for="item in batches"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                </el-option>
+                            </el-select>
+                            <div v-else>
+                                请点击上传Excel
+                            </div>
+                        </el-col>
+                        <el-col :span="4" v-if="batch">
+                            <el-button size="small" type="warning" @click="deleteBatch">删除批次</el-button>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-button size="small" type="warning" @click="deleteRow">删除选中行</el-button>
+                        </el-col>
+                        <el-col :span="4" v-if="batch">
+                            <el-button size="small" type="primary" @click="importProductInfo">将该批次导入</el-button>
+                        </el-col>
+                        <el-col :span="4">
+                            <el-button size="small" type="primary" @click="exportProductInfo">导出所有产品信息到Excel</el-button>
+                        </el-col>
+                    </el-row>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="staff" class="table table-bordered table-hover table-striped">
+                    <thead>
+                    <th>操作类型</th>
+                    <th>物料编号</th>
+                    <th>物料名称</th>
+                    <th>物料型号</th>
+                    <th>物料分类</th>
+                    <th>物料属性</th>
+                    <th>库房ID</th>
+                    <th>库房名称</th>
+                    <th>库存数量</th>
+                    <th>时间批次</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var batches = {$batches | json_encode};
+    var batchLength = batches.length;
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                loading: false,
+                batches: batches,
+                batch: '',
+                batchLength : batchLength
+            }
+        },
+        methods: {
+            beforeUpload: function () {
+                this.loading = true;
+            },
+            uploadSuccess: function (res) {
+                this.loading = false
+                if (res.status == 200) {
+                    this.batches.push(res.data)
+                    this.batchLength = batches.length
+                }
+                layer.msg(res.msg)
+            },
+            deleteRow: function () {
+                $.post('delMaterialBatchById', {id: id}, function (res) {
+                    if (res.status == 200){
+                        table.ajax.reload()
+                    }
+                    layer.msg(res.msg)
+                })
+            },
+            deleteBatch: function () {
+                var vm = this
+                layer.confirm('确认删除?', function (index) {
+                    $.post('delMaterialBatch', {batch: vm.batch}, function (res) {
+                        if (res.status == 200){
+                            layer.msg(res.msg, function () {
+                                window.location.reload()
+                            })
+                        }else {
+                            layer.msg(res.msg)
+                        }
+                    })
+                    layer.close(index)
+                })
+
+            },
+            changeBatch: function (batch) {
+                this.batch = batch
+                table.settings()[0].ajax.data = {
+                    batch: batch
+                }
+                table.ajax.reload()
+            },
+            importProductInfo: function () {
+                var vm = this
+                layer.confirm('确认导入?' , function (index) {
+                    vm.loading = true
+                    $.post('saveImportMaterialData', {batch: vm.batch}, function (res) {
+                        vm.loading = false
+                        if (res.status == 200){
+                            layer.msg(res.msg, function () {
+                                window.location.reload()
+                            })
+                        }else {
+                            layer.msg(res.msg)
+                        }
+                    })
+                    layer.close(index)
+                })
+            },
+            exportProductInfo: function () {
+                var index = layer.load('正在生成xlsx文件');
+                $.post('/Dwin/Stock/stockExportToExcel', {}, function (res) {
+                    layer.close(index);
+                    if (res.status == 200) {
+                        window.open(res.data.file_url);
+                        layer.msg(res.msg);
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                })
+            }
+        }
+    })
+    var table = $('#staff').DataTable({
+        ajax: {
+            type: 'post'
+        },
+        serverSide: true,
+        order:[[2,'desc']],
+        columns: [
+            {data: null, searchable: false, orderable: false, render: function () {
+                    return arguments[0].method_type
+                }},
+            {data: 'product_no',searchable:true},
+            {data: 'product_number',searchable:true},
+            {data: 'product_name',searchable:true},
+            {data: 'cate',searchable:false},
+            {data: 'material_type',searchable:false},
+            {data: 'warehouse_id',searchable:false},
+            {data: 'warehouse_name',searchable:false},
+            {data: 'stock_number',searchable:false},
+            {data: 'batch',searchable:false},
+        ],
+        oLanguage: {
+            "oAria": {
+                "sSortAscending": " - click/return to sort ascending",
+                "sSortDescending": " - click/return to sort descending"
+            },
+            "LengthMenu": "显示 _MENU_ 记录",
+            "ZeroRecords": "对不起，查询不到任何相关数据",
+            "EmptyTable": "未有相关数据",
+            "LoadingRecords": "正在加载数据-请等待...",
+            "Info": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录。",
+            "InfoEmpty": "当前显示0到0条，共0条记录",
+            "InfoFiltered": "（数据库中共为 _MAX_ 条记录）",
+            "Processing": "<img src='../resources/user_share/row_details/select2-spinner.gif'/> 正在加载数据...",
+            "Search": "搜索：",
+            "Url": "",
+            "Paginate": {
+                "sFirst": "首页",
+                "sPrevious": " 上一页 ",
+                "sNext": " 下一页 ",
+                "sLast": " 尾页 "
+            }
+        }
+    })
+    var id,currentData
+    $('#staff tbody').on('click', 'tr', function () {
+        currentData = table.row(this).data();
+        id = currentData.id;
+        $('tr').removeClass('selected')
+        $(this).addClass('selected')
+    })
+
+</script>
+</body>
+</html>

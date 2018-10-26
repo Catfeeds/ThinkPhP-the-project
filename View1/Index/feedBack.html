@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link href="__PUBLIC__/Admin/ue/themes/default/css/umeditor.css" type="text/css" rel="stylesheet">
+    <script src="__PUBLIC__/Admin/ue/third-party/jquery.min.js"></script>
+    <script charset="utf-8" src="__PUBLIC__/Admin/ue/umeditor.config.js"></script>
+    <script charset="utf-8" src="__PUBLIC__/Admin/ue/umeditor.min.js"></script>
+    <script src="__PUBLIC__/Admin/ue/lang/zh-cn/zh-cn.js"></script>
+    <title>addFeedBack</title>
+    <style type='text/css'>
+        select {
+            background: rgba(0, 0, 0, 0) url("__PUBLIC__/Admin/images/inputbg.png") repeat-x scroll 0 0;
+            border: 1px solid #c5d6e0;
+            height: 28px;
+            outline: medium none;
+            padding: 0 8px;
+            width: 240px;
+        }
+        .main p input {
+            float:none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="title"><h2>反馈内容编辑</h2></div>
+<form enctype="multipart/form-data" id="feedBackForm">
+    <div class="main">
+        <p class="short-input ue-clear">
+            <label>标题：</label>
+            <input name="title" type="text" placeholder="标题..." />
+        </p>
+        <p class="short-input ue-clear">
+            <label>内容：
+                <!--style给定宽度可以影响编辑器的最终宽度-->
+                <script type="text/plain" id="myEditor" style="width:1000px;height:240px;" name="content">
+            <p>这里我可以写一些输入提示</p>
+            </script>
+            </label>
+
+        </p>
+    </div>
+    <div class="btn ue-clear">
+        <input  type="button" class="confirm" id='btnSubmit' value="提交" />
+    </div>
+</form>
+</body>
+<script src="__PUBLIC__/Admin/js/common.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script type="text/javascript">
+    //实例化编辑器
+    var um = UM.getEditor('myEditor');
+    um.addListener('blur',function(){
+        $('#focush2').html('编辑器失去焦点了')
+    });
+    um.addListener('focus',function(){
+        $('#focush2').html('')
+    });
+    $("#btnSubmit").on('click', function() {
+        var feeds = $("#feedBackForm").serializeArray();
+        $("#btnSubmit").attr('disabled','disabled');
+        $.ajax({
+            type : 'POST',
+            url : "__CONTROLLER__/feedBack",
+            data : {feedB : feeds},
+            success : function (msg) {
+                console.log(msg);
+                if (msg == 2) {
+                    layer.msg('反馈消息提交成功，返回主页！',
+                        {
+                            icon : 6,
+                            time : 500
+                        },
+                        function(){
+                            window.parent.location.href = "/crm";
+                        });
+                } else {
+                    layer.alert("修改失败");
+                }
+            }
+        });
+    });
+</script>
+</html>

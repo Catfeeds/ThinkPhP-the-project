@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--绩效详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="questions">
+                <div class="ibox-title">
+                    <h4>项目名称：{$data.0.proname}</h4>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>研发费</th>
+                                <th>维护</th>
+                                <th>方案/临时</th>
+                                <th>PCB设计</th>
+                                <th>代码设计</th>
+                                <th>文档撰写</th>
+                                <th>总绩效</th>
+                                <th>绩效分配</th>
+                            </tr>
+                            <tr>
+                                <td>{$data[0]['proprice']}</td>
+                                <td>{$data[0]['promaint']}</td>
+                                <td>{$data[0]['protemp']}</td>
+                                <td>{$data[0]['propcb']}</td>
+                                <td>{$data[0]['codedesign']}</td>
+                                <td>{$data[0]['docwrite']}</td>
+                                <td>{$data[0]['performbonus']}</td>
+                                <td>
+                                    <table class="table table-bordered table-striped" style="margin: 0;padding: 0;">
+                                        <volist name="data" id="vol">
+                                            <tr style="text-align: center;">
+                                                <td>{$vol.pname}</td>
+                                                <td>{$vol.jxval}%</td>
+                                                <td>{$vol.staff_id}{$vol.sname}</td>
+                                            </tr>
+                                        </volist>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="ibox float-e-margins" style="display: none;">
+                <div class="ibox-title">
+                    <h5>绩效修改</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <h4>绩效总金额：&emsp;<input type="text" /></h4>
+                        <form>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>参与人</th>
+                                    <th>绩效占比</th>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td>kaka</td>
+                                    <td>
+                                        <select name="type" id="" style="width: 10%;">
+                                            <option value="电话">10%</option>
+                                            <option value="拜访">15%</option>
+                                            <option value="会议">20%</option>
+                                            <option value="电话">25%</option>
+                                            <option value="拜访">30%</option>
+                                            <option value="会议">35%</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td>ana</td>
+                                    <td>
+                                        <select name="type" id="" style="width: 10%;">
+                                            <option value="电话">10%</option>
+                                            <option value="拜访">15%</option>
+                                            <option value="会议">20%</option>
+                                            <option value="电话">25%</option>
+                                            <option value="拜访">30%</option>
+                                            <option value="会议">35%</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td>notail</td>
+                                    <td>
+                                        <select name="type" id="" style="width: 10%;">
+                                            <option value="电话">10%</option>
+                                            <option value="拜访">15%</option>
+                                            <option value="会议">20%</option>
+                                            <option value="电话">25%</option>
+                                            <option value="拜访">30%</option>
+                                            <option value="会议">35%</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td>miracle</td>
+                                    <td>
+                                        <select name="type" id="" style="width: 10%;">
+                                            <option value="电话">10%</option>
+                                            <option value="拜访">15%</option>
+                                            <option value="会议">20%</option>
+                                            <option value="电话">25%</option>
+                                            <option value="拜访">30%</option>
+                                            <option value="会议">35%</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td colspan="2">
+                                        <input type="submit" value="提交修改"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/peity/jquery.peity.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/iCheck/icheck.min.js"></script>
+<script src="__PUBLIC__/html/js/demo/peity-demo.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".i-checks").iCheck({
+            checkboxClass:"icheckbox_square-green",radioClass:"iradio_square-green"});
+    }
+    );
+
+// 左方向图标，回退到上一页
+    $(".backToLast").on('click', function() {
+        //self.location = document.referrer;
+        history.go(-1);
+    });
+</script>
+</body>
+</html>

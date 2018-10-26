@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--联系记录详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .mouseOn{
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="onlineservice">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped dataTables-example">
+                            <thead>
+                                <tr><td colspan="7"><h5>{$data[0]['cname']}文件列表</h5></td></tr>
+                                <tr>
+                                    <th>添加日期</th>
+                                    <th>添加人</th>
+                                    <th>文件名</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="data" id="vol">
+                                <tr style="text-align: center;">
+                                    <td>{$vol.addtime|date='Y-m-d',###}</td>
+                                    <td>{$vol.buildername}</td>
+                                    <td class="mouseOn showFile" data="{$vol.fid}">{$vol.fname}</td>
+                                    <td><input type="checkbox" name="fileCheckBox" class="checkValue" dat="{$vol.cid}"  data="{$vol.fid}" value="{$vol.customer_id}" ></td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="roleOnline" value="{$Think.session.staffId}">
+                        <input class="btn btn-outline btn-success" type="button" id="chOnline" value="删除文件" onclick="jqchk('fileCheckBox');" style="width: 10%; text-align: center;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready(function()
+    {
+        $(".dataTables-example").dataTable({
+            'bFilter' : true,
+            'bLengthChange' : false,
+            'iDisplayLength' :　3
+        });
+    });
+
+    var controller = "__CONTROLLER__";
+    $(".showFile").on('click', function () {
+        var fid = $(this).attr('data');
+        window.location.href = "__CONTROLLER__/download/id/" +　fid;
+    });
+</script>
+<script src="__PUBLIC__/html/js/dwin/customer/customer.js"></script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目更新列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+	<style type="text/css">
+        body {
+            color: black;
+        } 
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>编辑维修记录</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">                                               
+                            <table class="table table-bordered table-striped dataTables-list" id="table1">
+                                <label class="fa-hover col-md-1 col-sm-1">维修品基本信息</label>
+                                <thead> 
+                                    <tr>
+                                        <th>产品类别</th>
+                                        <th>产品型号</th>                                        
+                                        <th>数量（件）</th>
+                                        <th>条码日期</th> 
+                                        <th>客户反馈</th>
+                                        <th>售后方式</th>                                         
+                                        <th>客户名称</th>                                         
+                                        <th>业务名称</th>                                         
+                                        <th>收货时间</th>                                         
+                                        <th>收货快递单号</th>                                         
+                                        <th>返回地址</th>                                                                                  
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <volist name="result" id="vol">
+                                        <input type="hidden" name="sid" id="sid111" value="{$vol.sid}">
+                                    <tr>
+                                        <input type="hidden" value="{$vol.is_over}" id="over">
+                                        <td>{$vol.uname}</td>                                        
+                                        <td>{$vol.product_name}</td>
+                                        <td>{$vol.num}</td>
+                                        <td>{$vol.barcode_date}</td>
+                                        <td>{$vol.customer_question}</td>                                       
+                                        <td>{$vol.sale_mode}</td>  
+                                        <td>{$vol.cusname}</td>  
+                                        <td>{$vol.salename}</td>  
+                                        <td>{$vol.repair_date|date='Y-m-d H:i:s',###}</td>  
+                                        <td>{$vol.courier_number}</td>  
+                                        <td>{$vol.reback_address}</td>                                     
+                                    </tr> 
+                                        <input type="hidden" id="shname" value="{$vol.sale_commissioner}">
+                                        <input type="hidden" id="is_audit" value="{$vol.is_audit}">
+                                        <input type="hidden" id="yid" value="{$vol.yid}">
+                                        <input type="hidden" id="isshow" value="{$vol.is_show}">
+                                        <input type="hidden" id="finish" value="{$vol.sale_way}">
+                                    </volist>                  
+                               </tbody>
+                            </table> 
+                        <form id="addSaleRepairingForm1" method="post">
+                            <table class="table table-bordered table-striped dataTables-list" id="table2">    
+                                <label class="fa-hover col-md-1 col-sm-1">编辑维修单信息</label> 
+                                <volist name="productList" id="vol">
+                                <tr>                                        
+                                    <td>
+                                        <div class="input-group">
+                                            <span style="font-weight: bold;font-size: 18px;">产品型号
+                                            </span>
+                                        </div>
+                                        <div class="input-group">{$vol.product_name}</div>                                          
+                                    </td>                                          
+                                    <td>
+                                        <table class="table table-bordered table-striped dataTables-list" id = "smalltable{$key}">
+                                            <thead>
+                                                <th>维修员</th>                                          
+                                                <th>维修日期</th>
+                                                <th>数量（件）</th>
+                                                <th>状态</th>
+                                                <th>故障现象</th>
+                                                <th>维修方式</th>
+                                                <th>故障类型</th>
+                                                <th>维修费用(元)</th>
+                                                <th>计件工资</th>
+                                            </thead>
+                                            <volist name="result1" id="vol1">
+                                            <if condition="$vol.product_name  eq $vol1.product_name ">
+                                            <tr>
+                                                <input type="hidden" name="rpid{$key}" class="demo" value="{$vol1.rpid}">
+                                                <input type="hidden" name="pid"  id="sid" value="{$Think.get.sid}">
+                                                <td style="display:none;">
+                                                    <div class="input-group">
+                                                        <input type="text" readonly="readonly" class="form-control" placeholder="" name="a_name{$key}" id="a_name{$key}" value="{$vol1.product_name}">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">{$vol1.reperson_name}</div>
+                                                </td>
+                                                <td>{$vol1.start_date|date='Y-m-d H:i:s',###}</td>
+                                                <td>
+                                                    <div class="input-group">{$vol1.re_num}</div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">{$vol1.re_status}</div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <textarea class="form-control" readonly="readonly">{$vol1.situation}</textarea>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <textarea class="form-control" readonly="readonly" name="re_mode{$key}"  id="re_mode{$key}">{$vol1.re_mode} &nbsp; {$vol1.mode_info}</textarea>
+                                                    </div>                                                    
+                                                </td>
+                                                <td>                
+                                                    <div class="input-group">{$vol1.reperson_question}</div>                                        
+                                                    <div class="input-group">
+                                                        <textarea class="form-control" readonly="readonly" placeholder="费用明细">{$vol1.fault_info}</textarea>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">{$vol1.piece_wage}</div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">{$vol1.meter_piece}</div>
+                                                </td>
+                                            </tr>
+                                            <else />
+                                            </if>                          
+                                            </volist>             
+                                        </table>
+                                    </td>                                                                           
+                                </tr>
+                                </volist>
+                            </table> 
+                            <table class="table table-bordered table-striped dataTables-list">    
+                                <tr>  
+                                    <volist name="result4" id="vol">
+                                        <th style="width: 160px;">人工费用(元)：<textarea readonly="readonly" class="form-control" id="rgmoney" name = "rgmoney">{$vol.rgmoney}</textarea></th>
+                                        <th>
+                                            备注信息：<textarea readonly="readonly" class="form-control" name="note" id="note">{$vol.note}</textarea>
+                                        </th>
+                                    </volist>
+                                </tr>                   
+                            </table>                             
+                            <table class="table table-bordered table-striped dataTables-list" id = "table3">
+                                <label id="anniu" class="fa-hover col-md-2 col-sm-2">编辑发货信息<button type="button" id="sendgoods" style="background-color: #1AB394;" class="btn btn-default btn-xs "><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>&nbsp;<button type="button" id="delgoods" style="background-color: #1AB394;" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button></label>
+                                <volist name="result2" id="vol">
+                                <tr> 
+                                    <td>
+                                        <div class="input-group">
+                                            <span style="font-weight: bold;font-size: 18px;">发货批次</span>
+                                        </div>
+                                        <div class="input-group">                       
+                                            <input type="text" class="form-control aa" placeholder="" aria-describedby="basic-addon1" name="bactch{$key}" id="bactch{$key}" value="{$vol.bactch}"> 
+                                        </div>                                          
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <span style="font-weight: bold;font-size: 18px;">发货人</span>
+                                        </div>
+                                        <div class="input-group">                       
+                                            <input type="text" class="form-control" readonly="readonly" aria-describedby="basic-addon1" value="{$vol.send_man}">
+                                        </div>                                          
+                                    </td>
+                                    <td>
+                                        <div class="input-group">
+                                            <span style="font-weight: bold;font-size: 18px;">快递单号</span>
+                                        </div>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="track_number{$key}" id="track_number{$key}" value="{$vol.track_number}">
+                                        </div>                                          
+                                    </td> 
+                                    <td>
+                                        <div class="input-group">
+                                            <span style="font-weight: bold;font-size: 18px;">发货日期</span>
+                                        </div>
+                                        <div class="input-group">
+                                            <input class="form-control" type="text" readonly="readonly" name="send_date{$key}" id="send_date{$key}" value="{$vol.send_date|date='Y-m-d H:i:s',###}">
+                                        </div>                                          
+                                    </td>                                         
+                                    <td>
+                                        <table class="table table-bordered table-striped dataTables-list" id = "goodstable{$key}">
+                                            <thead>
+                                                <th>产品型号</th>
+                                                <th>数量（件）</th>
+                                            </thead>
+                                            <volist name="result3" id="vo" >
+                                            <if condition="$vol.bactch eq $vo.bactch ">
+                                                <input type="hidden" name="id{$key}" value="{$vo.id}">
+                                                <tr>                                         
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="reproduct_name{$key}" id="reproduct_name{$key}" value="{$vo.product_name}">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="send_num{$key}" id="send_num{$key}" value="{$vo.send_num}">
+                                                        </div>
+                                                    </td>
+                                                </tr>                             
+                                            <else />                                
+                                            </if>
+                                            </volist>
+                                        </table>
+                                    </td>                                                                             
+                                </tr>
+                                </volist>
+                            </table>
+                            <button class="btn btn-outline btn-success" id="addbasicinfo" type="button">保存编辑</button>
+                            <button class="btn btn-outline btn-success" id="print" type="button">打印售后维修单</button> 
+                            <button class="btn btn-outline btn-success" id="finishbasicinfo" type="button">完结流程</button>
+                            <button class="btn btn-outline btn-success" id="salecontract" type="button">打印维修合同</button>
+                            <input type="hidden" id="user_name" value="{$Think.session.staffId}">
+                        </form>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- <script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script> -->
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script>
+var username = $("#user_name").val();
+var shname = $("#shname").val();
+if(username != shname){
+    $(":button").attr("disabled",true);
+    $("#print").attr("disabled",false);
+    $("#sendgoods").attr("disabled",false);
+    $("#delgoods").attr("disabled",false);
+    $("#addbasicinfo").attr("disabled",false);
+    $("#finishbasicinfo").attr("disabled",false);
+}
+//是否完结流程
+var over = $("#over").val();
+if(over == 1){
+    $(":button").attr("disabled",true);
+}
+//是否发货
+var finish = $("#finish").val();
+if(finish != 0){
+    $("#table3").html("");
+    $("#anniu").html("");
+}
+//打印合同按钮
+var yid = $("#yid").val();
+var isshow = $("#isshow").val();
+if((username == yid)&&(isshow == 0)){
+    $("#salecontract").attr("disabled",false);
+}else{
+    $("#salecontract").attr("disabled",true);
+}
+//打印维修合同
+$(document).on('click','#salecontract',function () {
+    var sid = $("#sid111").val();
+    layer.open({
+        type: 2,
+        title: '维修合同',
+        shadeClose : true,
+        area: ['80%', '100%'],
+        content: "__CONTROLLER__/saleContract/sid/" + sid//iframe的url
+    });
+});
+//追加维修人行内部表格 
+var anumber = 0;
+function addnow(a){    
+    $("#smalltable"+a).append(
+        '<tr>'+
+            '<td style="display:none;">'+
+                '<div class="input-group">'+
+                    '<input type="text" class="form-control" name="aa_name'+ anumber +'" id="aa_name'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+
+                    '<select class="form-control" name="areperson_name'+ anumber +'"  id="areperson_name'+ anumber +'">'+   
+                        '<volist name="result6" id="vol123">'+
+                            '<option value="{$vol123.name}">{$vol123.name}</option>'+
+                        '</volist>'+
+                    '</select>'  + 
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<input class="form-control" type="text" name="astart_date'+ anumber +'" id="astart_date'+ anumber +'" onclick="WdatePicker( {el:this,dateFmt:\'yyyy-MM-dd HH:mm:ss\'} )">'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+
+                    '<input type="text" class="form-control" name="are_num'+ anumber +'" id="are_num'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' + 
+                    '<select class="form-control" name="are_status'+ anumber +'"  id="are_status'+ anumber +'">'+   
+                        '<option value="待换物料">待换物料</option>'+
+                        '<option value="待检测">待检测</option>'+
+                        '<option value="待维修">待维修</option>'+
+                        '<option value="维修中">维修中</option>'+
+                        '<option value="维修完成">维修完成</option>'+
+                    '</select>'  +                                          
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+                                                                   
+                    '<select class="form-control" name="are_mode'+ anumber +'"  id="are_mode'+ anumber +'">'+ 
+                        '<option value="更换触摸屏">更换触摸屏</option>'+  
+                        '<option value="液晶屏">液晶屏</option>'+
+                        '<option value="PCB板(母板)">PCB板(母板)</option>'+
+                        '<option value="内核">内核</option>'+
+                        '<option value="面膜">面膜</option>'+
+                        '<option value="外壳">外壳</option>'+
+                        '<option value="其他">其他</option>'+
+                    '</select>'  + 
+                '</div>'+
+                '<div class="input-group">'+
+                    '<input class="form-control" placeholder="附加说明（可不填）" id="amode_info'+ anumber +'" name="amode_info'+ anumber +'" >'+
+                '</div>'+
+            '</td>'+
+            '<td>'+                
+                '<div class="input-group">'+
+                        '<select class="form-control" name="areperson_question'+ anumber +'" id="areperson_question'+ anumber +'">' +
+                            '<option value="客责">客责</option>'+
+                            '<option value="液晶屏">液晶屏</option>'+
+                            '<option value="触摸屏">触摸屏</option>'+
+                            '<option value="芯片">芯片</option>'+
+                            '<option value="阻容">阻容</option>'+
+                            '<option value="其他原材料">其他原材料</option>'+
+                            '<option value="安装">安装</option>'+
+                            '<option value="直插件虚焊">直插件虚焊</option>'+
+                            '<option value="表插件虚焊">表插件虚焊</option>'+
+                            '<option value="程序问题">程序问题</option>'+
+                            '<option value="技术支持">技术支持</option>'+
+                            '<option value="焊接问题">焊接问题</option>'+
+                            '<option value="其他">其他</option>'+
+                            '<option value="模块">模块</option>'+
+                            '<option value="检测入库">检测入库</option>'+
+                            '<option value="连焊">连焊</option>'+
+                        '</select>'+                                                
+                    '</div>'+                                        
+                    '<div class="input-group">'+
+                        '<input class="form-control" placeholder="附加说明（可不填）" id="afault_info'+ anumber +'" name="afault_info'+ anumber +'" >'+
+                    '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' +                                               
+                    '<input type="text" class="form-control" placeholder="￥0.00" name="apiece_wage'+ anumber +'" id="apiece_wage'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' +                                               
+                    '<input type="text" class="form-control" placeholder="￥0.00" name="ameter_piece'+ anumber +'" id="ameter_piece'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+        '</tr>'
+        ); 
+    //给隐藏的td赋值 产品型号
+    var b = $("#rproduct_name"+a).val(); 
+    $('#'+'aa_name'+ anumber).attr("value",b);
+    anumber++;   
+    return anumber;    
+}    
+           
+//删除当前维修人行内部表格
+function removenow(a) {   
+    $("#"+ "smalltable" + a).children().children().last("tr").remove();
+    //anumber--;
+    return anumber;
+}
+
+//打印售后维修单
+$("#print").on("click", function () {
+    var sid = $("#sid111").val();
+    layer.open({
+        type: 2,
+        title: '售后维修单',
+  shadeClose : true,
+        end : function () {
+                window.location.reload();
+            },
+        area: ['80%', '100%'],
+        content: "__CONTROLLER__/printSalerecord/sid/" + sid//iframe的url
+    });
+    
+});
+//添加发货信息行数
+var gnumber = 0;
+$("#sendgoods").on('click',function(){   
+    var biao = $("#table1").find('tr').length;
+    var hang = biao - 1;
+    var timestamp = Date.parse(new Date());
+    var date=new Date(timestamp);
+    var time = date.toLocaleString();
+    $("#table3").append(                  
+            '<tr>'+                                        
+                '<td>'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">发货批次</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+                       
+                        '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="'+ gnumber +'bactch'+ gnumber +'" id="'+ gnumber +'bactch'+ gnumber +'" value="'+ (gnumber+2) +'">'+ 
+                    '</div>' +                                          
+                '</td>' + 
+                '<td>'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">发货人</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+                       
+                        '<input type="text" readonly = "readonly" class="form-control">'+ 
+                    '</div>' +                                          
+                '</td>' + 
+                '<td>'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">快递单号</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+
+                        '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="'+ gnumber +'track_number'+ gnumber +'" id="'+ gnumber +'track_number'+ gnumber +'">'+ 
+                    '</div>' +                                          
+                '</td>' + 
+
+                '<td>'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">发货日期</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+
+                        '<input class="form-control" readonly="readonly" type="text" name="'+ gnumber +'send_date'+ gnumber +'" id="'+ gnumber +'send_date'+ gnumber +'">'+
+                    '</div>' +                                          
+                '</td>' +                                          
+                '<td>'+
+                    '<table class="table table-bordered table-striped dataTables-list" id = "'+ gnumber +'goodstable'+ gnumber +'">'+
+                        '<thead>'+
+                            '<th>产品型号</th>'+
+                            '<th>数量（件）</th>'+
+                        '</thead>'+
+                        
+                    '</table>' +
+                '</td>'+                                                                            
+            '</tr>'
+            );
+        for (var i = 0; i < hang; i++) {
+            var a = $('#table1 tr:eq('+ (i+1) +') td:nth-child(3)').text();
+            var b = $('#table1 tr:eq('+ (i+1) +') td:nth-child(4)').text();
+            $("#"+ gnumber +'goodstable' + gnumber).append(
+                '<tr>'+
+                    '<td>'+
+                        '<div class="input-group">'+
+                            '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="'+ gnumber +'reproduct_name'+ i +'" id="'+ gnumber +'reproduct_name'+ i +'">'+
+                        '</div>'+
+                    '</td>'+
+                    '<td>'+
+                        '<div class="input-group">'+
+                            '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="'+ gnumber +'send_num'+ i +'" id="'+ gnumber +'send_num'+ i +'">'+
+                        '</div>'+
+                    '</td>'+
+                '</tr>'
+                );            
+            $('#' + gnumber +'reproduct_name'+ i).attr("value",a);
+            $('#' + gnumber +'send_num'+ i).attr("value",b);    
+        }
+        //追加发货当前时间
+        $("#" + gnumber +'send_date'+ gnumber).attr("value",time);   
+    gnumber++;
+    return gnumber;
+});
+
+//删除发货信息行数
+$("#delgoods").on('click',function(){    
+    $("#table3").children().children().last("tr").remove();
+    //gnumber--;
+    return gnumber;
+});
+//检验字段是否填写
+function checkMsg(idname)
+{
+    var data = $("#" + idname + "").val();
+    return data;
+}
+
+//addbasicinfo
+$("#addbasicinfo").on('click', function () { 
+    $("#addbasicinfo").attr('disabled', true);
+    var data = $("#addSaleRepairingForm1").serializeArray();
+    $.ajax({
+        type : 'POST',
+        url  : "__CONTROLLER__/editSendgoods",
+        data : {
+        data: data,
+        anumber : anumber,
+        gnumber : gnumber,
+
+        },
+        success : function (msg) {
+            if(msg == 1) {
+                layer.msg("ok,提交成功",
+                    {
+                        icon : 6,
+                        time : 1000
+                    },
+                function () {
+                    window.location.reload();
+                }
+                );
+            } else {
+                layer.alert("提交出错");
+                $("#addbasicinfo").attr('disabled', false);
+            }
+        },            
+    });    
+}); 
+
+//finishbasicinfo
+$("#finishbasicinfo").on('click', function () { 
+    $("#finishbasicinfo").attr('disabled', true);
+    var data = $("#addSaleRepairingForm1").serializeArray();
+    layer.confirm('点击确定将不能再对此记录进行编辑！',
+        {
+            icon  : 3,
+            title :'确认',
+        shadeClose : true,
+            btn   : ['确定', '再想想']
+        },
+    
+    function (){  
+    $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/editSendgoods",
+            data : {
+            data: data,
+            anumber : anumber,
+            flag : 1,
+
+        },
+            success : function (msg) {
+                if(msg == 1) {
+                    layer.msg("ok,提交成功",
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                    function () {
+                        window.location.reload();
+                    }
+                    );
+                } else {
+                    layer.alert("提交出错");
+                    $("#finishbasicinfo").attr('disabled', false);
+                }
+            },            
+        });
+    },function (){
+        $("#finishbasicinfo").attr('disabled', false);
+    });    
+}); 
+</script>
+</body>
+</html>
+

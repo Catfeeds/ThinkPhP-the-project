@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+
+    <style>
+        body{
+            color:black;
+        }
+        .selected{
+            background: #d0d27e!important;
+        }
+        #staff th,td{
+            white-space: nowrap!important;
+        }
+        .el-table thead{
+            color:black!important;
+        }
+
+        .el-table td, .el-table th{
+            padding-top: 2px!important;
+            padding-bottom: 2px!important;
+        }
+        .el-pagination__jump{
+            color:black!important;
+        }
+        /*.table-responsive{*/
+            /*height: 400px;*/
+            /*overflow: auto;*/
+        /*}*/
+        .table2000{
+            width: 2000px;
+        }
+        #staff_wrapper{
+            overflow: hidden;
+        }
+        .dataTables_scrollBody thead{
+            visibility: hidden;
+        }
+        div.dataTables_scrollBody table{
+            margin-top: -25px!important;
+            margin-left: 1px;
+        }
+        .tab-pane{
+            overflow: auto;
+        }
+        .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+            padding:3px!important;
+        }
+        li.active > a{
+            background-color: #1c84c6 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="title">
+                <h4>员工信息</h4>
+                <div>
+                    <button class="btn btn-xs btn-outline btn-success refresh">刷新</button>
+                    <button class="btn btn-xs btn-outline btn-success add_staff"><span class="glyphicon glyphicon-plus"></span>添加</button>
+                    <button class="btn btn-xs btn-outline btn-success edit_staff"><span class="glyphicon glyphicon-edit"></span>修改</button>
+                    <button class="btn btn-xs btn-outline btn-success departure"><span class="glyphicon glyphicon-remove"></span>离职</button>
+                    <button class="btn btn-xs btn-outline btn-success change"><span class="glyphicon glyphicon-flag"></span>异动</button>
+                    <button class="btn btn-xs btn-outline btn-success resume"><span class="glyphicon glyphicon-picture"></span>简历</button>
+                    <button class="btn btn-xs btn-outline btn-success contact"><span class="glyphicon glyphicon-phone-alt"></span>联系方式</button>
+                    <button class="btn btn-xs btn-outline btn-success education"><span class="glyphicon glyphicon-education"></span>学历</button>
+                    <button class="btn btn-xs btn-outline btn-success punishment"><span class="glyphicon glyphicon-bell"></span>奖惩记录</button>
+                    <button class="btn btn-xs btn-outline btn-success development"><span class="glyphicon glyphicon-tree-conifer"></span>员工发展</button>
+                    <button class="btn btn-xs btn-outline btn-success contract"><span class="glyphicon glyphicon-tree-conifer"></span>合同管理</button>
+                    <button class="btn btn-xs btn-outline btn-success contract_expire"><span class="glyphicon glyphicon-tree-conifer"></span>合同到期提醒</button>
+                    <button class="btn btn-xs btn-outline btn-success probation_expire"><span class="glyphicon glyphicon-tree-conifer"></span>试用期到期提醒</button>
+                    <button class="btn btn-xs btn-outline btn-success importInfoFromExcel"><span class="glyphicon glyphicon-tree-conifer"></span>从Excel导入</button>
+                    <button class="btn btn-xs btn-outline btn-success exportStaffInfo"><span class="glyphicon glyphicon-tree-conifer"></span>导出员工信息</button>
+                    <button class="btn btn-xs btn-outline btn-success exportStaffPunish"><span class="glyphicon glyphicon-tree-conifer"></span>导出奖惩记录</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="staff" class="table table-bordered table-hover table-striped table2000">
+                    <thead>
+                    <tr>
+                        <th>职员编号</th>
+                        <th>姓名</th>
+                        <th>部门</th>
+                        <th>职位</th>
+                        <th>性别</th>
+                        <th>入职时间</th>
+                        <th>出生日期</th>
+                        <th>学历</th>
+                        <th>籍贯</th>
+                        <th>民族</th>
+                        <th>政治面貌</th>
+                        <th>身份证号</th>
+                        <th>年龄</th>
+                        <th>户口所在地</th>
+                        <th>户口类别</th>
+                        <th>参加工作时间</th>
+                        <th>婚姻状况</th>
+                        <th>健康状况</th>
+                        <th>职员状态</th>
+                        <th>是否在职</th>
+                        <th>录入人</th>
+                        <th>录入时间</th>
+                    </tr>
+
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="ibox-content" id="app">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab">联系方式</a></li>
+                <li role="presentation"><a href="#education" aria-controls="education" role="tab" data-toggle="tab">学历信息</a></li>
+                <li role="presentation"><a href="#development" aria-controls="development" role="tab" data-toggle="tab">员工发展</a></li>
+                <li role="presentation"><a href="#punish" aria-controls="punish" role="tab" data-toggle="tab">奖惩记录</a></li>
+                <li role="presentation"><a href="#contract" aria-controls="contract" role="tab" data-toggle="tab">合同</a></li>
+                <li role="presentation"><a href="#change" aria-controls="change" role="tab" data-toggle="tab">人员调动</a></li>
+            </ul>
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="contact">
+                    <table class="table table-striped table-hover table-border">
+                        <tr>
+                            <th>电话</th>
+                            <th>邮箱</th>
+                            <th>家庭成员</th>
+                            <th>家庭成员联系方式</th>
+                        </tr>
+                        <tr v-for="item in contact">
+                            <td>{{item.phone}}</td>
+                            <td>{{item.mail}}</td>
+                            <td>{{item.member}}</td>
+                            <td>{{item.contact}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="education">
+                    <table class="table table-striped table-hover table-border">
+                        <tr>
+                            <th>毕业学校</th>
+                            <th>在校时间</th>
+                            <th>专业</th>
+                            <th>学历</th>
+                            <th>外语水平</th>
+                            <th>计算机水平</th>
+                            <th>其他证书水平</th>
+                            <th>证件上传状态</th>
+                        </tr>
+                        <tr v-for="item in education">
+                            <td>{{item.graduate_school}}</td>
+                            <td>{{item.period}}</td>
+                            <td>{{item.major}}</td>
+                            <td>{{item.education}}</td>
+                            <td>{{item.language_level}}</td>
+                            <td>{{item.computer_level}}</td>
+                            <td>{{item.other_level}}</td>
+                            <td>{{item.paper_upload_status}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="development">
+                    <el-table
+                            :data="employeeDevelopment.currentData"
+                            height="240"
+                            border
+                            style="width: 100%;font-size:10px;color:black;padding:3px 0!important;">
+                        <el-table-column
+                                prop="employee_id"
+                                label="职员编号"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column
+                                prop="record_type"
+                                label="记录类别"
+                                width="150">
+                        </el-table-column>
+                        <el-table-column
+                                prop="detail_information"
+                                label="详细信息">
+                        </el-table-column>
+                        <el-table-column
+                                prop="add_name"
+                                label="记录人"
+                                width="80">
+                        </el-table-column>
+                        <el-table-column
+                                prop="add_time"
+                                label="记录日期"
+                                width="180">
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                            @current-change="changeDevelopPage"
+                            :page-size="employeeDevelopment.pageSize"
+                            layout="prev, pager, next, jumper"
+                            :total="employeeDevelopment.total">
+                    </el-pagination>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="punish">
+                    <el-table
+                            :data="punish.currentData"
+                            height="240"
+                            border
+                            style="width: 100%;font-size:12px;color:black;padding:3px 0!important;">
+                        <el-table-column
+                                prop="employee_id"
+                                label="职员编号"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="姓名"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column
+                                prop="type"
+                                label="奖惩类别"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column
+                                prop="record_time"
+                                label="日期"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="reason"
+                                label="事由">
+                        </el-table-column>
+                        <el-table-column
+                                prop="fee"
+                                label="罚金/奖金"
+                                width="100">
+                        </el-table-column>
+                        <el-table-column
+                                prop="score"
+                                label="扣分"
+                                width="100">
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                            @current-change="changePunishPage"
+                            :page-size="punish.pageSize"
+                            layout="prev, pager, next, jumper"
+                            :total="punish.total">
+                    </el-pagination>
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="contract">
+                    <table class="table table-striped table-hover table-border table2000">
+                        <tr>
+                            <th>职员编号</th>
+                            <th>姓名</th>
+                            <th>合同编号</th>
+                            <th>合同类别</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>签订次数</th>
+                            <th>试用期开始时间</th>
+                            <th>试用期结束时间</th>
+                            <th>合约签订期限</th>
+                        </tr>
+                        <tr v-for="item in contract">
+                            <td>{{item.employee_id}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.contract_id}}</td>
+                            <td>{{item.contract_type}}</td>
+                            <td>{{item.start_time}}</td>
+                            <td>{{item.end_time}}</td>
+                            <td>{{item.sign_count}}</td>
+                            <td>{{item.probation_start_time}}</td>
+                            <td>{{item.probation_end_time}}</td>
+                            <td>{{item.duration}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="change">
+                    <table class="table table-striped table-hover table-border table2000">
+                        <tr>
+                            <th>职员编号</th>
+                            <th>姓名</th>
+                            <th>变更类型</th>
+                            <th>变更时间</th>
+                            <th>变更前部门</th>
+                            <th>变更后部门</th>
+                            <th>变更前职位</th>
+                            <th>变更后职位</th>
+                            <th>变更前薪水</th>
+                            <th>变更后薪水</th>
+                            <th>正式执行时间</th>
+                            <th>备注</th>
+                        </tr>
+                        <tr v-for="item in change">
+                            <td>{{item.employee_id}}</td>
+                            <td>{{item.name}}</td>
+                            <td>{{item.change_type}}</td>
+                            <td>{{item.change_time}}</td>
+                            <td>{{item.change_old_dept}}</td>
+                            <td>{{item.change_new_dept}}</td>
+                            <td>{{item.change_old_position}}</td>
+                            <td>{{item.change_new_position}}</td>
+                            <td>{{item.change_old_salary}}</td>
+                            <td>{{item.change_new_salary}}</td>
+                            <td>{{item.exec_time}}</td>
+                            <td>{{item.tips}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+
+<script>
+    var table = $('#staff'). DataTable({
+        ajax: {
+            type: 'post',
+            data: {
+                flag: 1
+            }
+        },
+        "scrollY": 440,
+        "scrollX": true,
+        "scrollCollapse": true,
+        "destroy"      : true,
+        "paging"       : true,
+        "autoWidth"	   : false,
+        "pageLength": 25,
+        serverSide: true,
+        order:[[21, 'desc']],
+        columns: [
+            {searchable: true, data: 'employee_id'},
+            {searchable: true, data: 'name'},
+            {searchable: true, data: 'department'},
+            {searchable: true, data: 'position'},
+            {searchable: false, data: 'sex'},
+            {searchable: false, data: 'entry_time'},
+            {searchable: false, data: 'birthday'},
+            {searchable: true, data: 'education'},
+            {searchable: true, data: 'birth_place'},
+            {searchable: true, data: 'nation'},
+            {searchable: true, data: 'politics_status'},
+            {searchable: true, data: 'id_card_no'},
+            {searchable: false, data: 'age', render: function (asdf, asddf ,row) {
+                if (row.birthday) {
+                    var a = row.birthday.split('-')[0]
+                    var b = new Date().getFullYear()
+                    return b - a;
+                }
+                return "未知";
+                }},
+            {searchable: true, data: 'census_place'},
+            {searchable: true, data: 'census_type'},
+            {searchable: false, data: 'working_time'},
+            {searchable: false, data: 'marital_status'},
+            {searchable: false, data: 'health_status'},
+            {searchable: false, data: 'is_probation', render: function (data){return ['正式员工', '试用期'][+data]}},
+            {searchable: false, data: 'on_job', render: function (data){return ['离职', '在职'][+data]}},
+            {searchable: true, data: 'auditor'},
+            {searchable: false, data: 'add_time'}
+        ],
+        oLanguage: {
+            "oAria": {
+                "sSortAscending": " - click/return to sort ascending",
+                "sSortDescending": " - click/return to sort descending"
+            },
+            "LengthMenu": "显示 _MENU_ 记录",
+            "ZeroRecords": "对不起，查询不到任何相关数据",
+            "EmptyTable": "未有相关数据",
+            "LoadingRecords": "正在加载数据-请等待...",
+            "Info": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录。",
+            "InfoEmpty": "当前显示0到0条，共0条记录",
+            "InfoFiltered": "（数据库中共为 _MAX_ 条记录）",
+            "Processing": "<img src='../resources/user_share/row_details/select2-spinner.gif'/> 正在加载数据...",
+            "Search": "搜索：",
+            "Url": "",
+            "Paginate": {
+                "sFirst": "首页",
+                "sPrevious": " 上一页 ",
+                "sNext": " 下一页 ",
+                "sLast": " 尾页 "
+            }
+        }
+    })
+    var currentId
+    var id
+    var currentData
+    $('tbody').on('click', 'tr', function () {
+        currentData = table.row(this).data();
+        currentId = currentData.employee_id;
+        id = currentData.id;
+        $('tr').removeClass('selected');
+        $(this).addClass('selected');
+        $.post('', {flag: 2,employee_id: currentId}, function (res) {
+            vm.contact = res.data.contactData
+            vm.education = res.data.eduData
+            vm.employeeDevelopment.allData = res.data.employeeDevelopment
+            vm.employeeDevelopment.currentData = res.data.employeeDevelopment.slice(0, vm.employeeDevelopment.pageSize)
+            vm.employeeDevelopment.total = vm.employeeDevelopment.allData.length
+            vm.punish.allData = res.data.punishData
+            vm.punish.currentData = vm.punish.allData.slice(0, vm.punish.pageSize)
+            vm.punish.total = vm.punish.allData.length
+            vm.contract = res.data.contractData
+            vm.change   = res.data.postChange
+        })
+    })
+    $('tbody').on('dblclick', 'tr', function () {
+        var id = table.row(this).data().employee_id
+        var index = layer.open({
+            type: 2,
+            title: '修改员工信息',
+            content: '/dwin/admin/editEmployee?employee_id=' + id,
+            area: ['90%', '90%'],
+            shadeClose:true,
+            end :function () {
+                table.ajax.reload( null, false );
+            }
+        })
+    })
+    $('table').on('processing.dt', function () {
+        currentId = undefined;
+        id = undefined;
+        $('tr').removeClass('selected')
+    })
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                contact: [],
+                change:[],
+                education: [],
+                contract: [],
+                employeeDevelopment: {
+                    allData: [],
+                    currentData: [],
+                    pageSize: 10,
+                    page: 1,
+                    total: 0
+                },
+                punish: {
+                    allData: [],
+                    currentData: [],
+                    pageSize: 10,
+                    page: 1,
+                    total: 0
+                }
+            }
+        },
+        methods: {
+            changeDevelopPage: function (page) {
+                this.employeeDevelopment.page = page
+                var start = (this.employeeDevelopment.page - 1) * this.employeeDevelopment.pageSize
+                var end = page * this.employeeDevelopment.pageSize
+                this.employeeDevelopment.currentData = this.employeeDevelopment.allData.slice(start, end)
+            },
+            changePunishPage: function (page) {
+                this.punish.page = page
+                var start = (this.punish.page - 1) * this.punish.pageSize
+                var end = page * this.punish.pageSize
+                this.punish.currentData = this.punish.allData.slice(start, end)
+            }
+        }
+    })
+    // 新增
+    $('.add_staff').on('click', function () {
+        var index = layer.open({
+            type: 2,
+            title: '新增员工',
+            shadeClose:true,
+            content: 'addEmployee',
+            area: ['90%', '90%'],
+            end: function () {
+                table.ajax.reload()
+            }
+        })
+    })
+    // 修改
+    $('.edit_staff').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '修改员工信息',
+                content: '/dwin/admin/editEmployee?employee_id=' + currentId,
+                area: ['90%', '90%'],
+                shadeClose:true,
+                end :function () {
+                    table.ajax.reload( null, false );
+                }
+            })
+        }
+    })
+    // 离职
+    $('.departure').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '员工离职',
+                content: '/dwin/admin/postDeparture/id/' + currentId,
+                area: ['80%', '70%'],
+                shadeClose:true,
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 异动
+    $('.change').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '员工异动',
+                shadeClose:true,
+                content: '/dwin/admin/postChange/id/' + currentId,
+                area: ['80%', '100%'],
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 联系方式
+    $('.contact').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '联系方式',
+                shadeClose:true,
+                content: '/dwin/admin/getContact/id/' + currentId,
+                area: ['80%', '70%'],
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 教育经历
+    $('.education').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '教育经历',
+                shadeClose:true,
+                content: '/dwin/admin/getEducation/id/' + currentId,
+                area: ['100%', '70%'],
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 奖惩记录
+    $('.punishment').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '奖惩记录',
+                shadeClose:true,
+                content: '/dwin/admin/getPunish/id/' + currentId,
+                area: ['100%', '80%'],
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 员工发展
+    $('.development').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '员工发展',
+                shadeClose:true,
+                content: '/dwin/admin/getDevelop/id/' + currentId,
+                area: ['100%', '80%'],
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 合同管理
+    $('.contract').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            var index = layer.open({
+                type: 2,
+                title: '合同管理',
+                shadeClose:true,
+                content: '/dwin/admin/getContract/id/' + currentId,
+                area: ['100%', '80%'],
+                end: function () {
+                    table.ajax.reload()
+                }
+            })
+        }
+    })
+    // 查看简历
+    $('.resume').on('click', function () {
+        if (currentId === undefined){
+            layer.msg('请选择一名员工')
+        } else {
+            window.open(currentData.resume)
+        }
+    })
+
+    // 合同到期提醒
+    $('.contract_expire').on('click', function () {
+        var index = layer.open({
+            type: 2,
+            title: '合同到期提醒',
+            shadeClose:true,
+            content: '/dwin/admin/contractExpire',
+            area: ['70%', '70%'],
+            end: function () {
+                table.ajax.reload()
+            }
+        })
+    })
+    // 试用期到期提醒
+    $('.probation_expire').on('click', function () {
+        var index = layer.open({
+            type: 2,
+            title: '试用期到期提醒',
+            shadeClose:true,
+            content: '/dwin/admin/probationExpire',
+            area: ['70%', '70%'],
+            end: function () {
+                table.ajax.reload()
+            }
+        })
+    })
+
+    // 从Excel导入
+    $('.importInfoFromExcel').on('click', function () {
+        var index = layer.open({
+            type: 2,
+            title: '从Excel导入',
+            shadeClose:true,
+            content: 'importStaffInfoFromExcel',
+            area: ['30%', '50%'],
+            end: function () {
+                table.ajax.reload()
+            }
+        })
+    })
+
+    // 从Excel导出
+    $('.exportStaffInfo').on('click', function () {
+        var index = layer.load('正在生成xlsx文件');
+        $.post('exportStaffInfo', {}, function (res) {
+            layer.close(index);
+            if (res.status == -1) {
+                layer.msg(res.msg);
+            } else {
+                console.log(res.data);
+                window.open(res.data);
+            }
+        })
+    })
+
+    // 从Excel导出
+    $('.exportStaffPunish').on('click', function () {
+        $(".exportStaffPunish").attr('disabled', true);
+        var index = layer.load('正在生成xlsx文件');
+        $.post('exportStaffPunish', {}, function (res) {
+            layer.close(index);
+            $(".exportStaffPunish").attr('disabled', false);
+            if (res.status == 403) {
+                layer.msg(res.msg);
+            } else {
+                if (res.data) {
+                    window.open(res.data);
+                } else {
+                    layer.msg(res.msg);
+                }
+            }
+        })
+    })
+
+    $('.refresh').on('click', function () {
+        table.order([[5, 'desc']])
+        table.ajax.reload()
+    })
+
+
+</script>
+</body>
+</html>

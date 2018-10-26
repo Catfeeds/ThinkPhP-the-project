@@ -1,0 +1,334 @@
+/**
+ * Created by ml on 2017/8/25.
+ */
+var chk_value = [], chk_data = [],dat = [];
+var co;
+var kid = $("#k").val();
+function jqchk(checkboxname)
+{
+    chk_value = [];
+    chk_data  = [];
+    chk_dat  = [];
+    $("input[name=" + checkboxname + "]:checked").each(function() {
+        chk_value.push($(this).val());
+        chk_data.push($(this).attr('data'));
+        chk_dat.push($(this).attr('dat'));
+    });
+}
+function cusButtonClick(keyValue,title,method,iframeWidth, iframeHeight)
+{
+    if (keyValue != undefined){
+        $.ajax({
+            type    : 'POST',
+            url     : controller + "/checkUser",
+            data    : {
+                cid : keyValue
+            },
+            success : function (msg) {
+                switch (msg) {
+                    case 1 :
+                        layer.alert("仅客户负责人有权执行该操作",
+                            {
+                                icon : 5
+                            }
+                        );
+                        break;
+                    case 2 :
+                        layer.open({
+                            type: 2,
+                            title: title,
+                            end : function () {
+                                window.location.reload();
+                            },
+                            area: [iframeWidth, iframeHeight],
+                            content: controller + "/" +  method +"/cusId/" + keyValue //iframe的url
+                        });
+                        break;
+                }
+            }
+        });
+    } else {
+        layer.alert('请选中客户');
+    }
+}
+
+$(".dataTables-Business tbody tr").css('border','1px solid #ddd;');
+
+$(".dataTables-Business tbody").on('mouseover', function() {
+    co = $(this).css('background-color');
+    return co;
+});
+function changeCss (tdNum){
+    $(".dataTables-Business tbody").on('mouseover', 'td', function () {
+        var tdIndex = $(this).parent()['context']['cellIndex'];
+        if(tdNum == tdIndex) {
+            co = $(this).css('background-color');
+            $(this).css('color', 'blue');
+            $(this).css('background-color', 'yellow');
+            return co;
+        }
+    });
+    $(".dataTables-Business tbody").on('mouseout', 'td', function () {
+        $(this).css('color', 'black');
+        $(this).css('background-color', co);
+    });
+}
+
+$('.dataTables-Business tbody').on('click', 'tr', function () {
+    var id = this.id;
+    var index = $.inArray(id, selected);
+    if ( index === -1 ) {
+        selected.push( id );
+        $(this).css('background-color','yellow');
+    } else {
+        selected.splice( index, 1 );
+        $(this).css('background-color',co);
+    }
+    $(this).toggleClass('selected');
+});
+$("input:checkbox").on('click', function(e){
+    e.stopPropagation();
+    var colorFlag = $(this).prop('checked');
+    if (colorFlag == true){
+        $(this).parent().parent('tr').css('background-color', 'yellow');
+    } else {
+        $(this).parent().parent('tr').css('background-color', co);
+    }
+});
+$("tr").click(function(){
+    var check = $(this).find("input[type='checkbox']");
+    if(check[0] != undefined){
+        var flag = check[0].checked;
+        if(flag){
+            check[0].checked = false;
+            $(this).css('background-color', co);
+        }else{
+            check[0].checked = true;
+            $(this).css('background-color',"yellow");
+        }
+    }
+});
+
+function showNumDetail(k,title,areaX,areaY,method,kid)
+{
+    $(".dataTables-Business tbody").on('click','td' ,function(e) {
+        var cellindex = $(this).parent();
+        var cusid = $(this).parent()[0].id;
+        var tdIndex = cellindex['context']['cellIndex'];
+        if (tdIndex == k) {
+            e.stopPropagation();
+            var count = ($(this).text());
+            if (k == 4 || k == 5) {
+                var n = count.indexOf("/");
+                count = count.substr(n + 1,count.length - n - 2);
+            } else if (k == 6) {
+                count = count.substr(0,count.length - 1);
+            } else {
+                count = parseInt(count);
+            }
+            count = parseInt(count);
+            if (count != 0) {
+		if (k == 4||k == 5){
+		layer.open({
+                    type: 2,
+                    end : function () {
+                        window.location.reload();
+                    },
+                    title: title,
+		    shadeClose : true,
+                    area: [areaX, areaY],
+                    content: controller + "/" + method + "/id/" + cusid + "/k/" + kid
+                });
+
+	    } else {
+	   	layer.open({
+                    type: 2,
+                    title: title,
+		    shadeClose : true,
+                    area: [areaX, areaY],
+                    content: controller + "/" + method + "/id/" + cusid + "/k/" + kid
+                });
+
+	    }
+            } else {
+                layer.msg(
+                    '没有记录',
+                    { time : 500 });
+            }
+        }
+    });
+}
+
+function abandon(checkboxName)
+{
+    if ($("input:checkbox[name='" + checkboxName +"']").is(':checked')) {
+        layer.confirm('确定放弃该客户？',
+            {
+                btn : ['确定','返回']
+            }, function() {
+                $.ajax({
+                    type : 'POST',
+                    url  : controller + "/removeCustomer",
+                    data : { id : chk_value[0] },
+                    success : function(data) {
+                        if (data == 1) {
+                            layer.msg('操作成功',
+                                {
+                                    icon: 6,
+                                    time : 500
+                                },
+                                function () {
+                                    window.location.reload();
+                                });
+                        } else if(data == 2)
+                        {
+                            layer.msg('好像出错了',
+                                {
+                                    icon : 5,
+                                    time : 500
+                                },
+                                function () {
+                                    window.location.reload();
+                                });
+                        } else if(data == 3) {
+                            layer.msg('仅本人可放弃',
+                                {
+                                    icon : 5,
+                                    time : 500
+                                },
+                                function () {
+                                    window.location.reload();
+                                });
+                        }
+                    }
+                });
+            }, function() {
+                layer.msg('ok', {icon: 6});
+                return false;
+            });
+    } else {
+        layer.alert('请选中客户');
+    }
+}
+
+
+$("#cusAdd").on('click', function() {
+    layer.open({
+        type : 2,
+        title : '客户添加',
+	end : function () {
+            window.location.reload();
+        },
+        area : ['90%', '90%'],
+        content : controller + "/addCustomer"
+    });
+});
+changeCss(0);
+changeCss(2);
+changeCss(3);
+changeCss(4);
+changeCss(5);
+changeCss(6);
+
+
+$(".dataTables-Business tbody").on('click','.cusDetail',function (e) {
+    var cusid = $(this).parent()[0].id;
+    e.stopPropagation();
+    layer.open({
+        type: 2,
+        title: '详情页',
+        area: ['100%', '100%'],
+        content: controller + "/showBusinessDetail/cusId/" + cusid //iframe的url
+    });
+});
+showNumDetail(2,'联系记录','90%', '70%','showContactRecordList',kid);
+showNumDetail(3,'项目记录','90%', '70%','showPrjUpdateList',kid);
+showNumDetail(4,'电话客服记录','90%', '70%','showOnlineServiceList',kid);
+showNumDetail(5,'客户售后服务','90%', '70%','showSaleServiceList',kid);
+showNumDetail(6,'客户订单','100%', '90%','showSaleOrderList',kid);
+
+$("#removeSel2").on('click', function (){
+    abandon('checkBox2');
+});
+$("#removeSel").on('click', function() {
+    if (selected[0] != undefined) {
+        layer.confirm('确定放弃该客户？',
+            {
+                btn : ['确定','返回']
+            }, function() {
+                $.ajax({
+                    type : 'POST',
+                    url  : controller + "/removeCustomer",
+                    data : { id : selected[0] },
+                    success : function(data) {
+                        if (data == 1) {
+                            layer.msg('操作成功',
+                                {
+                                    icon: 6,
+                                    time : 500
+                                },
+                                function () {
+                                    window.location.reload();
+                                });
+                        } else if(data == 2)
+                        {
+                            layer.msg('好像出错了',
+                                {
+                                    icon : 5,
+                                    time : 500
+                                },
+                                function () {
+                                    window.location.reload();
+                                });
+                        } else if(data == 3) {
+                            layer.msg('仅本人可放弃',
+                                {
+                                    icon : 5,
+                                    time : 500
+                                },
+                                function () {
+                                    window.location.reload();
+                                });
+                        }
+                    }
+                });
+            }, function() {
+                layer.msg('ok', {icon: 6});
+                return false;
+            });
+    } else {
+        layer.alert('请选中客户');
+    }
+});
+
+$("#changeCus").on('click', function() {
+    cusButtonClick(selected[0], '修改客户信息','editCustomer', '92%', '80%');
+});
+$("#addOrder").on('click', function() {
+    cusButtonClick(selected[0], '添加采购订单','addSaleOrder', '92%', '80%');
+});
+$("#addContact").on('click', function() {
+    cusButtonClick(selected[0], '添加联系记录','addContactRecords', '92%', '80%');
+});
+$("#addContacter").on('click', function() {
+    cusButtonClick(selected[0], '添加客户联系人','addCusContact', '92%', '80%');
+});
+$("#changeCus2").on('click', function() {
+    cusButtonClick(chk_value[0],'修改客户信息','editCustomer', '92%', '80%');
+});
+
+$("span .unCheck").css('color','red');
+$("span .allRecord").css('color','blue');
+$(".noCheckYet").css('color','black');
+$(".checkNot").css('color','red');
+$(".checkYes").css('color','blue');
+
+$(".cus-24").on('click', function() {
+    window.location.href = controller + "/showBusinessList/k/1";
+});
+$(".cus-7").on('click', function() {
+    window.location.href = controller + "/showBusinessList/k/7";
+});
+$(".cus-30").on('click', function() {
+    window.location.href = controller + "/showBusinessList/k/30";
+});

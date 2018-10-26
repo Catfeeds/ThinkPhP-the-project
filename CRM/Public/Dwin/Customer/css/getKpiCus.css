@@ -1,0 +1,22 @@
+body {
+  padding: 20px;
+}
+#app {
+  background: #fff;
+}
+header .myRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  align-content: center;
+}
+header .myRow .el-input {
+  width: auto;
+}
+tbody .cname {
+  cursor: pointer!important;
+}
+tbody .cname:hover {
+  background: #d2d250!important;
+}
+/*# sourceMappingURL=getKpiCus.css.map */

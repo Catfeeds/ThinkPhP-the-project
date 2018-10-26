@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--客户详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body{  color: black;  }
+        .mouseOn{  cursor:pointer;  }
+        .noCheckYet{  color:black;  }
+        .checkNot{  color: red;  }
+        .checkYes{  color:blue;  }
+        tbody > td { cursor:pointer;}
+        .hiddenClass{
+            display: none!important;
+        }
+        .form-control{
+            width:100%!important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>客户基本信息</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th style="width:20%;">客户名称</th>
+                                <th style="width:20%;">行业</th>
+                                <th style="width:10%;">客户级别</th>
+                                <th style="width:10%;">首要联系人及电话</th>
+                                <th style="width:20%;">公司网址</th>
+                                <th style="width:20%;">公司所在地</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                <h4 style="">
+                                {$data.cname}
+                                    <notempty name="data['son_name']">
+                                        <br/><span style="color:blue;">(子公司：{$data.son_name})</span>
+                                    </notempty>
+                                    <notempty name="data['sub_name']">
+                                        <br/><span style="color:blue;">(上级公司：{$data.sub_name.sub_name})</span>
+                                    </notempty>
+                                </h4>
+                                </td>
+                                <td><middle>{$data.indus}</middle></td>
+                                <td>{$data.clevel}级</td>
+                                <td><middle>{$data.cphonename}:{$data.cphonenumber}</middle></td>
+                                <td><middle>{$data.website}</middle></td>
+                                <td><middle>{$data.province}</middle></td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3">公司地址</td>
+                                <td colspan="5">{$data.addr.0}</td>
+                            </tr>
+                            <tr><td colspan="5">{$data.addr.1}</td></tr>
+                            <tr><td colspan="5">{$data.addr.2}</td></tr>
+                            <tr>
+                                <td rowspan="1">备注信息</td>
+                                <td colspan="5">{$data.tip}</td>
+                            </tr>
+                            <tr>
+                                <th>客户来源</th>
+                                <th>创建时间</th>
+                                <th>客户状态</th>
+                                <th>客户负责人</th>
+                                <th>客户审核人</th>
+                                <th>审核状态</th>
+                            </tr>
+                            <tr>
+                                <td>{$data.csource}</td>
+                                <td>{$data.addtime|date='Y-m-d',###}</td>
+                                <td>
+                                    <switch name="data.cstatus">
+                                        <case value="1">公共客户</case>
+                                        <case value="2">个人客户</case>
+                                    </switch>
+                                </td>
+                                <td>{$data.uname}</td>
+                                <td class="text-nowrap">{$data.auditorname}</td>
+                                <td class="text-nowrap">
+                                    <switch name="data.auditstatus">
+                                        <case value="1">{$data.auditorname}未审核</case>
+                                        <case value="2">总经理未审核</case>
+                                        <case value="3">审核通过</case>
+                                        <case value="4">不通过</case>
+                                    </switch>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>订单总金额（审核通过订单）</th>
+                                <th>联系人</th>
+                                <th>客户联系记录</th>
+                                <th>项目进度</th>
+                                <th>客服记录</th>
+                                <th>售后记录</th>
+                            </tr>
+                            <tr>
+                            <td class="mouseOn" id="numOfOrder"><span class="checkYes">{$data.ototal}元</span></td>
+
+                                <td class="mouseOn" id="numOfCont"><span class="checkYes">{$data.sumcontacter}人</span></td>
+                                <td class="mouseOn" id="numOfContactRecord"><span class="checkYes">{$data.countrecord}条</span></td>
+                                <td class="mouseOn" id="numOfPrj"><span class="checkYes">{$data.prosum}条</span></td>
+                                <td class="mouseOn" id="numOfOnline"><span class="checkYes">{$data.sumonline}条</span></td>
+                                <td class="mouseOn" id="numOfSale"><span class="checkYes">{$data.sumservice}条</span></td>
+
+                            </tr>
+                            <tr>
+                                <th>客户资料</th>
+                                <th colspan="5">上传资料</th>
+                            </tr>
+                            <tr>
+                                <td class="mouseOn" id="numOfFile"><span class="checkYes">{$data.fnum}</span></td>
+                                <td colspan="5" class="text-nowrap">
+                                    <div class="fa-hover">
+                                        <a href="javascript:;" data="{$data.cid}" id="uploadButton">上传客户资料</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-cusfile" style="display: none;">
+                        <table class="table table-striped table-bordered table-hover dataTables-cusfile">
+                            <thead>
+                            <tr><td colspan="7"><h5>{$data[0]['cname']}文件列表</h5></td></tr>
+                            <tr>
+                                <th>添加日期</th>
+                                <th>添加人</th>
+                                <th>文件名(点击下载)</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="cusFile" id="vol">
+                                <tr>
+                                    <td>{$vol.addtime|date='Y-m-d',###}</td>
+                                    <td>{$vol.buildername}</td>
+                                    <td class="mouseOn showFile" data="{$vol.fid}">{$vol.fname}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-contacter" style="display: none;">
+                        <table class="table table-striped table-bordered table-hover dataTables-contacter">
+                            <thead>
+                            <tr><td colspan="9"><h4>企业联系人</h4></td></tr>
+                            <tr>
+                                <th>姓名</th>
+                                <th>职务</th>
+                                <th>手机</th>
+                                <th>座机</th>
+                                <th>邮箱</th>
+                                <th>微信</th>
+                                <th>qq</th>
+                                <th>创建人</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                          <tbody>
+                          <volist name="contacters" id="vol">
+                              <tr id="{$vol.id}">
+                                  <td>
+                                      <span>{$vol.name}</span>
+                                      <input type="text" value="{$vol.name}" class="form-control hiddenClass contact-name" name="contact-name">
+                                  </td>
+                                  <td>
+                                      <span>{$vol.position}</span>
+                                      <input type="text" value="{$vol.position}" class="form-control hiddenClass contact-position" name="contact-position">
+                                  </td>
+                                  <td>
+                                      <span>{$vol.phone}</span>
+                                      <input type="text" value="{$vol.phone}" class="form-control hiddenClass contact-num" name="contact-num">
+                                  </td>
+                                  <td>
+                                      <span>{$vol.tel}</span>
+                                      <input type="text" value="{$vol.tel}" class="form-control hiddenClass contact-tel" name="contact-tel">
+                                  </td>
+                                  <td>
+                                      <span>{$vol.emailaddr}</span>
+                                      <input type="text" value="{$vol.emailaddr}" class="form-control hiddenClass contact-email" name="contact-email">
+                                  </td>
+                                  <td>
+                                      <span>{$vol.wechatnum}</span>
+                                      <input type="text" value="{$vol.wechatnum}" class="form-control hiddenClass contact-wechatnum" name="contact-wechatnum">
+                                  </td>
+                                  <td>
+                                      <span>{$vol.qqnum}</span>
+                                      <input type="text" value="{$vol.qqnum}" class="form-control hiddenClass contact-qq" name="contact-qq">
+                                  </td>
+                                  <td>{$vol.addname}</td>
+                                  <td>
+                                      <a href="javascript:;"><i class="fa fa-edit"></i></a>
+                                      &emsp;&emsp;
+                                      <a href="javascript:;"><i class="fa fa-save" style="color:red;"></i></a>
+                                  </td>
+                              </tr>
+                          </volist>
+                          </tbody>
+                        </table>
+                    </div>
+                    <div class="table-order" style="display: none;">
+                        <table class="table table-striped table-bordered table-hover dataTables-orderList">
+                            <thead>
+                                <tr><td colspan="7"><h4>采购记录</h4></td></tr>
+                                <tr>
+                                    <th>订单编号</th>
+                                    <th>订单名称</th>
+                                    <th>订单金额</th>
+                                    <th>下单时间</th>
+                                    <th>订单类型</th>
+                                    <th>负责人</th>
+                                    <th>审核状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <volist name="orderContent" id="vol">
+                                    <tr>
+                                        <td>{$vol.order_id}</td>
+                                        <td>{$vol.oname}</td>
+                                        <td>{$vol.oprice}（元）</td>
+                                        <td>{$vol.otime|date='Y-m-d',###}</td>
+                                        <td>{$vol.picname}</td>
+                                        <td>
+                                        <!-- 1正常销货2预收3应收借物4免费样品5借物退库6借物销货7退货8退款 -->
+                                            <switch name="vol.order_type">
+                                                <case value="1">正常销货</case>
+                                                <case value="2">预收</case>
+                                                <case value="3">应收借物</case>
+                                                <case value="4">免费样品</case>
+                                                <case value="5">借物退库</case>
+                                                <case value="6">借物销货</case>
+                                                <case value="7">退货</case>
+                                                <case value="8">退款</case>
+                                                <default />正常销货
+                                            </switch>
+                                        </td>
+                                        <td>
+                                            <switch name="vol.check_status">
+                                                <case value="1"><span class="noCheckYet">部门未审</span></case>
+                                                <case value="2"><span class="checkNot">不合格</span></case>
+                                                <case value="3"><span class="noCheckYet">财务未审</span></case>
+                                                <case value="4"><span class="checkYes">通过</span></case>
+                                                <default />未审
+                                            </switch>
+                                        </td>
+                                    </tr>
+                                </volist>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="7"><span class="checkYes">{$orderContent[0]['cname']}采购订单总金额：&emsp;{$data.ototal}元&emsp;(基于已通过审核的订单金额统计)</span></td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="table-contactRecord" style="display: none;">
+                        <table class="table table-striped table-bordered table-hover dataTables-contactRecord">
+                            <thead>
+                            <tr><td colspan="6"><h4>业务联系记录</h4></td></tr>
+                                <tr>
+                                    <th>联系时间</th>
+                                    <th>主题</th>
+                                    <th>联系内容</th>
+                                    <th>联系类型</th>
+                                    <th>提交时间</th>
+                                    <th>提交人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <volist name="contacts" id="vol">
+                                    <tr style="text-align: center;">
+                                        <td>{$vol.ctime|date='Y-m-d H:i:s',###}</td>
+                                        <td>{$vol.theme}</td>
+                                        <td class="cusContact mouseOn" data="{$vol.content}">{$vol.content|subtext=30}</td>
+                                        <td>
+                                            <switch name="vol.ctype">
+                                                <case value="1">电话</case>
+                                                <case value="2">拜访</case>
+                                                <case value="3">会议</case>
+                                                <case value="4">即时通讯（qq,微信）</case>
+                                                <case value="5">邮件</case>
+                                                <case value="6">其他</case>
+                                                <case value="7">高管约谈</case>
+                                            </switch>
+                                        </td>
+                                        <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                        <td>{$vol.pname}</td>
+                                    </tr>
+                                </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-prjUpdateList" style="display: none;">
+                        <table class="table table-striped table-bordered table-hover dataTables-prjUpdateList">
+                            <thead>
+                                <tr><td colspan="5"><h4>项目更新情况</h4></td></tr>
+                                <tr>
+                                    <th>项目名称</th>
+                                    <th>更新时间</th>
+                                    <th>进度更新内容</th>
+                                    <th>更新人</th>
+                                    <th>审核状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="prjProgress" id="vol">
+                                <tr>
+                                    <td>{$vol.prjname}</td>
+                                    <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                    <td class="prjUpdContent mouseOn" data="{$vol.prjcontent}">{$vol.prjcontent|subtext=30}</td>
+                                    <td>{$vol.prjername}</td>
+                                    <td>
+                                        <switch name="vol.audistatus">
+                                            <case value="1"><span class="noCheckYet">未审核</span></case>
+                                            <case value="2"><span class="checkYes">有效</span></case>
+                                            <case value="3"><span class="checkNot">无效</span></case>
+                                        </switch>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="rolePrj" value="{$Think.session.staffId}">
+                    </div>
+                    <div class="table-onlineSale" style="display: none;">
+                        <table class="table table-striped table-bordered table-hover dataTables-onlineSale">
+                            <thead>
+                                <tr><td colspan="7"><h4>在线客服记录</h4></td></tr>
+                                <tr>
+                                    <th>通话时间</th>
+                                    <th>通话内容</th>
+                                    <th>处理方式</th>
+                                    <th>来电人</th>
+                                    <th>客服姓名</th>
+                                    <th>审核状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="onlineService" id="vol">
+                                <tr>
+                                    <td>{$vol.addtime|date='Y-m-d H:i:s',###}</td>
+                                    <td class="cusAsk mouseOn" data="{$vol.content}">{$vol.content|subtext=10}</td>
+                                    <td class="onAnswer mouseOn" data="{$vol.answercontent}">{$vol.answercontent|subtext=10}</td>
+                                    <td>{$vol.caller}</td>
+                                    <td>{$vol.pname}</td>
+                                    <td>
+                                        <switch name="vol.austatus">
+                                            <case value="1"><span class="noCheckYet">未审核</span></case>
+                                            <case value="2"><span class="checkYes">有效</span></case>
+                                            <case value="3"><span class="checkNot">无效</span></case>
+                                        </switch>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-saler" style="display: none;">
+                        <!--<h4>客户信息：&emsp;xxxxxxx</h4>-->
+                        <table class="table table-striped table-bordered table-hover dataTables-saler">
+                            <thead>
+                                <tr><td colspan="7"><h4>售后服务记录</h4></td></tr>
+                                <tr>
+                                    <th>客户问题</th>
+                                    <th>解决方式</th>
+                                    <th>处理时间</th>
+                                    <th>售后人姓名</th>
+                                    <th>审核状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="saleService" id="vol">
+                                <tr >
+                                    <td class="descrip mouseOn" data="{$vol.pro_description}">{$vol.pro_description|subtext=10}</td>
+                                    <td class="solvePro mouseOn" data="{$vol.pro_solve}">{$vol.pro_solve|subtext=10}</td>
+                                    <td>{$vol.addtime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.pname}</td>
+                                    <td>
+                                        <switch name="vol.sstatus">
+                                            <case value="1"><span class="noCheckYet">未审核</span></case>
+                                            <case value="2"><span class="checkYes">有效</span></case>
+                                            <case value="3"><span class="checkNot">无效</span></case>
+                                        </switch>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    $(".fa-edit").on('click', function () {
+        var tr = $(this).parent().parent().parent();
+        if (tr.find('.hiddenClass')) {
+            tr.children('td').each(function (){
+                if ($(this).children('input').hasClass('hiddenClass')) {
+                    $(this).children('input').removeClass('hiddenClass');
+                    $(this).children('span').addClass('hiddenClass');
+                } else {
+                    $(this).children('input').addClass('hiddenClass');
+                    $(this).children('span').removeClass('hiddenClass');
+                }
+            });
+        }
+    });
+    var saveBtn = $('.fa-save');
+    saveBtn.on('click', function () {
+        saveBtn.attr('display', true);
+        var tr = $(this).parent().parent().parent();
+        if (tr.children('td').children('input').hasClass('hiddenClass')) {
+            layer.alert("编辑页面未开启，请点击编辑按钮，修改信息后提交");
+        } else {
+            var contactId = tr.attr('id');
+            var contact   = tr.find(".contact-name").val();
+            var postion   = tr.find(".contact-position").val();
+            var phone     = tr.find(".contact-num").val();
+            var tel       = tr.find(".contact-tel").val();
+            var qq        = tr.find(".contact-qq").val();
+            var wechat    = tr.find(".contact-wechatnum").val();
+            var mail      = tr.find(".contact-email").val();
+            if (!contact) {
+                layer.msg('联系人姓名为必填字段');
+                saveBtn.attr('display',false);
+                return false;
+            }
+            if (!phone) {
+                layer.msg('联系人电话为必填字段');
+                saveBtn.attr('display',false);
+                return false;
+            }
+            $.ajax({
+                type : 'post',
+                url  : controller + '/showBusinessDetail',
+                data : {
+                    id    : contactId,
+                    name  : contact,
+                    phone : phone,
+                    tel   : tel,
+                    qq    : qq,
+                    wechat : wechat,
+                    mail  : mail,
+                    postion : postion
+                },
+                success :function (msg) {
+                    if (msg['status'] == 2) {
+                        layer.msg(msg['msg']);
+                        saveBtn.attr('display',false);
+                    } else {
+                        layer.alert(msg['msg']);
+                        saveBtn.attr('display',false);
+                    }
+                }
+            });
+        }
+    });
+</script>
+<script src="__PUBLIC__/html/js/dwin/customer/business_det.js"></script>
+</body>
+</html>

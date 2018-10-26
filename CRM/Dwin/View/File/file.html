@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body{
+            padding: 10px 10px 10px 20px;
+        }
+        input[type=file]{
+            display: none;
+        }
+        .uploadResume{
+            margin: 30px 40px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <h3>上传文件</h3>
+    <el-form ref="form" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="文件分类" prop='file_category' v-if="info.tableId != '1'">
+            <el-select v-model="form.file_category" palceholder="选择分类" clearable>
+                <el-option
+                        v-for="item in cate"
+                        :key="item.category_name"
+                        :label="item.category_name"
+                        :value="item.category_name">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-row>
+            <el-col :span="8">
+                <el-form-item label="文件说明" prop='file_tip'>
+                    <el-input type="textarea" v-model="form.file_tip" :rows="2" placeholder="输入文件说明"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :span="8">
+                <el-form-item label="文件上传" prop='file_url'>
+                    <el-upload
+                            ref="upload"
+                            class="uploadResume"
+                            action="{:U('fileUpload')}"
+                            :data="{type: info.tableId, id: form.id}"
+                            :on-success="uploadSuccess"
+                            :limit="1"
+                    >
+                        <el-button size="small" v-if="!form.file_url" type="primary">点击上传文件</el-button>
+                        <el-button size="small" v-else type="info">文件已上传,点击替换</el-button>
+                    </el-upload>
+                    <el-input type="hidden" v-model="form.file_url"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :offset="3">
+                <el-button type="primary" @click="submit">提交</el-button>
+            </el-col>
+        </el-row>
+
+    </el-form>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var cate = {$cate | json_encode};
+    var info = {$info | json_encode};
+    var close = '{$close}';
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                cate: cate,
+                loading: true,
+                form: {},
+                rules: {
+                    file_category: [{required: true, message: '请输入', trigger: 'blur'}],
+                    file_tip: [{required: true, message: '请输入', trigger: 'blur'}],
+                    file_url: [{required: true, message: '请上传文件', trigger: 'click'}],
+                },
+                info: info
+            }
+        },
+        created: function () {
+            if (close == 1){
+                parent.layer.close(parent.layer.getFrameIndex(window.name))
+                parent.layer.msg('只有本人才可以修改')
+            }
+            var vm = this;
+            $.post('', vm.info, function (res) {
+                Vue.set(vm, 'form', res.data)
+                vm.loading = false
+            })
+        },
+        methods: {
+            uploadSuccess: function (res) {
+                if (res.status == 200){
+                    this.form.file_url = res.data.path
+                    this.form.file_name = res.data.file_name
+                    this.form.file_id = res.data.fileIdPrefix + this.form.id
+                }else {
+                    this.$refs.upload.clearFiles();
+                }
+                layer.msg(res.msg)
+            },
+            submit: function () {
+                var vm = this
+                vm.loading = true
+                this.$refs['form'].validate(function (res) {
+                    if (res){
+                        layer.confirm('确认提交?', function (index) {
+                            vm.loading = true
+                            var obj = {data: vm.form};
+                            Object.assign(obj, vm.info)
+                            if (vm.info.method === 'get'){
+                                obj.method = 'put'
+                            } else {
+                                obj.method = 'post'
+                            }
+                            obj.table = obj.tableId
+                            $.post("__MODULE__/File/" + obj.method + 'File' + vm.info.tableId , obj, function (res) {
+                                layer.msg(res.msg)
+                                vm.loading = false
+                            })
+                        })
+                    } else {
+                        layer.msg('表单中有空的必填项')
+                        vm.loading = false
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

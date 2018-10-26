@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        .hideDiv {  display: block;}
+        body {  color: black;  }
+    </style>
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins" id="questions">
+                    <div class="ibox-title">
+                        <h5>项目基本情况</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                            <a class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></a>
+                        </div>
+                    </div>
+                    <div class="ibox-content hideDiv">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>项目名称</th>
+                                    <th>研发部门</th>
+                                    <th>项目启动时间</th>
+                                    <th>项目参与人及绩效占比</th>
+                                    <th>项目验收人</th>
+                                </tr>
+                                <tr>
+                                    <td>{$data1.proname}</td>
+                                    <td>{$data1.deptname}</td>
+                                    <td>{$data1.protime|date='Y-m-d',###}</td>
+                                    <td>
+                                        <volist name="data2" id="vol">
+                                            {$vol.pname}&emsp;绩效占比:{$vol.jxval}%<br/>
+                                        </volist>
+                                    </td>
+                                    <td>{$data1.buildname}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>
+                            <label>项目截止时间变更</label>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>项目名称</th>
+                                    <th>原提交时间</th>
+                                    <th>现提交时间</th>
+                                </tr>
+                                <tr>
+                                    <td>{$data1.proname}</td>
+                                    <td id="delTime">{$data1.deliverytime|date='Y-m-d',###}</td>
+                                    <td><input type="text" id="newTime" class="form-control" onclick="WdatePicker( {el:this,dateFmt:'yyyy-MM-dd'} )"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>
+                            <label>项目需求变更</label>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>原需求</th>
+                                    <th>变更需求</th>
+                                </tr>
+                                <tr>
+                                    <td id="prjNeedBefore">{$data1.proneeds}</td>
+                                    <td><textarea style="width: 100%;" id="prjNeeds" name="proneeds" value="{$data1.proneeds}" class="form-control"></textarea></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>
+                            <label>项目总绩效变更</label>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th></th>
+                                    <th>研发费(元)</th>
+                                    <th>维护(元)</th>
+                                    <th>方案/临时(元)</th>
+                                    <th>PCB设计(元)</th>
+                                    <th>代码设计(元)</th>
+                                    <th>文档撰写(元)</th>
+                                    <th>项目总绩效(元)</th>
+                                </tr>
+                                <tr>
+                                    <td>原绩效</td>
+                                    <td id="oldPrice">{$data1.proprice}</td>
+                                    <td id="oldMaint">{$data1.promaint}</td>
+                                    <td id="oldTemp">{$data1.protemp}</td>
+                                    <td id="oldPcb">{$data1.propcb}</td>
+                                    <td id="oldCode">{$data1.codedesign}</td>
+                                    <td id="oldDoc">{$data1.docwrite}</td>
+                                    <td id="oldBonus">{$data1.performbonus}</td>
+                                </tr>
+                                <tr>
+                                    <td>新绩效</td>
+                                    <td><input id="prjPrice" name="proprice" type="number" placeholder="" class="form-control checkNum"/></td>
+                                    <td><input id="prjMaint" name="prjMaint" type="number" placeholder="" class="form-control checkNum"/></td>
+                                    <td><input id="prjTemp" name="prjTemp" type="number" placeholder="" class="form-control checkNum"/></td>
+                                    <td><input id="prjPCB" name="prjPCB" type="number" placeholder="" class="form-control checkNum"/></td>
+                                    <td><input id="codeDesign" name="codeDesign" type="number" placeholder="" class="form-control checkNum"/></td>
+                                    <td><input id="docWrite" name="docWrite" type="number" placeholder="" class="form-control checkNum"/></td>
+                                    <td><input id="bonus" name="bonus" type="number" readonly="readonly" class="form-control"/></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>
+                            <label>项目参与人及绩效分配变更</label>
+                        </div>
+                        <div class="table-responsive1">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>原参与人及绩效</th>
+                                    <th>现参与人：</th>
+                                    <th>绩效分配：</th>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td><volist name="data2" id="vol"><span style="color: blue;"><span class="partnerList" data="{$vol.pid}">{$vol.pname}</span>(<span class="performanceList" data="{$vol.jxval}">{$vol.jxval}</span>%)&emsp;</span></volist></td>
+                                    <td>
+                                        <div class="input-group">
+                                            <select name="partner" id="staffList" data-placeholder="选择项目参与人" class="chosen-select" multiple="multiple" style="width: 300px;" tabindex="4">
+                                                <volist name="data4" id="vol">
+                                                    <option class="rps" value="{$vol.id}" data="{$vol.name}">{$vol.name}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="table table-bordered table-striped" id="jixiao"></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="table-responsive">
+                            <form>
+                                <table class="table table-bordered table-striped">
+                                    <tr>
+                                        <th>审核人</th>
+                                        <th>时间</th>
+                                        <th>提交</th>
+                                    </tr>
+                                    <input type="hidden" value="{$data1.proid}" id="hiddenPrjInfo">
+                                    <input type="hidden" value="{$data1.auditorid}" id="oldPrjAuditor">
+                                    <tr style="text-align: center;">
+                                        <td><select id="changeAudi" name="auditor"><volist name="data3" id="vol"><option value="{$vol.id}">{$vol.name}</option></volist></select></td>
+                                        <td id="current-time"></td>
+                                        <td><input type="button" value="提交申请" id="submitChanges" class="btn btn-outline btn-success"/></td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+
+    function isEmpty(data)
+    {
+        if (data == "") {
+            return 0;
+        } else {
+            return data;
+        }
+    }
+    $(".checkNum").on('change', function () {
+        var _proPrice      = parseInt(isEmpty($("#prjPrice").val()) ? $("#prjPrice").val() : 0);
+        var _prjMaint      = parseInt(isEmpty($("#prjMaint").val()) ? $("#prjMaint").val() : 0);
+        var _prjTemp       = parseInt(isEmpty($("#prjTemp").val()) ? $("#prjTemp").val() : 0);
+        var _prjPCB        = parseInt(isEmpty($("#prjPCB").val()) ? $("#prjPCB").val() : 0);
+        var _codeDesign    = parseInt(isEmpty($("#codeDesign").val()) ? $("#codeDesign").val() : 0);
+        var _docWrite      = parseInt(isEmpty($("#docWrite").val()) ? $("#docWrite").val() : 0);
+        var _total = _proPrice + _prjMaint + _prjTemp + _prjPCB + _codeDesign + _docWrite;
+        $("#bonus").val(_total);
+    });
+
+    // 项目需求表单回填
+    var _text =  $("#prjNeedBefore").text();
+    document.getElementById('prjNeeds').value = _text;
+
+    // 变更提交时间显示
+    setInterval(function() {
+        var now = (new Date()).toLocaleString();
+        $("#current-time").text(now);
+    }, 1000);
+
+    // 获取参与人并对应显示绩效
+    $("#staffList").on('change', function(){
+        var liInner = "<tr><th>参与人</th><th>&emsp;绩效占比</th></tr>";
+        checkText   = [];
+        checkVal    = [];
+
+        $('#staffList option:checked').each(function(i){
+            checkText[i] = $(this).text();
+        });
+        $('#staffList option:checked').each(function(i){
+            checkVal[i]  = $(this).val();
+        });
+
+        for( var i = 0; i < checkText.length; i++){
+            if (checkVal != '') {
+                liInner  += "<tr><td class='jxList' id='" + checkVal[i] +"'>" + checkText[i] + "<td/><td><input type='number'max='100' class='form-control newJXVal'style='ime-mode:disabled;' onpaste='return false;'></td></tr>" ;
+                //liInner += checkText[i] + ':'+'<input type="text" class="jixiaoList"' + 'data="'+ checkVal[i] + '>';
+            }
+            $("#jixiao").html('');
+            $("#jixiao").append(liInner);
+        }
+        if (checkText.length == 0) {
+            $("#jixiao").html("");
+        }
+        return checkText,checkVal;
+    });
+
+
+    //ajax获取数据,筛选要提交的数据
+    $("#submitChanges").on('click', function() {
+        // 获取所有新的信息
+        var _newDeliveryTime = $('#newTime').val();// 提交时间
+        var _newPrjNeeds     = $("#prjNeeds").val();// 需求
+        var _newBonus        = $("#bonus").val();
+        var _newProPrice     = parseInt(isEmpty($("#prjPrice").val()) ? $("#prjPrice").val() : 0);
+        var _newPrjMaint     = parseInt(isEmpty($("#prjMaint").val()) ? $("#prjMaint").val() : 0);
+        var _newPrjTemp      = parseInt(isEmpty($("#prjTemp").val()) ? $("#prjTemp").val() : 0);
+        var _newPrjPCB       = parseInt(isEmpty($("#prjPCB").val()) ? $("#prjPCB").val() : 0);
+        var _newCodeDesign   = parseInt(isEmpty($("#codeDesign").val()) ? $("#codeDesign").val() : 0);
+        var _newDocWrite     = parseInt(isEmpty($("#docWrite").val()) ? $("#docWrite").val() : 0);
+        var _newPartner      = []; // 参与人
+        var _newJXVal        = [];// 绩效分配
+        var _newPartName      = [];
+        $("#staffList option:selected").each(function(i) {
+            _newPartner[i]   = $(this).val();
+            _newPartName[i]  = $(this).attr('data');
+        });
+        $(".newJXVal").each(function(i) {
+            _newJXVal[i]     = $(this).val();
+        });
+
+        // 获取旧的信息
+        var _oldDeliveryTime = $('#delTime').text();
+        var _oldPrjNeeds     = $("#prjNeedBefore").text();
+        var _oldBonus        = parseInt(isEmpty($("#oldBonus").text()) ? $("#oldBonus").text() : 0);
+        var _oldPrice        = parseInt(isEmpty($("#oldPrice").text()) ? $("#oldPrice").text() : 0);
+        var _oldMaint        = parseInt(isEmpty($("#oldMaint").text()) ? $("#oldMaint").text() : 0);
+        var _oldTemp         = parseInt(isEmpty($("#oldTemp").text()) ? $("#oldTemp").text() : 0);
+        var _oldPrjPCB       = parseInt(isEmpty($("#oldPcb").text()) ? $("#oldPcb").text() : 0);
+        var _oldCode         = parseInt(isEmpty($("#oldCode").text()) ? $("#oldCode").text() : 0);
+        var _oldDoc          = parseInt(isEmpty($("#oldDoc").text()) ? $("#oldDoc").text() : 0);
+        var _oldPartner      = [];
+        var _oldJXVal        = [];
+        var _oldPartName     = [];
+        $('.performanceList').each(function(i) {
+            _oldJXVal[i]     = $(this).attr('data');
+        });
+        $('.partnerList').each(function(i) {
+            _oldPartner[i]   = $(this).attr('data');
+            _oldPartName[i]  = $(this).text();
+        });
+        var _prjId   = $("#hiddenPrjInfo").val();
+        var _auditId = $("#changeAudi :selected").val();
+        var _oldAuditId = $("#oldPrjAuditor").val();
+        $("#submitChanges").attr("disabled", "disabled");
+        $.ajax({
+            'type' : 'POST',
+            'url'  : '__CONTROLLER__/changeProject',
+            'data' : {
+                prjId           : _prjId,
+                auditId         : _auditId,
+                oldAuditId      : _oldAuditId,
+                newDeliveryTime : _newDeliveryTime,
+                oldDeliveryTime : _oldDeliveryTime,
+                newPrjNeeds     : _newPrjNeeds,
+                oldPrjNeeds     : _oldPrjNeeds,
+                newBonus        : _newBonus,
+                oldBonus        : _oldBonus,
+                oldPrjPrice     : _oldPrice,
+                newPrjPrice     : _newProPrice,
+                oldPrjMaint     : _oldMaint,
+                newPrjMaint     : _newPrjMaint,
+                oldPrjTemp      : _oldTemp,
+                newPrjTemp      : _newPrjTemp,
+                oldPrjPcb       : _oldPrjPCB,
+                newPrjPcb       : _newPrjPCB,
+                oldCodeDesign   : _oldCode,
+                newCodeDesign   : _newCodeDesign,
+                newDocWrite     : _newDocWrite,
+                oldDocWrite     : _oldDoc,
+                oldPartner      : _oldPartner,
+                newPartner      : _newPartner,
+                oldPartName     : _oldPartName,
+                newPartName     : _newPartName,
+                oldJXVal        : _oldJXVal,
+                newJXVal        : _newJXVal
+            },
+            success : function(msg) {
+                if (msg == 1) {
+                    layer.msg("项目变更成功，请等待审核！",
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                        function () {
+                        window.location.reload();
+                        }
+                    );
+                }
+                else {
+                    layer.alert('提交失败');
+                    $("#submitChanges").attr("disabled", false);
+                    window.location.reload();
+                }
+            }
+        });
+    })
+</script>
+</html>

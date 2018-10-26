@@ -1,0 +1,414 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调拨</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/Public/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="/Public/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+
+        .hiddenDiv {
+            display: none;
+        }
+        .selected-highlight {
+            color:red;
+            background-color: #FFFFCC !important;
+        }
+        .span-set {
+            font-weight: 400;
+            font-size: small;
+            text-align: center;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        li.active > a{
+            background-color: #1c84c6 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>调拨单审核</h5>
+                </div>
+                <div class="ibox-content">
+                    <button class="btn btn-xs btn-outline btn-success editButton"><span class="glyphicon glyphicon-edit"></span>编 辑</button>
+                    <button class="btn btn-xs btn-outline btn-success deleteButton"><span class="glyphicon glyphicon-remove"></span>删 除</button>
+                    <button class="btn btn-xs btn-outline btn-success printButton"><span class="glyphicon glyphicon-print"></span>下载/打印</button>
+                    <div  class="ibox-content" style="margin-top: 15px;">
+                        <table id="table" class="table table-striped table-bordered table-full-width" width="100%">
+                            <thead>
+                            <tr>
+                                <th>调拨单号</th>
+                                <th>制单时间</th>
+                                <th>制单人</th>
+                                <th>源单类型</th>
+                                <th>审核状态</th>
+                                <th>备注</th>
+                                <th>更新时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="ibox-content">
+                        <div v-cloak class="table-responsive1" id="detailsModel">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#productData" aria-controls="productData" role="tab" data-toggle="tab">入库单情况</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="productData">
+                                    <br>
+                                    <div v-if="productData.length">
+                                        <div class="col-md-12">
+                                            <el-form :inline="true" ref="form" label-width="80px">
+                                                <el-form-item label="打印次数:">
+                                                    <span class="span-info">{{baseData.print_time}}</span>
+                                                </el-form-item>
+                                                <el-form-item label="单据编号:">
+                                                    <span class="span-info">{{baseData.transfer_id}}</span>
+                                                </el-form-item>
+                                                <el-form-item label="源单类型:">
+                                                    <el-input v-model="sourceType" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="制单人:">
+                                                    <el-input v-model="baseData.create_name" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="制单时间:">
+                                                    <el-input v-model="baseData.create_time" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="保管人:">
+                                                    <el-input v-model="baseData.keep_name" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="验收人:">
+                                                    <el-input v-model="baseData.check_name" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-button size="small" type="primary" @click="submitAudit" :disabled="canSubmitFlag">审核调拨单</el-button>
+                                            </el-form>
+                                        </div>
+                                        <table class="table table-striped table-bordered table-hover table-full-width dataTables-productData">
+                                            <thead>
+                                            <tr>
+                                                <th>物料代码</th>
+                                                <th>产品名称</th>
+                                                <th>规格型号</th>
+                                                <th>调拨数量</th>
+                                                <th>出库仓库</th>
+                                                <th>入库仓库</th>
+                                                <th>调拨原因</th>
+                                                <th>创建时间</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="v in productData">
+                                                <td>{{v.product_no}}</td>
+                                                <td>{{v.product_number}}</td>
+                                                <td>{{v.product_name}}</td>
+                                                <td>{{v.num}}</td>
+                                                <td>{{v.rep_name_out}}</td>
+                                                <td>{{v.rep_name_in}}</td>
+                                                <td>{{v.remark}}</td>
+                                                <td>{{v.create_time}}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-else class="col-xs-12 span-set">
+                                        <span class="selected-highlight">选中行查看调拨单详情后，点击审核按钮下推供出库库房审核</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script>
+    $(document).ready(function () {
+        var thisId = <?php echo (session('staffId')); ?>;
+        var tableTBody = $("#table tbody");
+        $.fn.dataTable.ext.errMode = 'throw';
+        var table = $('#table').DataTable({
+            "scrollY": 400,
+            // "scrollX": true,
+            "scrollCollapse": true,
+            "destroy"      : true,
+            "paging"       : true,
+            "autoWidth"	   : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 25, 50, 100],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true, //开启服务器获取数据
+            ajax: {
+                type: 'post'
+            },
+            order: [[1, 'desc']],
+            columns: [
+                {data: 'transfer_id', searchable: true},
+                {data: 'create_time', searchable: true},
+                {data: 'create_name', searchable: false},
+                {data: 'source_type', searchable: true},
+                {data: 'audit_status', searchable: false},
+                {data: 'tips',         searchable: false},
+                {data: 'update_time',  searchable: false}
+            ],
+            "columnDefs"   : [ //自定义列
+                {
+                    "targets" : 4,
+                    "data" : "audit_status",
+                    "render" : function(data, type, row) {
+                        var arr = ['待制单人审核', '单据不合格', '待出库库房审核', '单据完成'];
+                        return arr[data];
+                    }
+                },
+                {
+                    "targets" : 3,
+                    "data"    : "source_type",
+                    "render"  : function(data, type, row) {
+                        var arr = ['', '领料单调拨', '其他调拨', ''];
+                        return arr[data];
+                    }
+                }
+            ],"oLanguage": {
+                "sProcessing":   "处理中...",
+                "sLengthMenu":   "显示 _MENU_ 项结果",
+                "sZeroRecords":  "没有匹配结果",
+                "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix":  "",
+                "sSearch":       "搜索:",
+                "sUrl":          "",
+                "sEmptyTable":     "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands":  ",",
+                "oPaginate": {
+                    "sFirst":    "首页",
+                    "sPrevious": "上页",
+                    "sNext":     "下页",
+                    "sLast":     "末页"
+                },
+                "oAria": {
+                    "sSortAscending":  ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            }
+        });
+        var vm = new Vue({
+            el: '#detailsModel',
+            data: function () {
+                return {
+                    productData : [],
+                    baseData : [],
+                    selectInfo : [],
+                    form :{}
+                }
+            },
+            created: function () {
+                $.post('/Dwin/Stock/getSelectInfo', {
+                    type: 'getDept'
+                }, function (res) {
+                    if (res.status !== 200) {
+                        layer.msg(res.msg);
+                        return false;
+                    }
+                    vm.selectInfo = [];
+                    vm.selectInfo = res.data;
+                    var obj = {};
+                });
+            },
+            computed : {
+                sourceType : function () {
+                    var arr = ['', '领料单调拨', '其他调拨', ''];
+                    Vue.set(this.form,'transferId', this.baseData.id);
+                    return arr[this.baseData.source_type];
+                },
+                canSubmitFlag : function () {
+                    if(this.productData[0].rep_id_arr.indexOf(this.staffId) !== -1) {
+                        return this.flag = true;
+                    } else {
+                        return this.flag = false;
+                    }
+                }
+            },
+            methods : {
+                submitAudit : function () {
+                    var flag = true;
+                    if (flag) {
+                        var clickTime = 0;
+                        layer.confirm('确认审核通过，变更系统库存数量？',
+                            {
+                                btn  : ['确定', '取消'],
+                                icon : 6,
+                                end : function () {
+                                    table.ajax.reload(false, null);
+                                }
+                            }, function () {
+                                clickTime += 1;
+                                if(clickTime === 1) {
+                                    $.ajax({
+                                        url  : 'auditStockTransfer',
+                                        type : 'post',
+                                        data : {
+                                            form : vm.form,
+                                            flag : 2
+                                        },
+                                        success : function (res) {
+                                            if (res.status == 200) {
+                                                layer.msg(res.msg);
+                                                vm.afterAudit();
+                                            } else {
+                                                layer.msg(res.msg);
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                },
+                afterAudit : function () {
+                    this.productData = [];
+                    this.baseData = [];
+                    this.form = {};
+                },
+                deleteTrans: function (id) {
+                    var clickTime = 0;
+                    layer.confirm("确定删除调拨单据？",{
+                        btn:['确定','再想想'],
+                        icon:1
+                    }, function () {
+                        clickTime += 1;
+                        if(clickTime === 1) {
+                            $.ajax({
+                                url  : 'delStockTransfer',
+                                type : 'post',
+                                data : {
+                                    delId : id
+                                },
+                                success : function (res) {
+                                    if(res.status == 200) {
+                                        layer.msg(res.msg);
+                                        vm.afterAudit();
+                                    } else {
+                                        layer.msg(res.msg);
+                                    }
+                                }
+                            });
+                        }
+                    })
+                },
+                printData: function (id,type) {
+                    var clickTime = 0;
+                    var index = layer.confirm("确认打印该单据？",{
+                        btn  : ['确认', '取消'],
+                        icon : 6
+                    }, function () {
+                        clickTime += 1;
+                        if (clickTime === 1) {
+                            layer.open({
+                                type: 2,
+                                title: '单据打印',
+                                shadeClose: true,
+                                end: function () {
+                                    table.ajax.reload(false, null);
+                                },
+                                area: ['220mm', '110mm'],
+                                content: 'printTransferHtml?id=' + id //iframe的url
+                            });
+                            layer.close(index);
+                        }
+                    });
+
+                },
+                editTrans: function (id) {
+                    var clickTime = 0;
+                    var index = layer.confirm("确定编辑该调拨单据？",{
+                        btn:['确定','再想想'],
+                        icon:1
+                    }, function () {
+                        clickTime += 1;
+                        if(clickTime === 1) {
+                            layer.open({
+                                type: 2,
+                                title: '',
+                                shadeClose: true,
+                                end: function () {
+                                    table.ajax.reload(false, null);
+                                },
+                                area: ['100%', '80%'],
+                                content: 'editStockTransfer?id=' + id //iframe的url
+                            });
+                            layer.close(index);
+                        }
+                    })
+                }
+            }
+        });
+
+
+        tableTBody.on("click", "tr", function () {
+            $('tr').removeClass('selected-highlight')
+            $(this).addClass('selected-highlight');
+            selectedID = table.row(this).data().id;
+            vm.baseData = table.row(this).data();
+            $.post('/Dwin/Stock/getTransferDataWithId', {'orderId': selectedID}, function (res) {
+                if (res.status === 200) {
+                    vm.productData = res.data;
+                } else {
+                    layer.msg(res.msg);
+                }
+            });
+        });
+
+
+        $(".deleteButton").click( function () {
+            if (vm.baseData.length !== 0 && vm.baseData.length !== undefined)
+                layer.msg('未选择入库单据', function () {return false;});
+            vm.deleteTrans(selectedID);
+        });
+
+        $(".printButton").click( function () {
+            if (vm.baseData.length !== 0 && vm.baseData.length !== undefined)
+                layer.msg('未选择入库单据', function () {return false;});
+            vm.printData(selectedID);
+        });
+        $(".editButton").click( function () {
+            if (vm.baseData.length !== 0 && vm.baseData.length !== undefined)
+                layer.msg('未选择单据', function () {return false;});
+            vm.editTrans(selectedID);
+        });
+    });
+
+
+
+</script>
+</body>
+</html>

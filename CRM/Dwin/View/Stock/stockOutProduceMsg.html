@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        input {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+        .el-table .warning-row {
+             background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+        .head_thead{
+            height: 40px;
+            line-height: 40px;
+            text-align: left;
+            padding-left: 10px;
+            font-size: 15px;
+        }
+        .el-autocomplete{
+            width: 100%;
+        }
+        /* .el-button--primary {
+            float: left;
+        } */
+        .add_button_new {
+            text-align: left
+        }
+        .title_name_product{
+            font-size:16px;
+            text-align: left;
+            margin-left:2%; 
+        }
+        .productClass .el-scrollbar{
+            width: 475px;
+        }
+        .but_print{
+            position: fixed;
+            right:20px;
+            bottom: 50px;
+            z-index: 13;
+        }
+        .companyName{
+            height: 51px;
+            text-align: center;
+            line-height: 51px;
+            font-size: 22px;
+            font-weight: bold;
+            font-family: 微软雅黑
+        }
+        .row_top{
+            margin-top: 13px;
+            text-align: left
+        }
+    </style>
+</head>
+<body>
+    <div id="app" style="text-align: center">
+        <el-row>
+            <el-col :span="22" :offset="1">
+                    <el-form ref="form" :model="form" label-width="120px" size="medium" @submit.native.prevent v-loading="loading">
+                        <!-- 表头 -->
+                        <el-button type="success"  @click="CloseAfterPrint" v-show="print" class="but_print">打印</el-button>
+                        <el-row>
+                                <el-col :span="5">
+                                    <img :src="imgURL" alt="湖南迪文科技有限公司">
+                                </el-col>
+                                <el-col :span="11" :offset="7" class="companyName">
+                                    湖南迪文科技有限公司领料出库详情
+                                </el-col>
+                            </el-row> 
+                            
+                        <el-row class="row_top">
+                                <el-col :span="9" :offset="2">
+                                    <b>领料出库单号：</b>{{form.stock_out_id}}
+                                    
+                                </el-col>
+                                <el-col :span="7" :offset="6">
+                                    <b>类别名称：</b>{{form.purchase_cate_name}}
+                                    
+                                </el-col>
+                            </el-row>
+                            <el-row class="row_top">
+                                <el-col :span="7" :offset="2">
+                                    <b>对方科目：</b>{{form.other_subject}}
+                                    
+                                </el-col>
+                                <el-col :span="7" :offset="8">
+                                        <b>创建时间：</b>{{form.create_time}}
+                                        
+                                </el-col>
+                            </el-row>
+                            <el-row class="row_top">
+                                <el-col :span="7" :offset="2">
+                                    <b>领料类型：</b>{{form.picking_kind}}
+                                    
+                                </el-col>
+                                <el-col :span="7" :offset="8">
+                                    <b>领料部门：</b>{{form.picking_dept_name}}
+                                    
+                                </el-col>
+                            </el-row>
+                            <el-row class="row_top">
+                                <el-col :span="7" :offset="2">
+                                        <b>选单号：</b>{{form.choise_no}}
+                                    
+                                </el-col>
+                                
+                                <el-col :span="7" :offset="8">
+                                        <b>打印次数：</b>{{form.printing_times}}
+                                    
+                                </el-col>
+                            </el-row>
+                            
+                            <el-row :gutter="20">
+                                <el-col :span="24">
+                                        <div>
+                                            <br>
+                                            <p class="title_name_product"><b>出货单物料信息 </b></p>
+                                            <el-table ref="multipleTable" :data="product" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange" border>
+                                            <el-table-column v-if="false" label="id" prop="id" type="index" align="center" header-align="center" width="50"></el-table-column>
+                                            <el-table-column v-if="false" label="source_id" prop="id" type="index" align="center" header-align="center" width="50"></el-table-column>
+                                            <el-table-column label="序号" type="index" :index="indexMethod" width="50px"> </el-table-column>
+                                            <el-table-column v-if="false" label="product_id" prop="product_id" align="center" header-align="center"></el-table-column>
+                                            <el-table-column label="物料编号" prop="product_no" align="center" header-align="center"></el-table-column>
+                                            <el-table-column label="物料名称" prop="product_number" align="center" header-align="center"> </el-table-column>
+                                            <el-table-column label="物料型号" prop="product_name" align="center" header-align="center"> </el-table-column>
+                                            <el-table-column v-if="false" label="product_id" prop="product_id" align="center" header-align="center"></el-table-column>
+                                            <el-table-column v-if="false" label="替换物料id" prop="substituted_id" align="center" width="200px" header-align="center"></el-table-column>
+                                            <el-table-column label="订单数量" prop="total_num" align="center" header-align="center"> </el-table-column>
+                                            <el-table-column label="已出库数量" prop="used_num" align="center" header-align="center"> </el-table-column>
+                                            <el-table-column label="库房余量" prop="stock_number" align="center" header-align="center"> </el-table-column>
+                                            <el-table-column label="锁定出库量" prop="o_audit" align="center" header-align="center"> </el-table-column>
+                                            <el-table-column label="出库数量" prop="num" width="100px" align="center" header-align="center" type="text"></el-table-column>
+                                            <el-table-column label="出货仓库" prop="rep_pid" width="150px" align="center" header-align="center" type="text">
+                                                
+                                            </el-table-column>
+                                            </el-table>
+                                        </div>
+                                        
+                            <br>
+                            <el-row class="row_top"> 
+                                    <el-col :span="7" :offset="2">
+                                            <b>制单人：</b>{{form.create_name}}
+                                            
+                                    </el-col>
+                                    <el-col :span="6" :offset="1">
+                                            <b>发货人：</b>{{form.send_name}}
+                                            
+                                    </el-col>
+                                    <el-col :span="7" :offset="1">
+                                            <b>领料人：</b>{{form.collect_name}}
+                            
+                                    </el-col>
+                                </el-row>
+                                <el-row class="row_top">
+                                    <el-col :span="7"  :offset="2">
+                                            <b>审核人：</b>{{form.audit_name}}
+                                        
+                                    </el-col>
+                                    <el-col :span="6" :offset="1">
+                                            <b>记账人：</b>{{form.account_name}}
+                                        
+                                    </el-col>
+                                </el-row>
+                                <el-row class="row_top">
+                                    <el-col :span="22" :offset="2">
+                                            <b>备注：</b>{{form.tips}}
+                                            
+                                    </el-col>
+                                </el-row>
+                            <br>
+                            
+                           
+                           
+                                
+                            
+                        </el-form>
+            </el-col>
+        </el-row>
+    </div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var id = {$id|json_encode};  //仓库名称
+    var vm = new Vue({
+        el: '#app',
+        data : function(){
+            return {
+                loading:true,
+                GeTATry:false,
+                print:true,
+                imgURL:'/Public/Admin/images/dwinlogo.png',
+                // searchProduct: {
+                //     name: ''
+                // },
+                form :{
+                    production_code:'',
+                    // xin
+                    stock_out_id:'',
+                    tips:'',
+                    source_id:'',
+                    purchase_cate_name:'',
+                    other_subject:'',
+                    choise_no:'',
+                    purpose:'',
+                    engine_item:'',
+                    picking_dept_id:'',
+                    picking_dept_name:'',
+                    picking_kind:'',
+                    create_time:new Date(),
+                    create_name:'',
+                    create_id:'',
+                    send_name:'',
+                    send_id:'',
+                    collect_name:'',
+                    collect_id:'',
+                    audit_name:'',
+                    audit_id:'',
+                    account_name:'',
+                    account_id:'',
+                    charge_name:'',
+                    charge_id:'',
+                    business_name:'',
+                    business_id:'',
+                    printing_times:'0',
+                    picking_kind:''
+
+                },
+                product:[]
+                            
+            }
+        },
+        created : function () {
+            this.loading = false
+            $.post('{:U("/Dwin/Stock/stockOutProduceMsg")}',{id:id},function(res){
+                vm.loading = false
+                if(res.data.produceData == null){
+                    return false
+                }
+                vm.form.stock_out_id = res.data.produceData.stock_out_id
+                vm.form.other_subject = res.data.produceData.other_subject
+                vm.form.choise_no = res.data.produceData.choise_no
+                vm.form.picking_dept_id = res.data.produceData.picking_dept_id
+                vm.form.picking_dept_name = res.data.produceData.picking_dept_name
+                vm.form.purchase_cate_name = res.data.cate_name
+                vm.form.picking_kind = res.data.produceData.picking_kind
+                for(var i in res.data.pickingType){
+                    if(vm.form.picking_kind == i){
+                        vm.form.picking_kind = res.data.pickingType[i]
+                    }
+                }
+                vm.form.create_time = vm.formatDateTime(res.data.produceData.create_time)
+                
+                vm.form.create_name = res.data.produceData.create_name
+
+                vm.form.send_name = res.data.produceData.send_name
+
+                vm.form.collect_name = res.data.produceData.collect_name
+
+                vm.form.audit_name = res.data.produceData.audit_name
+
+                vm.form.account_name = res.data.produceData.account_name
+
+                vm.form.charge_name = res.data.produceData.charge_name
+
+                vm.form.business_name = res.data.produceData.business_name
+                
+                vm.form.tips = res.data.produceData.tips
+
+                // 物料赋值
+                vm.options_rep_pid = res.data.repMap
+                for(let i in res.data.materialData){
+                    var obJ = {
+                        id:'',
+                        source_id:'',
+                        product_id:'',
+                        product_no:'',
+                        substituted_no:'',
+                        substituted_id:'',
+                        substituted_name:'',
+                        substituted_number:'',
+                        total_num:'',
+                        used_num:'',
+                        stock_number:'',
+                        o_audit:'',
+                        replace_data:'',
+                        num:'',
+                        rep_pid:'',
+                    }
+                    
+                    vm.product.push(obJ)
+                    vm.product[i].product_id = res.data.materialData[i].product_id
+                    vm.product[i].product_no = res.data.materialData[i].product_no
+                    vm.product[i].product_name = res.data.materialData[i].product_name
+                    vm.product[i].product_number = res.data.materialData[i].product_number
+                    vm.product[i].total_num = res.data.materialData[i].total_num
+                    vm.product[i].used_num = res.data.materialData[i].used_num 
+                    vm.product[i].stock_number = res.data.materialData[i].stock_number
+                    vm.product[i].o_audit = res.data.materialData[i].o_audit
+                    vm.product[i].replace_data = res.data.materialData[i].replace_data
+                    for(let x = 0;x<res.data.repMap.length;x++){
+                        if(res.data.materialData[i].rep_pid == res.data.repMap[x].rep_id){
+                            vm.product[i].rep_pid = res.data.repMap[x].repertory_name
+                        }
+                    } 
+                }
+
+            })
+
+        },
+        mounted() {
+        },
+        methods :{
+            handleSelectionChange(val){
+                console.log(val)
+            },
+            // 序号
+            indexMethod(index){
+                return index + 1 
+            },
+
+            // 时间戳转化为时间
+            formatDateTime:function (timeStamp) {
+                if(timeStamp != ''&&timeStamp != 0){
+                    var date = new Date();
+                    date.setTime(timeStamp * 1000);
+                    var y = date.getFullYear();    
+                    var m = date.getMonth() + 1;    
+                    m = m < 10 ? ('0' + m) : m;    
+                    var d = date.getDate();    
+                    d = d < 10 ? ('0' + d) : d;    
+                    var h = date.getHours();  
+                    h = h < 10 ? ('0' + h) : h;  
+                    var minute = date.getMinutes();  
+                    var second = date.getSeconds();  
+                    minute = minute < 10 ? ('0' + minute) : minute;    
+                    second = second < 10 ? ('0' + second) : second;   
+                    // return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;  
+                    return y + '-' + m + '-' + d;  
+                }else{
+                    return ''
+                }
+            },
+            CloseAfterPrint(){ 
+                this.print = false
+                if (confirm("是否打印")==true){ 
+                if(tata=document.execCommand("print")){
+                    window.close();
+                    this.print = true
+                    $.post('{:U("/Dwin/Stock/editStockOutOtherPrintTime")}',{id:id},function (res) {
+                        location.reload()
+                    })
+                }else setTimeout("CloseAfterPrint();",1000);
+                }
+            }
+        }
+    })
+</script>
+</html>
+   

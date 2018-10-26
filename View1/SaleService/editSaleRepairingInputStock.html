@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--更新维修单数据</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .input_stock_audit .form-group{
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>编辑维修记录</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content" id="app">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-list" id="table1">
+                            <label class="fa-hover col-md-2 col-sm-2">维修品基本信息</label>
+                            <thead>
+                            <tr>
+                                <th>产品类别</th>
+                                <th>产品型号</th>
+                                <th>数量（件）</th>
+                                <th>条码日期</th>
+                                <th>客户反馈</th>
+                                <th>售后方式</th>
+                                <th>客户名称</th>
+                                <th>业务名称</th>
+                                <th>收货时间</th>
+                                <th>收货快递单号</th>
+                                <th>返回地址</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="item in repairItemList">
+                                    <td>{{item.uname}}</td>
+                                    <td>{{item.product_name}}</td>
+                                    <td>{{item.num}}</td>
+                                    <td>{{item.barcode_date}}</td>
+                                    <td>{{item.customer_question}}</td>
+                                    <td>{{item.sale_mode}}</td>
+                                    <td>{{item.cusname}}</td>
+                                    <td>{{item.salename}}</td>
+                                    <td>{{item.repair_date | timestampToTime}}</td>
+                                    <td>{{item.courier_number}}</td>
+                                    <td>{{item.reback_address}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table class="table table-bordered table-striped dataTables-list" id="table2">
+                            <label class="fa-hover col-md-2 col-sm-2">编辑维修单信息</label>
+                                <tr v-for="(product,key) in product_list">
+                                    <td>
+                                        <div class="input-group">
+                                            <span style="font-weight: bold;font-size: 18px;">产品型号
+                                            </span>
+                                        </div>
+                                        <div class="input-group">{{product.product_name}}</div>
+                                        <button class="btn btn-info" @click="addWeixiuItem(key)" v-if="repairItemEditAble">添加</button>
+                                        <button class="btn btn-warning" @click="delWeixiuItem(key)" v-if="repairItemEditAble">删除</button>
+                                    </td>
+                                    <td>
+                                        <table class="table table-bordered table-striped dataTables-list">
+                                            <thead>
+                                            <th>维修员</th>
+                                            <th>维修日期</th>
+                                            <th>数量（件）</th>
+                                            <th>状态</th>
+                                            <th>故障现象</th>
+                                            <th>维修方式</th>
+                                            <th>故障类型</th>
+                                            <th>维修费用(元)</th>
+                                            <th>计件工资</th>
+                                            </thead>
+                                            <tr v-for="(item,index) in product.data">
+                                                <td>
+                                                    <select v-validate="'required'" name="" v-model="item.reperson_name" class="form-control" :disabled="!repairItemEditAble">
+                                                        <option :value="person.name" v-for="person in repairStaff">{{person.name}}</option>
+                                                    </select>
+                                                </td>
+                                                <td>{{item.start_date | timestampToTime}}</td>
+                                                <td>
+                                                    <input type="text" class="form-control" v-validate="'required'" v-model="item.re_num"  @input="validateSum(key,index)" style="width: 100px;" :disabled="!repairItemEditAble">
+                                                </td>
+                                                <td>
+                                                    <select v-validate="'required'" name="" v-model="item.re_status" class="form-control" :disabled="!repairItemEditAble">
+                                                        <option :value="status.id" v-for="status in re_status_list">{{status.name}}</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group" style="float: left;">
+                                                        <textarea name="" class="form-control" v-model="item.situation" :disabled="!repairItemEditAble"></textarea>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <select v-validate="'required'" name="" v-model="item.re_mode" class="form-control" :disabled="!repairItemEditAble">
+                                                            <option :value="mode.id" v-for="mode in re_mode_list">{{mode.name}}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="input-group">
+                                                        <textarea name="" class="form-control" v-model="item.mode_info" placeholder="附加说明(选填)" :disabled="!repairItemEditAble"></textarea>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <select v-validate="'required'" v-model="item.reperson_question" class="form-control" :disabled="!repairItemEditAble">
+                                                        <option :value="question.id" v-for="question in reperson_question_list">{{question.name}}</option>
+                                                    </select>
+                                                    <div class="input-group">
+                                                        <textarea name="" class="form-control" v-model="item.fault_info" placeholder="费用明细(选填)" :disabled="!repairItemEditAble"></textarea>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" v-model="item.piece_wage" style="width: 100px;" :disabled="!repairItemEditAble">
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" v-model="item.meter_piece" style="width: 100px;" :disabled="!repairItemEditAble">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                        </table>
+                        <table class="table table-bordered table-striped" id="table5">
+                            <tr >
+                                <th style="width: 160px">
+                                    人工费用(元)：
+                                    <textarea class="form-control" v-model="feeAndTips.rgmoney" :disabled="!feeAndTipsEditAble"></textarea>
+                                </th>
+                                <th style="width: 160px">
+                                    总计(元):
+                                    <textarea class="form-control" v-model="totalFee" :disabled="!feeAndTipsEditAble"></textarea>
+                                </th>
+                                <th>
+                                备注信息：
+                                <textarea class="form-control" v-model="feeAndTips.note" :disabled="!feeAndTipsEditAble"></textarea>
+                                </th>
+                            </tr>
+                        </table>
+                        <table class="table table-bordered table-striped dataTables-list" id = "table4" v-if="showFeedbackFlag">
+                            <tr style="width: 100%;">
+                                <td v-for="item in salesmanFeedback">
+                                    业务反馈信息：<textarea class="form-control" readonly="readonly" >{{item.reback_content}}</textarea>
+                                </td>
+                            </tr>
+                        </table>
+                        <h4>物流信息</h4>
+                        <table class="table table-bordered table-striped"  >
+                            <tr>
+                                <th>发货批次</th>
+                                <th>发货人</th>
+                                <th>快递单号</th>
+                                <th>发货日期</th>
+                                <th>详情</th>
+                                <th v-if="expressEditAble">操作</th>
+                            </tr>
+                            <tr v-for="(batch,batch_key) in sendGoods">
+                                <td>{{batch.bactch}}</td>
+                                <td>{{batch.send_man}}</td>
+                                <td>
+                                    <input v-validate="'required'" type="text" class="form-control" v-model="batch.track_number" :disabled="!expressEditAble">
+                                </td>
+                                <td>{{batch.send_date | timestampToTime}}</td>
+                                <td>
+                                    <table class="table table-bordered table-striped">
+                                        <tr>
+                                            <th>产品型号</th>
+                                            <th>数量</th>
+                                        </tr>
+                                        <tr v-for="(item,data_key) in batch.data">
+                                            <td>
+                                                <input v-validate="'required'" type="text" class="form-control" v-model="item.product_name" disabled>
+                                            </td>
+                                            <td>
+                                                <input v-validate="'required'" type="text" class="form-control" v-model="item.send_num" :disabled="!expressEditAble" @input="sendGoodsNumber(batch_key, data_key)">
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td v-if="expressEditAble">
+                                    <button class="btn btn-danger" @click="deleteSendGoodsItem(batch_key)" >删除</button>
+                                </td>
+                            </tr>
+                            <tr v-if="expressEditAble && !repairItemIsEmpty">
+                                <td colspan="6">
+                                    <button class="btn btn-info" @click="addGoodsSendBatch">添加发货批次</button></td>
+                            </tr>
+                        </table>
+                        <div>
+                            <hr>
+                            <h4>入库申请</h4>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>批次</th>
+                                    <th>内容</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tr v-for="(batch,batch_key) in stock_io_record">
+                                    <td>{{batch.batch}}</td>
+                                    <td>
+                                        <table class="table table-bordered table-striped">
+                                            <tr>
+                                                <th>产品名</th>
+                                                <th>仓库</th>
+                                                <th>数量</th>
+                                                <th>备注</th>
+                                                <th>审核员</th>
+                                                <th>状态</th>
+                                            </tr>
+                                            <tr v-for="(item,data_key) in batch.data">
+                                                <td>{{item.product_name}}</td>
+                                                <td>
+                                                    <select v-validate="'required'" class="form-control" v-model="item.warehouse_number" :disabled="item.audit_status == 2 || item.audit_status == 1 || !stockEditAble" @change="warehouseSelect(batch_key, data_key)">
+                                                        <option :value="warehouseItem.warehouse_number" v-for="warehouseItem in item.warehouse">{{warehouseItem.warehouse_name}}</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input v-validate="'required'" :disabled="item.audit_status == 2 || item.audit_status == 1 || !stockEditAble" class="form-control num" type="text" v-model="item.num" @input="stockNumberValidate(batch_key,data_key)">
+                                                </td>
+                                                <td>
+                                                    <input v-validate="'required'" :disabled="item.audit_status == 2 || item.audit_status == 1 || !stockEditAble"   class="form-control num" type="text" v-model="item.tips">
+                                                </td>
+                                                <td>
+                                                    <select v-validate="'required'" :disabled="item.audit_status || item.audit_status == 3 || !stockEditAble" name="shenheyuan" class="form-control auditor" v-model="item.auditor" @change="auditorSelect(batch_key, data_key)">
+                                                        <option value="" hidden>请选择审核员</option>
+                                                        <option :value="item.id" v-for="item in auditorArr">{{item.name}}</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <span v-if="item.audit_status">{{item.audit_status | stockAuditStatus}}</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <button v-if="stockEditAble" class="btn btn-danger" @click="delStockRecord(batch_key)">删除</button>
+                                    </td>
+                                </tr>
+                                <tr v-if="stockEditAble && !repairItemIsEmpty">
+                                    <td colspan="2"><button class="btn btn-primary" @click="addStockBatch">添加入库批次</button></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div v-show="!allDisabled">
+                            <button class="btn btn-outline btn-success" id="addbasicinfo" type="button" @click="testSubmit">保存编辑</button>
+                            <button class="btn btn-outline btn-success" id="salecontract" type="button" @click="openPrintPage">打印维修合同</button>
+                            <input type="hidden" id="user_name" value="{$Think.session.staffId}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- <script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script> -->
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/vee-validate.js"></script>
+<script src="/Public/html/js/bluebird.js"></script>
+<script>
+    Vue.use(VeeValidate);
+    var repairItemList   = {$repairProductData|json_encode}; // 维修品基本信息
+    var product_list     = {$productList|json_encode};  // 维修品具体维修信息
+    var feeAndTips       = {$saleRecordBasicData[0]|json_encode};    // 反馈与人工费
+    var repairStaff      = {$repairStaffArray|json_encode};   // 维修员列表
+    var salesmanFeedback = {$saleRecordBasicData|json_encode};  //业务反馈信息
+    var sendGoods        = {$sendGoods|json_encode};   // 物流信息
+    var re_status_list   = JSON.parse({$repairStatus|json_encode});    // 维修状态列表
+    var re_mode_list     = JSON.parse({$repairMode|json_encode});     // 维修方式列表
+    var reperson_question_list = JSON.parse({$repairQuestion|json_encode});   // 故障类型列表
+    var auditorArr       = {$auditorArr|json_encode};     // 出入库审核员列表
+    var stock_io_record  = {$stock_io_record|json_encode};     // 出入库记录
+    var pid  = {$sid};     // 出入库记录
+    console.log(stock_io_record);
+    /**
+     * 可编辑标志位
+     * editableFlag['completeFlag'] 为ture,该单据已完结，任何人不能编辑；
+     * editableFlag['editFlag'] 为true 该单据可以被编辑，对应按钮可以提交数据
+     * editableFlag['repairAssignFlag'] 冗余，true:维修产品可重新分配
+     * editableFlag['showFeedbackFlag'] true:feeTips中reback_contents显示，false不显示。
+     * */
+    var editableFlag     = {$flagArray|json_encode};
+    var allDisabled = editableFlag.completeFlag || !editableFlag.editFlag;
+    //var allDisabled = false;    // 测试用, 上面的是正确的
+
+
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                repairItemList          : repairItemList,
+                product_list            : product_list,
+                repairStaff             : repairStaff,
+                auditorArr              : auditorArr,
+                feeAndTips              : feeAndTips,
+                salesmanFeedback        : salesmanFeedback,
+                re_status_list          : re_status_list,
+                re_mode_list            : re_mode_list,
+                reperson_question_list  : reperson_question_list,
+                stock_io_record         : stock_io_record,
+                sendGoods               : sendGoods,
+                allDisabled             : allDisabled,
+                showFeedbackFlag        : editableFlag.showFeedbackFlag,
+                completeFlag            : editableFlag.completeFlag
+            }
+        },
+        created:function () {
+            for (var i = 0; i < this.product_list.length; i++){
+                if ('data' in this.product_list[i]){
+                }else {
+                    Vue.set(this.product_list[i], 'data', [])
+                }
+                Vue.set(this.product_list[i], 're_sum', 0);
+                for (var j = 0; j < this.product_list[i].data.length; j++){
+                    this.product_list[i].re_sum += +this.product_list[i].data[j].re_num;
+                }
+            }
+            Vue.set(this.feeAndTips, 'totalFee', 0);
+
+            if (this.stock_io_record.length > 0){
+                for (i = 0; i < this.stock_io_record.length; i++){
+                    for (j = 0; j < this.stock_io_record[i].data.length; j++){
+                        var warehouseNumber = this.stock_io_record[i].data[j].warehouse_number;
+                        var warehouseName = this.stock_io_record[i].data[j].warehouse_name;
+                        var auditor = this.stock_io_record[i].data[j].auditor;
+                        var auditorName = this.stock_io_record[i].data[j].auditor_name;
+                        Vue.set(this.stock_io_record[i].data[j], 'warehouseArr', warehouseNumber + '_' + warehouseName);
+                        Vue.set(this.stock_io_record[i].data[j], 'auditorArr', auditor + '_' + auditorName);
+                    }
+                }
+            }
+        },
+        computed: {
+            totalFee: function () {
+                var total = 0;
+                for (var i = 0; i < this.product_list.length; i++){
+                    for (var j = 0; j < this.product_list[i].data.length; j++){
+                        var staffList = this.repairStaff;
+                        var name = this.product_list[i].data[j].reperson_name;
+                        for (var a = 0; a < staffList.length; a++){
+                            if (staffList[a].name === name){
+                                staffId = staffList[a].id;
+                                this.product_list[i].data[j].staffArr = staffId + '_' + name;
+                            }
+                        }
+                        if ('piece_wage' in this.product_list[i].data[j]){
+                            if (this.product_list[i].data[j].piece_wage != ''){
+                                total += +this.product_list[i].data[j].piece_wage;
+                            }
+                        }
+                    }
+                }
+                if (this.feeAndTips.rgmoney == undefined){
+                    this.feeAndTips.rgmoney = 0;
+                }
+                total += +this.feeAndTips.rgmoney;
+                this.feeAndTips.totalFee = total;
+                return total;
+            },
+            repairNumberList: function () {
+                var obj = {};
+                for (var i = 0; i < this.repairItemList.length; i++){
+                    var item = this.repairItemList[i];
+                    obj[item.product_name] = obj[item.product_name] ? obj[item.product_name] : 0;
+                    obj[item.product_name] += +item.num
+                }
+
+                return obj
+            },
+            repairItemIsEmpty: function () {
+                for (var i = 0; i < this.product_list.length; i++){
+                    if (this.product_list[i].data.length == 0){
+                        return true
+                    }
+                }
+                return false
+            },
+            repairItemEditAble: function () {
+                if (allDisabled){
+                    return false
+                }
+                if (this.repairItemIsEmpty){
+                    return true
+                }
+                if (this.stock_io_record.length > 0 || this.sendGoods.length > 0 ){
+                    return false
+                }
+                return true;
+            },
+            feeAndTipsEditAble: function () {
+                if (allDisabled){
+                    return false
+                }
+                return true
+            },
+            expressEditAble: function () {
+                if (allDisabled){
+                    return false
+                }
+                return true
+            },
+            stockEditAble: function () {
+                if (allDisabled){
+                    return false
+                }
+                return true
+            }
+        },
+        methods: {
+            addWeixiuItem: function (key) {
+                var nowTime = Date.parse( new Date());
+                nowTime /= 1000;
+                var newItem = {
+                    start_date: nowTime,
+                    product_name: this.product_list[key].product_name,
+                    pid: pid
+                };
+                this.product_list[key].data.push(newItem);
+            },
+            testSubmit: function () {
+                this.$validator.validateAll().then(function (res) {
+                    if (res === true){
+                        var obj = {
+                            product_list: this.product_list,
+                            feeAndTips: this.feeAndTips,
+                            sendGoods: this.sendGoods,
+                            stock: this.stock_io_record
+                        };
+                        var index = layer.confirm('是否完结此单?', {title: '是否完结'},
+                            function () {
+                                obj.flag = 1;
+                                // console.log(obj);
+                                $.post('{:U("SaleService/editSaleRepairing")}', obj, function (res) {
+                                    layer.msg(res['msg'], function () {
+                                        window.location.reload();
+                                    });
+                                });
+                                layer.close(index);
+                            },
+                            function () {
+                                // console.log(obj);
+                                $.post('{:U("SaleService/editSaleRepairing")}', obj, function (res) {
+                                    layer.msg(res['msg']);
+                                });
+                        });
+                            console.log(res);
+                    }else {
+                        layer.msg('请填写未填项')
+                    }
+                })
+            },
+            delWeixiuItem: function (key) {
+                this.product_list[key].data.pop()
+            },
+            addGoodsSendBatch: function () {
+                var nowTime = Date.parse( new Date());
+                nowTime /= 1000;
+                var newBatch = this.sendGoods[this.sendGoods.length - 1] ? +this.sendGoods[this.sendGoods.length - 1].bactch + 1 : 1;
+                var productList = this.repairItemList;
+                var newData = [];
+                for (var i = 0; i < productList.length; i++){
+                    var obj = {
+                        bactch: newBatch,
+                        send_date: nowTime,
+                        send_man: "<?php echo session('nickname'); ?>"
+                    };
+                    obj.pid = productList[i].sid;
+                    obj.product_name = productList[i].product_name;
+                    newData.push(obj);
+                }
+
+                var newItem = {
+                    bactch: newBatch,
+                    send_date: nowTime,
+                    send_man: "<?php echo session('nickname'); ?>",
+                    data: newData
+                };
+                this.sendGoods.push(newItem);
+            },
+            addStockBatch: function () {
+                var productList = this.product_list;
+                var newBatch = this.stock_io_record.length == 0 ? 1 : +this.stock_io_record[this.stock_io_record.length - 1].batch + 1;
+                var obj = {
+                    batch: newBatch,
+                    pid: pid
+                };
+                var newData = [];
+                var data;
+                for (var i = 0; i < productList.length; i++){
+                    data = {
+                        product_id: productList[i].product_id,
+                        product_name: productList[i].product_name,
+                        proposer: "{:session('staffId')}",
+                        proposerArr: "{:session('staffId')}_{:session('nickname')}",
+                        action_order_number: repairItemList[0].sale_number,
+                        warehouse: productList[i].warehouse,
+                        cateArr: '4_售后入库',
+                        type: 1,
+                        pid: pid
+                    };
+                    newData.push(data)
+                }
+                obj.data = newData;
+                this.stock_io_record.push(obj)
+            },
+            deleteSendGoodsItem: function (key) {
+                this.sendGoods.splice(key,1)
+            },
+            delStockRecord: function (key) {
+                this.stock_io_record.splice(key, 1)
+            },
+            validateSum: function (a,b) {
+                var changedProductName = this.product_list[a].data[b].product_name;
+                var maxNum = this.repairNumberList[changedProductName];
+                var hasNum = 0;
+                for (var i = 0; i < this.product_list[a].data.length; i++){
+                    hasNum += +this.product_list[a].data[i].re_num
+                }
+                var currentNum = this.product_list[a].data[b].re_num;
+                if (hasNum > maxNum){
+                    layer.msg('该产品型号最大总数不得超过维修单上的总数');
+                    if (maxNum - (hasNum - currentNum) <= 0 ){
+                        this.product_list[a].data[b].re_num = 0
+                    }else {
+                        this.product_list[a].data[b].re_num = maxNum - (hasNum - currentNum)
+                    }
+                }
+                for (i = 0; i < this.product_list.length; i++){
+                    if ('data' in this.product_list[i]){
+
+                    }else {
+                        Vue.set(this.product_list[i], 'data', [])
+                    }
+                    Vue.set(this.product_list[i], 're_sum', 0);
+                    for (var j = 0; j < this.product_list[i].data.length; j++){
+                        this.product_list[i].re_sum += +this.product_list[i].data[j].re_num;
+                    }
+                }
+            },
+            openPrintPage: function () {
+                layer.open({
+                    type: 2,
+                    title: '打印详情',
+                    content: "{:U('printSalerecord')}?sid="+pid,
+                    area: ['100%', '100%'],
+                    yes: function(index, layero){
+                        layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    }
+                });
+            },
+            sendGoodsNumber: function (batch,index) {
+                var max = this.repairItemList[index].num;
+                var value = this.sendGoods[batch].data[index].send_num;
+                var sumValue = 0;
+                for (var i = 0; i < this.sendGoods.length; i++){
+                    sumValue += +(this.sendGoods[i].data[index].send_num ? this.sendGoods[i].data[index].send_num : 0);
+                }
+                if (sumValue > max){
+                    layer.msg('发货总数不能超过维修单对应的数量');
+                    this.sendGoods[batch].data[index].send_num = 0
+                }else if(value <= 0){
+                    layer.msg('发货数量不可小于0!!!');
+                    this.sendGoods[batch].data[index].send_num = 0;
+                }
+            },
+            warehouseSelect: function(batch_key, index){
+                var id = this.stock_io_record[batch_key].data[index].warehouse_number;
+                var warehouse = this.stock_io_record[batch_key].data[index].warehouse;
+                var name = '';
+                for (var i = 0; i < warehouse.length; i++){
+                    if (id == warehouse[i].warehouse_number){
+                        name = warehouse[i].warehouse_name
+                    }
+                }
+                Vue.set(this.stock_io_record[batch_key].data[index], 'warehouseArr', id + '_' + name)
+            },
+            auditorSelect: function(batch_key, index){
+                var id = this.stock_io_record[batch_key].data[index].auditor;
+                var auditorArr = this.auditorArr;
+                var name = '';
+                for (var i = 0; i < auditorArr.length; i++){
+                    if (id == auditorArr[i].id){
+                        name = auditorArr[i].name
+                    }
+                }
+                Vue.set(this.stock_io_record[batch_key].data[index], 'auditorArr', id + '_' + name)
+            },
+            stockNumberValidate: function(batch, index){
+                console.log(batch, index);
+            }
+        },
+        filters: {
+            timestampToTime: function (timestamp) {
+                var date = new Date(timestamp * 1000);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+                var Y = date.getFullYear() + '-';
+                var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()) + '-';
+                var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()) : date.getDate()) + ' ';
+                var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()) : date.getHours()) + ':';
+                var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()) : date.getMinutes()) + ':';
+                var s = (date.getSeconds()+1 < 10 ? '0'+(date.getSeconds()) : date.getSeconds()) + ' ';
+                return Y+M+D+h+m+s;
+            },
+            stockAuditStatus: function (status) {
+                var arr = ['', '未审核', '审核通过', '审核不通过'];
+                return arr[status]
+            }
+        }
+    });
+</script>
+</body>
+</html>
+

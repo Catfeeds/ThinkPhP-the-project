@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        body div table th {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title"><h5>项目基本信息</h5></div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>项目编号</th>
+                                <th>项目名称</th>
+                                <th>立项部门</th>
+                                <th>启动时间</th>
+                                <th>预计完成时间</th>
+                                <th>内部验收时间</th>
+                                <th>实际完成时间</th>
+                                <th>客户</th>
+                                <th>立项人</th>
+                                <th>项目状态</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td id="">{$data1.proid}</td>
+                                <td>{$data1.proname}</td>
+                                <td>
+                                    {$data1.deptname}
+                                </td>
+                                <td>{$data1.protime|date='Y-m-d',###}</td>
+                                <td>{$data1.deliverytime|date='Y-m-d',###}</td>
+                                <td><if condition="$data1.prodtime == ''">未验收<else/>{$vol.prodtime|date='Y-m-d',###}</if></td>
+                                <td><if condition="$data1.prodtime == ''">未完成<else/>{$vol.prodtime|date='Y-m-d',###}</if></td>
+                                <td>{$data1.cusname}</td>
+                                <td>{$data1.buildname}</td>
+                                <td>
+                                    <switch name="data1.prostatus">
+                                        <case value="1"><span style="color: blue;">进展中</span></case>
+                                        <case value="2"><span style="color: brown;">内部验收中</span></case>
+                                        <case value="3"><span style="color: black;">已完成</span></case>
+                                        <case value="4"><span style="color: red;">失败</span></case>
+                                        <case value="5"><span style="color: red;">暂停</span></case>
+                                    </switch>
+                                </td>
+                            </tr>
+                            <tr><td colspan="10" style="height: 80px;">项目需求：{$data1.proneeds}</td></tr>
+                            <tr>
+                                <td rowspan="2">绩效情况</td>
+                                <td>研发费</td>
+                                <td>维护</td>
+                                <td>方案/临时</td>
+                                <td>PCB设计</td>
+                                <td>代码设计</td>
+                                <td>文档撰写</td>
+                                <td>总绩效</td>
+                                <td colspan="2">研发人员及绩效</td>
+                            </tr>
+                            <tr>
+                                <td>{$data1.proprice}</td>
+                                <td>{$data1.promaint}</td>
+                                <td>{$data1.protemp}</td>
+                                <td>{$data1.propcb}</td>
+                                <td>{$data1.codedesign}</td>
+                                <td>{$data1.docwrite}</td>
+                                <td>{$data1.performbonus}</td>
+                                <td colspan="2">
+                                    <volist name="data2" id="vol">
+                                        {$vol.pname}({$vol.jxval}%)<br/>
+                                    </volist>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h5>项目进度</h5>
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-prjUpdateList">
+                            <thead>
+                            <tr>
+                                <th>更新时间</th>
+                                <th>更新人</th>
+                                <th>进度更新内容</th>
+                                <th>审核状态</th>
+                            </tr>
+                            </thead>
+                          <tbody>
+                          <volist name="updContent" id="vol">
+                              <tr>
+                                  <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                  <td>{$vol.prjername}</td>
+                                  <td class="prjUpdContent mouseOn" data="{$vol.prjcontent}">{$vol.prjcontent|subtext=30}</td>
+                                  <td>
+                                      <switch name="vol.audistatus">
+                                          <case value="1"><span style="color: blue;">未审核</span></case>
+                                          <case value="2"><span style="color: blue;">通过</span></case>
+                                          <case value="3"><span style="color: red;">无效</span></case>
+                                      </switch>
+                                  </td>
+                              </tr>
+                          </volist>
+                          </tbody>
+                        </table>
+                    </div>
+                    <h5>项目变更记录</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>项目变更时间</th>
+                                <th>变更人</th>
+                                <th>变更内容</th>
+                                <th>审核人</th>
+                            </tr>
+                            <volist name="chData" id="vol">
+                                <tr style="text-align: center;">
+                                    <td>{$vol.changetime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.postname}</td>
+                                    <td class="prjChanges">
+                                        <present name="vol.olddeliverytime">
+                                            项目验收时间由:&emsp;{$vol.olddeliverytime|date='Y-m-d',###}&emsp;变为:&emsp;<span>{$vol.newdeliverytime|date='Y-m-d',###}</span><br/>
+                                        </present>
+                                        <present name="vol.oldprjneeds">
+                                            项目需求由:<br/>&emsp;{$vol.oldprjneeds}<br/>变为:<br/>&emsp;<span>{$vol.newprjneeds}</span><br/>
+                                        </present>
+                                        <present name="vol.oldbonus">
+                                            项目总绩效由:&emsp;{$vol.oldbonus}元，&emsp;变为:&emsp;<span>{$vol.newbonus}</span>元<br/>
+                                        </present>
+                                        <present name="vol.newpartner">参与人及绩效变更情况：
+                                            <foreach name="vol.oldpartname" item="num1">
+                                                {$num1}&emsp;
+                                            </foreach>对应绩效
+                                            <foreach name="vol.oldjxval" item="num2">
+                                                {$num2}%&emsp;
+                                            </foreach>变为：
+                                            <foreach name="vol.newpartname" item="num1">
+                                                {$num1}&emsp;
+                                            </foreach>对应绩效
+                                            <foreach name="vol.newjxval" item="num2">
+                                                {$num2}%&emsp;
+                                            </foreach>
+                                        </present>
+                                    </td>
+                                    <td>{$vol.auditname}</td>
+                                </tr>
+                            </volist>
+                        </table>
+                    </div>
+                    <h5>项目变更申请</h5>
+                    <div class="table-responsive">
+                        <input type="hidden" id="dataid" value="{$data1.proid}">
+                        <h4 align="center"><input type="button" id="changePrj" value="项目变更" class="btn btn-outline btn-info"/> </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".dataTables-prjUpdateList").dataTable({
+            'bFilter' : true,
+            'bLengthChange' : false,
+            'bInfo' :　true,
+            'bAutoWidth': false,
+            'iDisplayLength' :　10
+        });
+
+        var layera;
+        $('.dataTables-prjUpdateList tbody').on('mouseover','.prjUpdContent', function () {
+            var content = $(this).attr('data');
+            layera = layer.tips( content , '.prjUpdContent',{
+                tips: [1, '#3595CC'],
+                area: '500px',
+                time : 100000
+            });
+            return layera;
+        });
+        $('.dataTables-prjUpdateList tbody').on('mouseout','.prjUpdContent', function () {
+            layer.close(layera);
+        });
+    });
+
+    /*--------------------------------------------------------------------------------*/
+    $("td").on('mouseover',function() {
+        co = $(this).css('background-color');
+        return co;
+    });
+    $(".mouseOn").on('mouseover', function () {
+        co = $(this).css('background-color');
+        $(this).css('color', 'blue');
+        $(this).css('background-color', 'yellow');
+        return co;
+    });
+    $(".mouseOn").on('mouseout', function () {
+        $(this).css('color', 'black');
+        $(this).css('background-color', co);
+    });
+    /*--------------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------------------*/
+
+    $("#changePrj").on('click', function() {
+        var pid = $("#dataid").val();
+        $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/checkChange",
+            data : {
+                proid : pid
+            },
+            success : function (msg) {
+                if (msg == 1) {
+                    layer.open({
+                        type : 2,
+                        title : '项目变更',
+                        area : ['90%', '80%'],
+                        content : "__CONTROLLER__/changeProject/id/" + pid //iframe的url
+                    });
+                } else {
+                    layer.msg(message, {icon : 5});
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

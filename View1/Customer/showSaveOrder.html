@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CRM--订单列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>订单列表</h5>
+                    <input type="hidden" name="orderType" id="orderType" value="order_1">
+                    <input type="hidden" name="orderNum" id="orderNum" value="{:I('get.k')}">
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-orderList">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    $(document).ready(function () {
+        var oTable = $(".dataTables-orderList").dataTable({
+            "paging"       : true,
+            "autoWidth"    : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 20, 35, 50],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true,//开启服务器获取数据
+            "ajax"         : { // 获取数据
+                "url"   : controller + "/showSaveOrder",
+                "type"  : 'post',
+                "data"  : {
+                    "orderType": function () {
+                    return document.getElementById('orderType').value;
+                    },
+                    'orderNum' : function () {
+                    return document.getElementById('orderNum').value;
+                    },
+                }
+            },
+            "columns" :[ //定义列数据来源
+                {'title' : "订单编写时间", 'data' : 'time', 'class' : "mouseOn"},
+                {'title' : "客户名称", 'data':"cusname"},
+                {'title' : "K3单据编号", 'data' : "k3_id"},
+                {'title' : "订单金额", 'data' : "cur_num"},
+                {'title' : "填写人", 'data' : "staname"},
+                {'title' : "操作",'data': 'edit','class':"align-center"}
+            ],
+            "columnDefs": [{
+                "render": function(data, type, row) {
+                    return '<a href="javascript:;"><i class="fa fa-close"></i></a>&emsp;' +
+                    '<a href="javascript:;"><i class="fa fa-edit"></i></a>';
+                },
+                "targets": 5
+            }]
+        });
+    });
+
+    $(document).on('click', '.fa-close', function (){
+        $(".fa-close").attr('disabled', 'disabled');
+        var orderId = $(this).parent().parent().parent().attr('id');
+        layer.confirm('确定删除这条记录？', {
+            btn: ['Yes', 'No'] //按钮
+            }, function(){
+                $.ajax({
+                    type : "post",
+                    url  : controller + '/delSavedOrder',
+                    data : {
+                        order_id : orderId
+                    },
+                    success : function (ajaxData) {
+                        if (ajaxData == 2) {
+                            layer.msg('删除成功', {
+                                time : 500,
+                                end  : function () {
+                                    var oTable = $('.dataTables-orderList').DataTable();
+                                    oTable.draw();
+                                }
+                            });
+                        } else {
+                            layer.alert("您不是该订单的负责人");
+                            $('#changeButton').attr('disabled', false);
+
+                        }
+                    }
+                });
+                $(".fa-close").attr('disabled', false);
+            }, function(){
+                layer.msg('OK', {
+                    time : 500, //0.5s后自动关闭
+                    end  : function () {
+                        $(".fa-close").attr('disabled', false);
+                    }
+            });
+        });
+    });
+    $(document).on('click', '.fa-edit', function () {
+        var orderId = $(this).parent().parent().parent().attr('id');
+        layer.open({
+            type: 2,
+            title: '销售单据',
+            area: ['100%', '100%'],
+            content: controller + "/editSavedOrder/orderId/" + orderId //iframe的url
+        });
+        console.log(orderId);
+    });
+
+    $(".changeOrder").on('click', function() {
+        $(".changeOrder").css('color', '#337ab7');
+        $(this).css('color','red');
+        var kElement =  document.getElementById("orderType");
+        var id = $(this).attr('id');
+        kElement.value = id;
+        var oTable = $(".dataTables-orderList").DataTable();
+        oTable.ajax.reload();
+    });
+</script>
+</html>

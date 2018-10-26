@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>CRM--联系记录添加</title>
+    <meta name="keywords" content="业务">
+    <meta name="description" content="响应式">
+
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color : black;
+        }
+        .margin-set{
+            margin:5px 0;
+        }
+        .hidden-class{
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$data[0]['cname']}联系记录添加</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <form id="contactSubmit">
+                            <div class="form-group margin-set">
+                                <div class="col-xs-12 margin-set">
+                                    <label class="col-sm-2 control-label" for="contact-type" style="text-align:right;font-size:1.4em;">记录类型</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control required" name="contact-type" id="contact-type" style="width: 100%;">
+                                            <option value="1">电话</option>
+                                            <option value="2">拜访</option>
+                                            <option value="3">会议</option>
+                                            <option value="4">即时通讯（qq,微信）</option>
+                                            <option value="5">邮件</option>
+                                            <option value="7">高管约谈</option>
+                                            <option value="6">其他</option>
+                                        </select>
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group margin-set">
+                                <div class="col-xs-12 margin-set">
+                                    <label class="col-sm-2 control-label" for="contact-time" style="text-align:right;font-size:1.4em;">时间</label>
+                                    <div class="col-sm-3">
+                                        <input style="width: 100%;" name="contact-time" id="contact-time" type="text" class="form-control required" onclick="WdatePicker( {el:this,dateFmt:'yyyy-MM-dd HH:mm:ss'})" >
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 margin-set">
+                                    <label class="col-sm-2 control-label" for="contact-name" style="text-align:right;font-size:1.4em;">联系人</label>
+                                    <div class="col-sm-3">
+                                        <input style="width: 100%;" name="contact-name" id="contact-name" type="text" class="form-control required" minlength="2">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <button class="btn btn-outline btn-success btn-xs" type="button" id='sel-contact-btn'>快速选择联系人</button>
+                                        <select class="form-control hidden-class" name="sel-contact" id="sel-contact">
+                                            <option value="">请选择</option>
+                                            <volist name="contactSel" id="vo">
+                                                <option value="{$vo.id}" contactNum="{$vo.phone}">{$vo.name}</option>
+                                            </volist>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xs-12 margin-set">
+                                    <label class="col-sm-2 control-label" for="contact-num" style="text-align:right;font-size:1.4em;">联系号码</label>
+                                    <div class="col-sm-3">
+                                        <input style="width: 100%;" name="contact-num" id="contact-num" type="text" class="form-control required" minlength="7" maxlength="40" placeholder="请按照红字提示输入对应联系方式">
+                                        <span class="help-block m-b-none"></span><span id="contact-list" style="color:red">(电话号码)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group margin-set">
+                                <div class="col-xs-12 margin-set">
+                                    <label class="col-sm-2 control-label" for="contact-theme" style="text-align:right;font-size:1.4em;">主题</label>
+                                    <div class="col-sm-10">
+                                        <input style="width: 60%;" name="contact-theme" id="contact-theme" type="text" class="form-control required" minlength="3">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group margin-set">
+                                <div class="col-xs-12 margin-set">
+                                    <label class="col-sm-2 control-label" for="contact-content" style="text-align:right;font-size:1.4em;">联系内容</label>
+                                    <div class="col-sm-10">
+                                        <textarea name="contact-content" class="form-control required" rows="7" id="contact-content" style="width: 60%;" placeholder="请至少填写10个字，拖动输入框右下角可拉伸窗口大小" minlength="10"></textarea>
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="cusid" value="{$Think.get.cusId}">&emsp;
+                            <button class="btn btn-outline btn-success" type="submit" id="contactSub">提交</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var controller       = "__CONTROLLER__";
+    var submitBtn        = $("#contactSub");
+    var selContactBtn    = $("#sel-contact-btn");
+    var selectionContact = $("#sel-contact");
+    var contactType      = $('#contact-list');
+    var contactTypeSel   = $("#contact-type");
+    var contactName      = $("#contact-name");
+    var contactNumber    = $("#contact-num");
+    selContactBtn.on('click', function () {
+        selectionContact.toggle();
+    });
+    selectionContact.on('change', function () {
+        contactId = $(this).val();
+        conName  = $(this).find("option:selected").text();
+         phoneNum = $(this).find("option:selected").attr('contactNum');
+         console.log(phoneNum);
+        if (contactId) {
+            // 取到联系人id ajax获取联系电话等，回填表单
+            var contactMethod = contactTypeSel.val();
+            if (contactMethod != 4 && contactMethod != 5) {
+                contactName.val(conName);
+                contactNumber.val( phoneNum);
+            } else {
+                $.ajax({
+                    type : 'post',
+                    url  : controller + "/addContactRecords",
+                    data : {
+                        type : contactMethod,
+                        contactId : contactId
+                    },
+                    success : function (ajaxData) {
+                        console.log(ajaxData);
+                        if (ajaxData) {
+                            contactName.val(ajaxData.name);
+                            contactNumber.val(ajaxData.number);
+                        }
+                    }
+                });
+            }
+        } else {
+
+        }
+       /* if (!contactId) {
+            console.log(contactTypeSel.val());
+            console.log("dfege");
+            //$.ajax()
+        } else {
+            console.log("difjei");
+        }*/
+    });
+    $(document).ready(function(){
+        contactTypeSel.on('change', function () {
+            // 清空联系人 清空selcontact默认值
+            contactName.val("");
+            contactNumber.val("");
+            selectionContact.val("");
+            // 联系方式提示
+            if ($(this).val() == 4) {
+                // qq 微信
+                contactType.html("");
+                contactType.html("(qq、微信号码)");
+            } else if ($(this).val() == 5) {
+                // 邮件往来
+                contactType.html("");
+                contactType.html("(邮箱地址)");
+            } else {
+                // 电话
+                contactType.html("");
+                contactType.html("(电话号码)");
+            }
+        });
+        $("#contactSubmit").validate({
+            submitHandler: function(form) {
+                submitBtn.attr('disabled', true);
+                var data = $(form).serializeArray();
+                $.ajax({
+                    type : 'POST',
+                    url  : controller + '/addContactRecords',
+                    data : data,
+                    success : function (msg) {
+                        if(msg['status'] == 1) {
+                            layer.msg("ok,提交成功",
+                                {
+                                    icon : 6,
+                                    time : 1000
+                                },
+                                function () {
+                                    window.location.reload();
+                                }
+                            );
+                        } else {
+                            layer.alert(msg['msg']);
+                            submitBtn.attr("disabled", false);
+                        }
+                    },
+                    error : function (error) {
+                        layer.alert(error);
+                    }
+                });
+            }
+        });
+    });
+    /* submitBtn.on('click', function() {
+         submitBtn.attr('disabled', true);
+         var themeString = $("#conTheme").val();
+         var conTime = $("#conTime").val();
+         var conDetail = $("#conDetail").val();
+         if (!themeString) {
+             layer.alert('请检查主题,不要为空');
+             submitBtn.attr('disabled', false);
+             return false;
+         } else if (themeString.length < 2) {
+             layer.alert("字数不要低于两个字");
+             submitBtn.attr('disabled', false);
+             return false;
+         }
+         if (!conTime) {
+             layer.alert('请检查联系时间是否填写');
+             submitBtn.attr('disabled', false);
+             return false;
+         }
+         if (!conDetail) {
+             layer.alert('联系内容不能为空');
+             submitBtn.attr('disabled', false);
+             return false;
+         } else if (conDetail.length < 10){
+             layer.alert("联系记录字数不能少于10");
+             submitBtn.attr('disabled', false);
+             return false;
+         }
+         var datas = $("#contactSubmit").serializeArray();
+         $.ajax({
+             type : 'POST',
+             url  : controller + '/addContactRecords',
+             data : datas,
+             success : function (msg) {
+                 if(msg['status'] == 1) {
+                     layer.msg("ok,提交成功",
+                         {
+                             icon : 6,
+                             time : 1000
+                         },
+                     function () {
+                         window.location.reload();
+                     }
+                     );
+                 } else {
+                     layer.alert("提交出错");
+                     submitBtn.attr("disabled", false);
+                 }
+             },
+             error   : function (error) {
+                 layer.alert(error);
+             }
+         });
+     });*/
+</script>
+</body>
+</html>

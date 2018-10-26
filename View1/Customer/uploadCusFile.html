@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>客户文件上传</title>
+    <webuploadercss />
+</head>
+<body>
+<form action="__CONTROLLER__/uploadFile" method="post">
+    <input type="hidden" value="{$Think.get.cusId}" id="userId">
+    <webuploader name="image" url="__CONTROLLER__/uploadFile" word="支持文件拖拽，单次最多20个文件,单个文件不能超过10M!" />
+</form>
+    <webuploaderjs />
+</body>
+
+</html>

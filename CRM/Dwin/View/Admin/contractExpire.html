@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body{
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <el-row>
+        <el-col :span="8">
+            <el-radio @change="changeMap" v-model="time" label="1">下一个月</el-radio>
+            <el-radio @change="changeMap" v-model="time" label="2">下两个月</el-radio>
+        </el-col>
+    </el-row>
+    <table class="table table-striped table-hover table-bordered" >
+        <tr>
+            <th>职员编号</th>
+            <th>姓名</th>
+            <th>合同编号</th>
+            <th>合同类别</th>
+            <th>合同起始日期</th>
+            <th>合同终止日期</th>
+            <th>合同签订次数</th>
+            <th>试用期起始日期</th>
+            <th>试用期终止日期</th>
+            <th>合同签订期限</th>
+        </tr>
+        <tr v-for="(item, index) in data">
+            <td>{{item.employee_id}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.contract_id}}</td>
+            <td>{{item.contract_type}}</td>
+            <td>{{item.start_time}}</td>
+            <td>{{item.max_end_time}}</td>
+            <td>{{item.sign_count}}</td>
+            <td>{{item.probation_start_time}}</td>
+            <td>{{item.max_probation_end_time}}</td>
+            <td>{{item.duration}}</td>
+        </tr>
+    </table>
+    <el-pagination
+            layout="prev, pager, next"
+            @current-change="changePage"
+            :total="total">
+    </el-pagination>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var staffInfo = {$staffInfo|json_encode};
+    var vm = new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                data: [],
+                type: '1',
+                time: '1',
+                loading: true,
+                page: 1,
+                total: 0
+            }
+        },
+        created: function () {
+            this.getData()
+        },
+        methods: {
+            getData: function () {
+                var vm = this;
+                this.loading = true;
+                $.post('', {
+                    type: vm.type,
+                    time: vm.time,
+                    page: vm.page
+                }, function (res) {
+                    vm.loading = false
+                    vm.data = res.data
+                    vm.total = res.total
+                    this.page = 1
+                })
+            },
+            changePage: function (page) {
+                this.page = page
+                this.getData()
+            },
+            changeMap: function () {
+                this.page = 1;
+                this.getData();
+            }
+        }
+    })
+</script>
+</body>
+</html>

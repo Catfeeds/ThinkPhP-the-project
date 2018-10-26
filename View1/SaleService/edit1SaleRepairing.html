@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目更新列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+	<style type="text/css">
+        body {
+            color: black;
+        }
+        /*.chosen-select{
+            color : black;
+        }!important*/
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>编辑维修记录</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1"> 
+                        <form id="addSaleRepairingForm1" method="post">                      
+                            <table class="table table-bordered table-striped dataTables-list" id="table1">
+                                <label class="fa-hover col-md-1 col-sm-1">维修品基本信息</label>
+                                <thead>
+                                    <tr>
+                                        <th>产品类别</th>
+                                        <th>产品型号</th>                                        
+                                        <th>数量（件）</th>
+                                        <th>条码日期</th>
+                                        <th>客户反馈</th>
+                                        <th>售后方式</th>                                         
+                                        <th>退回地址</th>                                                                                  
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <volist name="result" id="vol">
+                                        <input type="hidden" name="sid" value="{$vol.sid}">
+                                    <tr>
+                                        <td>{$vol.name}</td>                                        
+                                        <td>{$vol.product_name}</td>
+                                        <td>{$vol.num}</td>
+                                        <td>{$vol.barcode_date}</td>
+                                        <td>{$vol.customer_question}</td>                                       
+                                        <td>{$vol.sale_mode}</td>  
+                                        <td>{$vol.reback_address}</td>                                     
+                                    </tr> 
+                                    </volist>                  
+                               </tbody>
+                            </table> 
+                        
+                            <table class="table table-bordered table-striped dataTables-list" id="table2">    
+                                <label class="fa-hover col-md-1 col-sm-1">编辑维修人信息</label>               
+                                
+                            </table>    
+                            <table class="table table-bordered table-striped dataTables-list" id = "table3">
+                                <label class="fa-hover col-md-1 col-sm-1">编辑发货信息<span class="glyphicon glyphicon-arrow-down" style="color: #1AB394;" id="sendgoods" aria-hidden="true"></span>&nbsp;<span class="glyphicon glyphicon-arrow-up" style="color: #1AB394;" id="delgoods" aria-hidden="true"></span></label>
+                            </table>
+                            <button class="btn btn-outline btn-success" id="addbasicinfo" type="button">保存编辑</button>
+                        </form>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- <script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script> -->
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script>
+
+$(".dataTables-list").ready(function(){
+    window.onload = function(){
+        var biao = $("#table1").find('tr').length;
+        var hang = biao - 1;
+        //通过上面表格的行数来控制下面显示几行
+        for (var fnNum = 1; fnNum <= hang; fnNum++) {
+            $("#table2").append(                  
+                    '<tr>'+                                        
+                        '<td style="width: 180px;">'+
+                            '<div class="input-group">'+
+                                '<span style="font-weight: bold;font-size: 18px;">产品型号'+
+                                    '<button type="button" onclick="addnow('+fnNum+');" style="background-color: #1AB394; margin-left:5px;" class="btn btn-default btn-xs "><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>'+
+                                    '<button type="button" onclick="removenow('+fnNum+');" style="background-color: #1AB394; margin-left:5px;" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>'+
+                                    '<button type="button" id="down'+ fnNum +'" style="background-color: #1AB394; margin-left:5px;" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></button>'+
+                                '</span>'+
+                            '</div>'+
+                            '<div class="input-group">'+
+                                '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="rproduct_name'+ fnNum +'" id="rproduct_name'+ fnNum +'">'+ 
+                            '</div>' +                                          
+                        '</td>' +                                          
+                        '<td>'+
+                            '<table class="table table-bordered table-striped dataTables-list" id = "smalltable'+ fnNum +'">'+
+                                '<thead>'+
+                                    '<th>维修员</th>' +                                          
+                                    '<th>维修日期</th>'+
+                                    '<th>数量（件）</th>'+
+                                    '<th>状态</th>'+
+                                    '<th>维修方式</th>'+
+                                    '<th>故障类型</th>'+
+                                    '<th>维修费用</th>'+
+                                '</thead>'+
+                                                                       
+                            '</table>' +
+                        '</td>'+                                                                            
+                    '</tr>'
+            );
+            var a = $('#table1 tr:eq('+ fnNum +') td:nth-child(2)').text(); 
+            $('#'+'rproduct_name'+ fnNum).attr("value",a);
+        }
+    }
+});    
+    
+           
+//追加当前维修人行内部表格
+var anumber = 0;
+function addnow(fnNum){
+    //console.log(hang);
+    //获取select赋值给隐藏的td    
+    $("#"+ "smalltable" + fnNum).append(
+        '<tr>'+
+            '<td style="display:none;">'+
+                '<div class="input-group">'+
+                    '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="a_name'+ anumber +'" id="a_name'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+
+                    '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="reperson_name'+ anumber +'" id="reperson_name'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<input class="form-control" type="text" name="start_date'+ anumber +'" id="start_date'+ anumber +'" onclick="WdatePicker( {el:this,dateFmt:\'yyyy-MM-dd HH:mm:ss\'} )">'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+
+                    '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="re_num'+ anumber +'" id="re_num'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' + 
+                    '<select class="form-control" name="re_status'+ anumber +'"  id="re_status'+ anumber +'">'+   
+                        '<option value="待换物料">待换物料</option>'+
+                        '<option value="待检测">待检测</option>'+
+                        '<option value="待维修">待维修</option>'+
+                        '<option value="维修中">维修中</option>'+
+                        '<option value="维修完成">维修完成</option>'+
+                    '</select>'  +                                          
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+                                                
+                    '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="re_mode'+ anumber +'" id="re_mode'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+                
+                '<div class="input-group" style="float: left;">'+
+                        '<select class="form-control" name="reperson_question'+ anumber +'" id="reperson_question'+ anumber +'">' +  
+                            '<option value="客责">客责</option>'+
+                            '<option value="液晶屏">液晶屏</option>'+
+                            '<option value="触摸屏">触摸屏</option>'+
+                            '<option value="芯片">芯片</option>'+
+                            '<option value="阻容">阻容</option>'+
+                            '<option value="其他原材料">其他原材料</option>'+
+                            '<option value="安装">安装</option>'+
+                            '<option value="直插件虚焊">直插件虚焊</option>'+
+                            '<option value="表插件虚焊">表插件虚焊</option>'+
+                            '<option value="程序问题">程序问题</option>'+
+                            '<option value="技术支持">技术支持</option>'+
+                            '<option value="焊接问题">焊接问题</option>'+
+                            '<option value="其他">其他</option>'+
+                            '<option value="模块">模块</option>'+
+                            '<option value="检测入库">检测入库</option>'+
+                            '<option value="连焊">连焊</option>'+
+                        '</select>'+                                                
+                    '</div>'+                                        
+                    '<div class="input-group" style="float: left;">'+
+                        '<input class="form-control" placeholder="附加说明（可不填）" id="fault_info" name="fault_info'+ anumber +'" >'+
+                    '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' +                                               
+                    '<input type="text" class="form-control" placeholder="￥0.00" aria-describedby="basic-addon1" name="piece_wage'+ anumber +'" id="piece_wage'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+        '</tr>'
+        );
+        //获取数量赋值
+        var a = $('#table1 tr:eq('+ fnNum +') td:nth-child(3)').text();        
+        $('#'+'re_num'+ anumber).attr("value",a);
+        //获取产品名赋值给隐藏td
+        var b = $('#table1 tr:eq('+ fnNum +') td:nth-child(2)').text();
+        $('#'+'a_name'+ anumber).attr("value",b);
+        //console.log(b);
+    anumber++;
+    return anumber;
+}
+
+//删除当前维修人行内部表格
+function removenow(fnNum) {   
+    $("#"+ "smalltable" + fnNum).children().children().last("tr").remove();
+    anumber--;
+    return anumber;
+}
+
+//添加发货信息行数
+var gnumber = 0;
+$("#sendgoods").on('click',function(){   
+    var biao = $("#table1").find('tr').length;
+    var hang = biao - 1;
+    $("#table3").append(                  
+            '<tr>'+                                        
+                '<td style="width: 180px;">'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">发货批次</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+                       
+                        '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="bactch'+ gnumber +'" id="bactch'+ gnumber +'">'+ 
+                    '</div>' +                                          
+                '</td>' + 
+                '<td style="width: 180px;">'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">快递单号</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+
+                        '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="track_number'+ gnumber +'" id="track_number'+ gnumber +'">'+ 
+                    '</div>' +                                          
+                '</td>' + 
+                '<td style="width: 180px;">'+
+                    '<div class="input-group">'+
+                        '<span style="font-weight: bold;font-size: 18px;">发货日期</span>'+
+                    '</div>'+
+                    '<div class="input-group">'+
+                        '<input class="form-control" type="text" name="send_date'+ gnumber +'" id="send_date'+ gnumber +'" onclick="WdatePicker( {el:this,dateFmt:\'yyyy-MM-dd HH:mm:ss\'} )">'+
+                    '</div>' +                                          
+                '</td>' +                                          
+                '<td>'+
+                    '<table class="table table-bordered table-striped dataTables-list" id = "goodstable'+ gnumber +'">'+
+                        '<thead>'+
+                            '<th>产品型号</th>'+
+                            '<th>数量（件）</th>'+
+                        '</thead>'+
+                        
+                    '</table>' +
+                '</td>'+                                                                            
+            '</tr>'
+            );
+        for (var i = 0; i <= hang; i++) {
+            var a = $('#table1 tr:eq('+ i +') td:nth-child(2)').text();       
+            var b = $('#table1 tr:eq('+ i +') td:nth-child(3)').text();                     
+            $("#"+ 'goodstable' + gnumber).append(
+                '<tr>'+
+                    '<td>'+
+                        '<div class="input-group">'+
+                            '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="reproduct_name'+ i +'" id="reproduct_name'+ i +'">'+
+                        '</div>'+
+                    '</td>'+
+                    '<td>'+
+                        '<div class="input-group">'+
+                            '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="send_num'+ i +'" id="send_num'+ i +'">'+
+                        '</div>'+
+                    '</td>'+
+                '</tr>'
+                );
+
+            $('#'+'reproduct_name'+ i).attr("value",a);
+            $('#'+'send_num'+ i).attr("value",b);          
+        } 
+        $('#reproduct_name0').parent().parent().parent().remove();   
+    gnumber++;
+    return gnumber;
+});
+
+//删除发货信息行数
+$("#delgoods").on('click',function(){    
+    $("#table3").children().children().last("tr").remove();
+    gnumber--;
+    return gnumber;
+});
+
+function checkMsg(idname)
+{
+    var data = $("#" + idname + "").val();
+    return data;
+}
+
+//addbasicinfo
+$("#addbasicinfo").on('click', function () { 
+    var data = [];
+    data.push(checkMsg('rproduct_name1'), checkMsg('reperson_name0'), checkMsg('start_date0'), checkMsg('re_num0'), checkMsg('re_status0'), checkMsg('customer'), checkMsg('saleman'), checkMsg('reback_address'), checkMsg('product_category0'), checkMsg('product_name0'), checkMsg('re_mode0'), checkMsg('reperson_question0'), checkMsg('bactch0'), checkMsg('track_number0'), checkMsg('send_date0'), checkMsg('rproduct_name1'), checkMsg('send_num1'));
+    var index = $.inArray("", data);
+    if (index !== -1) {
+        layer.alert("信息填写不完整，请查验后提交");
+        return false;
+    }
+    var data = $("#addSaleRepairingForm1").serializeArray();  
+    $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/addSaleRepairing",
+            data : {
+            data: data,
+            anumber : anumber,
+            gnumber : gnumber,
+            flag : 2
+        },
+            success : function (msg) {
+                console.log(msg);
+                if(msg == 1) {
+                    layer.msg("ok,提交成功",
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                    function () {
+                        window.parent.location.reload();
+                    }
+                    );
+                } else {
+                    layer.alert("提交出错");
+                }
+            }
+        });    
+}); 
+</script>
+</body>
+</html>
+

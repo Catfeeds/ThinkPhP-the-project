@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--售后记录详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        td{  cursor:pointer;  }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="onlineservice">
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-sServiceList">
+                            <thead>
+                            <tr><td colspan="6"><h5>{$data[0]['cname']}售后记录</h5></td></tr>
+                            <tr>
+                                <th>客户问题</th>
+                                <th>解决方式</th>
+                                <th>处理时间</th>
+                                <th>售后人姓名</th>
+                                <th>审核状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="data" id="vol">
+                                <tr style="text-align: center;">
+                                    <td class="descrip mouseOn" data="{$vol.pro_description}">{$vol.pro_description|subtext=10}</td>
+                                    <td class="solvePro mouseOn" data="{$vol.pro_solve}">{$vol.pro_solve|subtext=10}</td>
+                                    <td>{$vol.addtime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.pname}</td>
+                                    <td>
+                                        <switch name="vol.sstatus">
+                                            <case value="1"><span class="noCheckYet">未审核</span></case>
+                                            <case value="2"><span class="checkYes">有效</span></case>
+                                            <case value="3"><span class="checkNot">无效</span></case>
+                                        </switch>
+                                    </td>
+                                    <td><input type="checkbox" name="serviceCheckBox" class="checkValue" dat="{$vol.id}"  data="{$vol.rpbid}" value="{$vol.customer_id}" autocomplete="off"></td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="roleSer" value="{$Think.session.staffId}">
+                        <input class="btn btn-outline btn-success" type="button" id="chService" value="选中项审核" onclick="jqchk('serviceCheckBox');" style="width: 10%; text-align: center;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    $(document).ready(function () {
+        dataTabelset('sServiceList', 10);
+    });
+</script>
+<script src="__PUBLIC__/html/js/dwin/customer/sale_service.js"></script>
+</body>
+</html>

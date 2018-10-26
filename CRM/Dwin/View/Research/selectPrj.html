@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        body div table th {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title"><h5>项目基本信息</h5></div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>项目名称</th>
+                                <th>项目研发内容</th>
+                                <th>启动时间</th>
+                                <th>预计完成时间</th>
+                                <th>内部验收时间</th>
+                                <th>实际完成时间</th>
+                                <th>客户</th>
+                                <th>立项人</th>
+                                <th>项目状态</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>{$data1.proname}</td>
+                                <td>
+                                    <volist name="data2" id="vol">
+                                    {$vol.pname}<br/>
+                                </volist>
+                                </td>
+                                <td>{$data1.protime|date='Y-m-d',###}</td>
+                                <td>{$data1.deliverytime|date='Y-m-d',###}</td>
+                                <td><if condition="$data1.prodtime == ''">未验收<else/>{$vol.prodtime|date='Y-m-d',###}</if></td>
+                                <td><if condition="$data1.prodtime == ''">未完成<else/>{$vol.prodtime|date='Y-m-d',###}</if></td>
+                                <td>{$data1.keyword}</td>
+                                <td>{$data1.buildname}</td>
+                                <td>
+                                    <switch name="data1.prostatus">
+                                        <case value="1"><span style="color: blue;">进展中</span></case>
+                                        <case value="2"><span style="color: brown;">内部验收中</span></case>
+                                        <case value="3"><span style="color: black;">已完成</span></case>
+                                        <case value="4"><span style="color: red;">失败</span></case>
+                                        <case value="5"><span style="color: red;">暂停</span></case>
+                                    </switch>
+                                </td>
+                            </tr>
+                            <tr><td colspan="9" style="height: 80px;">项目需求：{$data1.proneeds}</td></tr>
+                            <tr>
+                                <td rowspan="2">绩效情况</td>
+                                <td>研发费</td>
+                                <td>维护</td>
+                                <td>方案/临时</td>
+                                <td>PCB设计</td>
+                                <td>代码设计</td>
+                                <td>文档撰写</td>
+                                <td>总绩效</td>
+                                <td colspan="2">研发绩效分配</td>
+                            </tr>
+                            <tr>
+                                <td>{$data1.proprice}</td>
+                                <td>{$data1.promaint}</td>
+                                <td>{$data1.protemp}</td>
+                                <td>{$data1.propcb}</td>
+                                <td>{$data1.codedesign}</td>
+                                <td>{$data1.docwrite}</td>
+                                <td>{$data1.performbonus}</td>
+                                <td colspan="2">
+                                    <volist name="data2" id="vol">
+                                        {$vol.pname}({$vol.jxval}%)<br/>
+                                    </volist>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h5>项目申请</h5>
+                    <div class="input-group">
+                        <select name="partner" id="prjSelector" data-placeholder="选择研发内容" class="chosen-select" multiple="multiple" style="width: 200px;" tabindex="4">
+                            <volist name="selType" id="vol">
+                                <option value="{$vol.jxid}">{$vol.pname}</option>
+                            </volist>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <input type="hidden" id="dataid" value="{$data1.proid}">
+                        <h4 align="center"><input type="button" id="unPrjSel" value="项目申请" class="btn btn-outline btn-info"/> </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".dataTables-prjUpdateList").dataTable({
+            'bFilter': true,
+            'bLengthChange': false,
+            'bInfo': true,
+            'bAutoWidth': false,
+            'iDisplayLength': 10
+        });
+    });
+
+    /*--------------------------------------------------------------------------------*/
+    /*--------------------------------------------------------------------------------*/
+
+    $("#unPrjSel").on('click', function() {
+        checkVal    = [];
+        $('#prjSelector :selected').each(function(i, selected){
+            checkVal[i]  = $(selected).val();
+        });
+        $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/selectPrj",
+            data : {
+                ids : checkVal
+            },
+            success : function (msg) {
+                if (msg == 2) {
+                    layer.msg("申请成功", {icon : 5});
+                    window.location.reload();
+                } else {
+                    layer.msg("失败了", {icon : 5});
+                }
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

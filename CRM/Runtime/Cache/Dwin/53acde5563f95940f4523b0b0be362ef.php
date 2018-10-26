@@ -1,0 +1,732 @@
+<?php if (!defined('THINK_PATH')) exit();?><!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="/Public/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        input {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+        .el-table .warning-row {
+             background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+        .head_thead{
+            height: 40px;
+            line-height: 40px;
+            text-align: left;
+            padding-left: 10px;
+            font-size: 15px;
+        }
+        .el-autocomplete{
+            width: 100%;
+        }
+        /* .el-button--primary {
+            float: left;
+        } */
+        .add_button_new {
+            text-align: left
+        }
+    </style>
+</head>
+<body>
+    <div id="app" style="text-align: center">
+        <h1>湖南迪文科技有限公司采购合同</h1>
+        <br><br><br>
+        <el-form ref="form" :model="form" label-width="150px" size="medium" @submit.native.prevent v-loading="loading">
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="供方：">
+                            <el-input v-model="form.supplier_name" readonly="readonly"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10" :offset="2">
+                    <el-form-item label="合同编号：">
+                        <el-input v-model="form.contract_id" style="width: 60%;"></el-input>
+                        <el-button type="primary" plain @click="getNumber()">获取编号</el-button>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <!-- <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -4%;">需方：湖南迪文科技有限公司</span> -->
+                    <el-form-item label="需方："  readonly="readonly">
+                        <el-input readonly="readonly" v-model="form.demand_side"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10"  :offset="2">
+                    <el-form-item label="签订时间：">
+                        <!-- <el-input v-model="form.signing_time"></el-input> -->
+                        <el-date-picker
+                        style="width: 100%;"
+                        v-model="form.signing_time"
+                        type="date"
+                        value-format="timestamp" 
+                        format="yyyy 年 MM 月 dd 日"
+                        placeholder="选择日期">
+                        </el-date-picker>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <p></p>
+                </el-col>
+                <el-col :span="10"  :offset="2">
+                    <!-- <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -19%;">签订地点：湖南</span> -->
+                    <el-form-item label="签订地点：">
+                            <!-- v-model="form.signing_place" -->
+                        <!-- <el-input v-model="form.signing_place"></el-input> -->
+                        <el-autocomplete
+                            class="inline-input"
+                            v-model="form.signing_place"
+                            :fetch-suggestions="querySearch_address"
+                            placeholder="请输入签订地方"
+                        ></el-autocomplete>
+                    </el-form-item>
+                </el-col>
+                </el-row>
+            <el-row :gutter="20">
+                <el-col :span="22" :offset="1">
+                        <table class="table table-striped table-hover table-bordered" border style="margin-bottom: 0">
+                                <div class="head_thead">一、产品名称、型号、单位、金额、供货时间及数量</div>
+                                <tbody>
+                                    <tr  class="deal_cent">
+                                        <th v-show="false">ID</th>      
+                                        <th style="width: 50px">序号</th>      
+                                        <th>系统内部编号</th>      
+                                        <th>型号</th>
+                                        <th>外部编号</th>      
+                                        <th>单位</th>
+                                        <th>数量</th>
+                                        <th>单价(元)</th>
+                                        <th>金额(元)</th>
+                                        <th>交货日期</th>
+                                        <th style="width: 80px;">操作</th>
+                                    </tr>
+                                    <tr v-for="(item, index) in product">
+                                        <td v-show="false">
+                                            <el-input v-model="item.product_id" ></el-input>
+                                        </td>
+                                        <td>
+                                            {{item.sort_id}}
+                                            <!-- <el-input v-model="item.sort_id" readonly="readonly"></el-input> -->
+                                        </td>
+                                        <td>
+                                            {{item.product_number}}
+                                        </td>
+                                        <td>
+                                            {{item.product_no}}
+                                            <!-- <el-input v-model="item.product_no"  placeholder="型号"></el-input> -->
+                                        </td>
+                                        <td>
+                                            <!-- {{item.product_name}} -->
+                                            <el-input v-model="item.product_name" placeholder="外部编号"></el-input>
+                                        </td>
+                                        <td>
+                                            <el-input v-model="item.unit" placeholder="单位"></el-input>
+                                        </td>
+                                        <td>
+                                            <el-input v-model="item.purchase_number" @keyup.native="calculationAmount(index)" placeholder="数量" onkeypress="return event.keyCode >= 48 && event.keyCode <= 57 || event.keyCode==46" ></el-input>
+                                        </td>
+                                        <td>
+                                            <el-input v-model="item.purchase_single_price" @keyup.native="calculationAmount(index)"  placeholder="单价"  onkeypress="return event.keyCode >= 48 && event.keyCode <= 57 || event.keyCode==46" ></el-input>
+                                        </td>
+                                        <td>
+                                            <el-input v-model="item.purchase_price" placeholder="金额"  readonly="readonly"  onkeypress="return event.keyCode >= 48 && event.keyCode <= 57 || event.keyCode==46" ></el-input>
+                                        </td>
+                                        <td>
+                                            <!-- <el-input v-model="item.deliver_time" placeholder="交货日期"></el-input> -->
+                                            <el-date-picker
+                                            style="width: 135px;"
+                                            v-model="item.deliver_time"
+                                            type="date"
+                                            value-format="timestamp" 
+                                            format="yyyy-MM-dd"
+                                            placeholder="交货日期">
+                                            </el-date-picker>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-warning" @click="delawards11(index)">删除</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="add_button_new">
+                                <el-popover ref="add_product" placement="right" width="400" trigger="click">
+                                        <div class="form-inline">
+                                            <input type="text" class="form-control" placeholder="请输入产品名" v-model="searchProduct.name" @input="searchingProduct">
+                                        </div>
+                                        <table class="table table-striped table-hover table-bordered">
+                                            <tr>
+                                                <th v-if="false">id</th>
+                                                <th>系统内部编号</th>
+                                                <th>型号</th>
+                                                <th>系统外部编号</th>
+                                            </tr>
+                                            <tr v-for="item in searchProductRes" @click="addProduct(item)">
+                                                <td v-if="false">{{item.product_id}}</td>
+                                                <td>{{item.product_no}}</td>
+                                                <td>{{item.product_name}}</td>
+                                                <td>{{item.product_number}}</td>
+                                            </tr>
+                                        </table>
+                                    </el-popover>
+                                    <el-button v-popover:add_product type="primary">新增产品</el-button>
+                            </div>
+                    <br>
+                    <el-row :gutter="20">
+                        <el-col :span="15">
+                            <!-- <p style="text-align: left">
+                                <el-button @click="adds" type="primary">添加</el-button>
+                            </p> -->
+                            <p style="font-size: 16px;font-weight: bold;">备注：含税16%</p>
+                        </el-col>
+                        <el-col :span="9" label-width="150px">
+                            <el-row>
+                                <el-col :span="20" label>
+                                    <el-form-item label="合计金额:">
+                                        <el-input v-model="form.total_amount" readonly="readonly"></el-input>
+                                    </el-form-item>
+                                </el-col>
+                               </el-row>
+                               <!-- <el-row>
+                                <el-col :span="20">
+                                    <el-form-item label="合计金额（大写）:">
+                                        <el-input v-model="form.capital_amount" disabled></el-input>
+                                    </el-form-item>
+                                 </el-col>
+                               </el-row> -->
+                        </el-col>
+                    </el-row>
+                        
+                        
+               
+                <!-- 文字表格 -->
+                <table class="table table-striped table-hover table-bordered" border>
+                        <div class="head_thead">二、合同修改内容</div>
+                        <tbody>
+                            <tr>
+                                <th>一、交货地点：</th>
+                                <th style="width:13%">二、收货人：</th>
+                                <th style="width:18%">三、收货人电话：</th>
+                                <th style="width:25%">四、结算方式：</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <el-input v-model="form.trading_location" ></el-input>
+                                </td>
+                                <td>
+                                    <el-input v-model="form.receiver" ></el-input>
+                                </td>
+                                <td>
+                                    <el-input v-model="form.receiving_phone"></el-input>
+                                </td>
+                                <td>
+                                    <!-- <el-input v-model="billing_method"></el-input> -->
+                                    <el-autocomplete
+                                    class="inline-input"
+                                    v-model="form.billing_method"
+                                    :fetch-suggestions="querySearch_balance"
+                                    placeholder="请输入内容"
+                                    ></el-autocomplete>
+                                </td>
+                            </tr>
+                        </tbody>
+                </table>
+
+            <br>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="供方：">
+                        <el-input v-model="form.supplier_name" readonly="readonly"></el-input>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10" :offset="2">
+                    <el-form-item label="需方：">
+                        <el-input  v-model="form.demand_side" readonly="readonly"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="单位名称：">
+                        <el-input v-model="form.supplier_name"  readonly="readonly"></el-input>
+                        <!-- <el-autocomplete
+                            class="inline-input"
+                            v-model="form.supplier_name"
+                            :fetch-suggestions="querySearch"
+                            placeholder="请输入供方名称"
+                        ></el-autocomplete> -->
+                    </el-form-item>
+                </el-col>
+                 <el-col :span="10" :offset="2">
+                    <el-form-item label="单位名称：">
+                            <!-- v-model="form.demand_side" -->
+                        <el-input  value="湖南迪文科技有限公司" readonly="readonly"></el-input>
+                    </el-form-item>
+                    <!-- <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -4%;">单位名称：湖南迪文科技有限公司</span> -->
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="单位地址：">
+                        <!-- <el-input v-model="form.supply_address"></el-input> -->
+                        <el-autocomplete
+                            class="inline-input"
+                            v-model="form.supply_address"
+                            :fetch-suggestions="querySearch_U"
+                            placeholder="请输入供方单位地址"
+                        ></el-autocomplete>
+                    </el-form-item>
+                </el-col>
+                 <el-col :span="10"  :offset="2">
+                    <el-form-item label="单位地址：">
+                            <!-- v-model="form.demand_address" -->
+                        <el-input value="湖南省常德市桃源县漳江创业园创业大道8号" readonly="readonly"></el-input>
+                    </el-form-item>
+                    <!-- <span style="font-size: 14px;color: #606266;font-weight: bold;margin-left: -4%;">单位地址：湖南省常德市桃源县漳江创业园创业大道8号</span> -->
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="法定代表：">
+                        <!-- <el-input v-model="form.supplier_representative"></el-input> -->
+                        <el-autocomplete
+                            class="inline-input"
+                            v-model="form.supplier_representative"
+                            :fetch-suggestions="querySearch_law"
+                            placeholder="请输入供方法人代表"
+                            @select="handleSelect_of"
+                        ></el-autocomplete>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10"  :offset="2">
+                    <el-form-item label="法定代表：">
+                        <el-input v-model="form.purchaser_representative"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="电话：">
+                        <!-- <el-input v-model="form.supplier_phone"></el-input> -->
+                        <el-autocomplete
+                            class="inline-input"
+                            v-model="form.supplier_phone"
+                            :fetch-suggestions="querySearch_call"
+                            placeholder="请输入电话"
+                        ></el-autocomplete>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10" :offset="2">
+                    <el-form-item label="电话：">
+                        <el-input v-model="form.purchaser_phone"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="10">
+                    <el-form-item label="传真：">
+                        <!-- <el-input v-model="form.supplier_fax"></el-input> -->
+                        <el-autocomplete
+                            class="inline-input"
+                            v-model="form.supplier_fax"
+                            :fetch-suggestions="querySearch_fax"
+                            placeholder="请输入传真"
+                        ></el-autocomplete>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="10" :offset="2">
+                    <el-form-item label="传真：">
+                        <el-input v-model="form.purchaser_fax"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <br><br>
+            <el-button type="success" @click="onSubmit(form)">提 交</el-button>
+            <br><br>
+                </el-col>
+            </el-row>
+        </el-form>
+    </div>
+</body>
+<script src="/Public/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/jquery.form.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="/Public/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdn.bootcss.com/element-ui/2.3.6/index.js"></script>
+<script>
+    var data = JSON.parse('<?php echo (json_encode($data)); ?>');
+    var vm = new Vue({
+        el: '#app',
+        data : function(){
+            return {
+                details:[
+                    {'details_name':'一、交货地点：','details_vel':''},
+                    {'details_name':'二、收货人：','details_vel':''},
+                    {'details_name':'三、收货人电话：','details_vel':''},
+                    {'details_name':'四、结算方式：','details_vel':''}
+                ],
+                loading:true,
+                serial_Number:'1',  //序号
+                form :{
+                    id:'',
+                    supplier_pid:'',
+                    contract_id:'',  //合同编码
+                    signing_time: '',
+                    total_amount:'',
+                    demand_side:'湖南迪文科技有限公司',
+                    signing_place:'',
+                    supplier_name:'',
+                    supply_address:'',
+                    demand_address:'湖南省常德市桃源县漳江创业园创业大道8号',
+                    supplier_representative:'',
+                    purchaser_representative:'',
+                    supplier_phone:'',
+                    purchaser_phone:'',
+                    purchaser_fax:'',
+                    supplier_fax:'',
+                    trading_location:'湖南省桃源县漳江创业园湖南迪文科技有限公司',
+                    receiver:'何青华',
+                    receiving_phone:'15211211065',
+                    billing_method:''
+                },
+                searchProduct: {
+                    name: ''
+                },
+                searchProductRes: [],
+                data:data,
+                restaurants: [],  // 供应
+                address:[
+                    {"value":"湖南"}
+                ],  //签订地方
+                address_U:[],  //供方地址
+                legal_law:[],   //法人代表
+                legal_sign:[],  // 签字人
+                company_call:[],  // 电话
+                company_fax:[],   //传真
+                product_name_num:[],
+                balance:[
+                    {'value':'结算方式一'},
+                    {'value':'结算方式二'},
+                    {'value':'结算方式三'},
+                    {'value':'结算方式四'}
+                ],
+                timeout:  null,
+                product:[],
+                clue_yes:['供应商表主键','合同编号','签订时间','需方名称','签订地点','供方名称','供方地址','需方地址','供方法定代表','需方法定代表','供方电话','需方电话','交货地点','收货人','收货电话','结算方式']
+            }
+        },
+        created : function () {
+            this.loading = false
+        },
+        mounted() {
+            // 供方下拉
+            // this.form.supplier = data.base.supplier_name
+            this.form.supplier_name = data.base.supplier_name
+            this.restaurants.push({"value":data.base.supplier_name})
+            // 供方单位地址  下拉
+            for(var i = 0;i < data.address.length;i++){
+                this.address_U.push({"value":data.address[i].address})
+            }
+            if(data.address[0]){
+                this.form.supply_address = data.address[0].address
+            }
+            // 法人代表 
+            this.legal_law.push({"value":data.base.legal_name})
+            this.form.supplier_representative = data.base.legal_name
+            // 电话
+            for(var i = 0;i < data.contact.length;i++){
+                if(data.contact[i]){
+                    this.company_call.push({"value":data.contact[i].telephone})   
+                }
+            }
+            if(data.contact[0]){
+                this.form.supplier_phone = data.contact[0].telephone
+            }
+            // 传真fax
+            for(var i = 0;i < data.contact.length;i++){
+                this.company_fax.push({"value":data.contact[i].fax})   
+            }
+            if(data.contact[0]){
+                this.form.supplier_fax = data.contact[0].fax
+            }
+            // 签订地方
+            this.form.signing_place = this.address[0].value
+            // ID
+            this.form.supplier_pid = data.base.id
+        },
+        methods :{
+            // 获取三个产品值
+            searchingProduct: function() {
+                $.post('<?php echo U("Dwin/Purchase/getProductMsg");?>', {'condition':this.searchProduct.name}, function(res) {
+                    vm.searchProductRes = res.data
+                })
+            },
+            // 下拉选中时
+            addProduct: function(item) {
+                var judgement = true
+                function Item(product) {
+                    this.product_id = product.product_id
+                    this.product_no = product.product_no
+                    this.product_name = product.product_name
+                    this.product_number = product.product_number
+                }
+                var obj = new Item(item)
+                for(var i = 0 ; i < vm.product.length;i++){
+                    if(obj.product_id == vm.product[i].product_id && judgement){
+                        layer.msg('选中物料信息已存在订单中，不可重复添加,请重新选择！')
+                        judgement = false
+                    }
+                }
+                if(judgement){
+                    this.product.push(obj)
+                    for(var i = 0; i<vm.product.length ; i++){
+                        vm.product[i].sort_id = i + 1
+                    }
+                }
+            },
+            // 传真 下拉
+            querySearch_fax(queryString, cb) {
+                var company_fax = this.company_fax;
+                var results = queryString ? company_fax.filter(this.createFilter_fax(queryString)) : company_fax;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter_fax(queryString) {
+                return (restaurant) => {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            // 结算方式
+            querySearch_balance(queryString, cb) {
+                var balance = this.balance;
+                var results = queryString ? balance.filter(this.createFilter_fax(queryString)) : balance;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter_fax(queryString) {
+                return (restaurant) => {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            // 电话  下拉
+            querySearch_call(queryString, cb) {
+                var company_call = this.company_call;
+                var results = queryString ? company_call.filter(this.createFilter_call(queryString)) : company_call;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter_call(queryString) {
+                return (restaurant) => {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            // 供方法人代表  下拉
+            querySearch_law(queryString, cb) {
+                var legal_law = this.legal_law;
+                var results = queryString ? legal_law.filter(this.createFilter_law(queryString)) : legal_law;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter_law(queryString) {
+                return (restaurant) => {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            handleSelect_of(item,index) {
+            },
+            // 供方单位地址  下拉
+            querySearch_U(queryString, cb) {
+                var address_U = this.address_U;
+                var results = queryString ? address_U.filter(this.createFilter_U(queryString)) : address_U;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter_U(queryString) {
+                return (restaurant) => {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            // 签订地方  下拉
+            querySearch_address(queryString, cb) {
+                var address = this.address;
+                var results = queryString ? address.filter(this.createFilter_address(queryString)) : address;
+                // 调用 callback 返回建议列表的数据
+                cb(results);
+            },
+            createFilter_address(queryString) {
+                return (restaurant) => {
+                return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            // 产品名称 模糊查询
+            querySearchAsync_name(queryString, cb) {
+                var product_name_num = this.product_name_num;
+                var results = queryString ? product_name_num.filter(this.createStateFilter_name(queryString)) : product_name_num;
+                this.timeout = setTimeout(() => {
+                cb(results);
+                }, 1000 * Math.random());
+            },
+            createStateFilter_name(queryString) {
+                return (state) => {
+                return (state.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            handleSelect_name(item) {
+                for(var i = 0;i<vm.product.length;i++){
+                    vm.product[vm.product.length - 1].product_name = item.address
+                    vm.product[vm.product.length - 1].product_id = item.product_id
+                    vm.product[vm.product.length - 1].product_no = item.product_no
+                } 
+            },
+            // 获取金额
+            calculationAmount (index) {
+                if(vm.product[index].purchase_number == undefined || vm.product[index].purchase_single_price == undefined){
+
+                }else{
+                    vm.product[index].purchase_price = vm.product[index].purchase_number * vm.product[index].purchase_single_price
+                    var zong_money = 0;
+                    for(var i = 0;i < vm.product.length;i++){
+                        zong_money = zong_money + Number(vm.product[i].purchase_price)
+                    }
+                    vm.form.total_amount = zong_money;
+                }
+            },
+            // 获取编号
+            getNumber(){
+                this.loading = true;
+                $.get('<?php echo U("Dwin/Purchase/createContractId");?>', function (res) {
+                    if(res.status == 200){
+                        vm.loading = false
+                        vm.form.contract_id = res.data.contractIdString
+                        vm.form.id = res.data.id
+                    }
+                })
+            },
+            // 添加一行
+            adds () {
+                var num_box = vm.product.length
+                if(num_box == 1){        
+                    if(vm.product[0].product_number == ''){
+                        layer.msg('请填写产品名称！')
+                    }else{
+                        var obj = {}
+                        vm.product.push(obj)
+                    }
+                }else{
+                    if(vm.product[num_box - 1].product_number == undefined){
+                        layer.msg('请填写产品名称！')
+                    }else{
+                        var obj = {}
+                        vm.product.push(obj)
+                    }
+                }
+               
+            },
+            // 删除
+            delawards11 (index) {
+                vm.form.total_amount = vm.form.total_amount - vm.product[index].purchase_price
+                vm.product.splice(index,1)
+            },
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex === 1) {
+                return 'warning-row';
+                } else if (rowIndex === 3) {
+                return 'success-row';
+                }
+                return '';
+            },
+            // 提交
+            onSubmit(form){
+                var judge_up = true
+                var k = -1
+                var list_num = 0
+                var values = []
+                for(var key in form){
+                    if(key == 'purchaser_fax' || key == 'supplier_fax' || key == "total_amount"){
+                    }else{
+                        values.push(form[key])
+                    }
+                }
+                values.forEach(function(e){ 
+                   if(judge_up){
+                        k = k + 1
+                        if(e == '' || e == null){
+                            layer.msg(vm.clue_yes[k]+'不能为空！')
+                            judge_up = false
+                        }
+                   }
+                })
+                values.length = 0
+                if(judge_up){
+                    if(this.product){
+                        this.product.forEach(function (e) {
+                            for(var key in e){
+                                if(key == 'product_no' || key == 'product_name' || key == 'product_number' || key == 'unit' || key == 'purchase_number' || key == 'purchase_single_price' || key == 'purchase_price' || key == 'deliver_time'){
+                                    list_num++
+                                }
+                            }
+                            if(judge_up){
+                                if(list_num < 8){
+                                    layer.msg('产品名称、型号、单位、金额、供货时间及数量都是必填项,请填写完整！')
+                                    judge_up = false
+                                }
+                            }
+                            list_num = 0
+                        })
+                    }else{
+                        layer.msg('物料不能为空！')
+                        judge_up = false
+                    }
+                }
+                if(judge_up){
+                    for(var i = 0;i<vm.product.length;i++){
+                        vm.product[i].deliver_time = vm.product[i].deliver_time / 1000
+                    }  
+                    vm.form.signing_time = vm.form.signing_time / 1000
+                    var data = {
+                        'contract' : form,
+                        'product' : vm.product
+                    }
+                    $.post('<?php echo U("Dwin/Purchase/addContract");?>', data , function (res) {
+                        if(res.status == 200){
+                            // 关闭弹框 刷新父页面
+                            layer.msg(res.msg)
+                            var index=parent.layer.getFrameIndex(window.name);//获取窗口索引
+                            parent.layer.close(index)
+                        }else{
+                            for(var i = 0;i<vm.product.length;i++){
+                                vm.product[i].deliver_time = vm.product[i].deliver_time * 1000
+                            }  
+                            vm.form.signing_time = vm.form.signing_time * 1000
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+            }
+        }
+    })
+</script>
+</html>

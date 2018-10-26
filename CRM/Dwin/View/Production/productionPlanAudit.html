@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--生产计划列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .selected{ 
+            background-color: #2a83cf !important;
+        }
+        td.row-details-open {
+            background: url('__PUBLIC__/Admin/images/details_open.png') no-repeat center center;
+            cursor: pointer;
+        }
+        td.row-details-close {
+            background: url('__PUBLIC__/Admin/images/details_close.png') no-repeat center center;
+            cursor:pointer;
+        }
+        .row-details{
+            background: url('__PUBLIC__/Admin/images/details_open.png') no-repeat center center;
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-content">
+                    <h3>
+                        <switch name="type">
+                            <case value="2">生产计划单据审核</case>
+                            <case value="3">生产计划产线确认</case>
+                            <case value="4">生产计划齐料登记</case>
+                            <default />default
+                        </switch>
+                    </h3>
+                    <div class="table-responsive1">
+                        <table class="table table-striped table-bordered table-hover table-full-width dataTables-productionList" id="productionPlan">
+                            <thead>
+                                <tr>
+                                    <th>生产单号</th>
+                                    <th>业务员</th>
+                                    <th>备货方式</th>
+                                    <th>型号</th>
+                                    <th>生产地</th>
+                                    <th>生产线</th>
+                                    <th>生产数量</th>
+                                    <th>下单日期</th>
+                                    <th>期望日期</th>
+                                    <th>状态</th>
+                                    <th>特殊要求</th>
+                                    <th>审核备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/finance/common_finance.js"></script>
+<script>
+var oTable;
+var btngroup2 = "<button class='btn btn-success btn-xs audit_pass' type='button'>通过</button> <button class='btn btn-warning btn-xs audit_fail' type='button'>不通过</button>";
+var btngroup34 = "<button class='btn btn-success btn-xs audit_pass' type='button'>通过</button>";
+
+$(document).ready(function() {
+    oTable = $("#productionPlan").DataTable({
+        ajax: { // 获取数据
+                "type"  : "post"
+            },
+        serverSide: true,
+        order:[['7', 'desc']],
+        columns: [
+            {data:'production_order'},
+            {data:'staff_name'},
+            {data:'stock_cate_name',searchable:false},
+            {data:'product_name'},
+            {data:'production_company',searchable:false},
+            {data:'production_line',searchable:false},
+            {data:'production_plan_number',searchable:false},
+            {data:'create_time',searchable:false},
+            {data:'delivery_time',searchable:false},
+            {data:'production_status',searchable:false, render: function (data) {
+                    if (data == 400){
+                        return '单据审核不通过'
+                    }
+                    var arr = ['','等待单据确认', '等待齐料确认', '产线确认完毕','等待产线确认'];
+                    return arr[data];
+                }},
+            {data:'tips',searchable:false},
+            {
+                data: 'tips', searchable: false, render: function (data, type, row) {
+                    if (row.production_status == {$type - 1}) {
+                        return '<input class="form-control tips">'
+                    }
+                    return data
+                }
+            },
+            {data:null,
+                render: function (row) {  //根据状态设置按钮
+                    if (row.production_status == {$type - 1}) {
+                        return {$type == 2 ? btngroup2 : btngroup34};
+                    } else {
+                        return "<button class='btn btn-info btn-xs' type='button' disabled>该计划已审核完毕</button>"
+                    }
+                },
+                orderable: false
+            }
+        ],
+        "oLanguage": {
+            "oAria": {
+                "sSortAscending": " - click/return to sort ascending",
+                "sSortDescending": " - click/return to sort descending"
+            },
+            "LengthMenu": "显示 _MENU_ 记录",
+            "ZeroRecords": "对不起，查询不到任何相关数据",
+            "EmptyTable": "未有相关数据",
+            "LoadingRecords": "正在加载数据-请等待...",
+            "Info": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录。",
+            "InfoEmpty": "当前显示0到0条，共0条记录",
+            "InfoFiltered": "（数据库中共为 _MAX_ 条记录）",
+            "Processing": "<img src='../resources/user_share/row_details/select2-spinner.gif'/> 正在加载数据...",
+            "Search": "搜索：",
+            "Url": "",
+            //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
+            "Paginate": {
+                "sFirst": "首页",
+                "sPrevious": " 上一页 ",
+                "sNext": " 下一页 ",
+                "sLast": " 尾页 "
+            }
+        }
+    });
+
+    // 通过审核
+    $("#productionPlan tbody").on("click", ".audit_pass", function () {
+        $(this).attr('disabled', true)
+        var that = this
+        var orderNumber = $(this).parents('tr').children('td')[0].innerText;
+        $.ajax({
+            type:'post',
+            url:'{:U("editProductionPlanAudit",["type"=> $type])}',
+            data:{
+                production_order: orderNumber,
+                tips: $(this).parents('tr').children('td').children('.tips').val(),
+                audit_result: 1,
+                audit_type: {$type}
+            },
+            success:function (data) {
+                $(that).attr('disabled', false)
+                layer.msg(data.msg, {icon: 1, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                    location.reload();
+                });
+                return false;
+            }
+        })
+    });
+
+    //未通过审核
+    $("#productionPlan tbody").on("click", ".audit_fail", function () {
+        var orderNumber = $(this).parents('tr').children('td')[0].innerText;
+        $.ajax({
+            type:'post',
+            url:'{:U("editProductionPlanAudit",["type"=> $type])}',
+            data:{
+                production_order: orderNumber,
+                tips: $(this).parents('tr').children('td').children('.tips').val(),
+                audit_result: 2,
+                audit_type: {$type}
+            },
+            success:function (data) {
+                layer.msg(data.msg, {icon: 1, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                    location.reload();
+                });
+                return false;
+            }
+        })
+    })
+
+});
+
+</script>
+</body>
+</html>

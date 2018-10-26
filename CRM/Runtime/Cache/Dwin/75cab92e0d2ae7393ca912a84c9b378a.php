@@ -1,0 +1,251 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>公司员工列表-数据表格</title>
+    <meta name="keywords" content="List">
+    <meta name="description" content="StaffList">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="/Public/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;}
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>公司职员基本信息表</h5>
+                    <div class="fa-hover col-md-3 col-sm-4">
+                        <a id="btnadd" class="addStaff" href="javascript:;"><i class="fa fa-plus"></i> 添加职工</a>
+                    </div>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-staffinfomation">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-unstaff">
+                        <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>账户名</th>
+                            <th>账户状态</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php if(is_array($data)): $i = 0; $__LIST__ = $data;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vol): $mod = ($i % 2 );++$i;?><tr>
+                                <td><?php echo ($vol["name"]); ?></td>
+                                <td><?php echo ($vol["info"]); ?></td>
+                                <td><?php echo ($vol["status"]); ?></td>
+                            </tr><?php endforeach; endif; else: echo "" ;endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script>
+var controller = "/Dwin/System";
+    $(document).ready( function() {
+        $.fn.dataTable.ext.errMode = 'none';
+        $('.dataTables-unstaff').dataTable();
+        var oTable = $(".dataTables-staffinfomation").dataTable({
+            "paging"       : true,
+            "autoWidth"    : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 20, 35, 50],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true,//开启服务器获取数据
+             "ajax"         : {  //获取数据
+                "url"   : controller + "/showStaff",
+                "type"  : 'post'
+            },
+            "columns" :[ //定义列数据来源
+                {'title' : "姓名",     'data' : 'name'},
+                {'title' : "职位",     'data' : "posname"},
+                {'title' : "部门",     'data' : "dname"},
+                {'title' : "入职时间", 'data' : "entrytime"},
+                {'title' : "审核权限", 'data' : "auid"},
+                {'title' : "登录账户", 'data' : "login_name"},
+                {'title' : "账户状态", 'data' : "loginstatus"},
+                {'title' : "操作",     'data' : null}
+            ],
+            "columnDefs"   : [ //自定义列
+                {
+                    "targets" : 7,
+                    "data" : 'options',
+                    "render" : function(data, type, row) {
+                        var html = '<a class="changeP"><i class="fa fa-minus-square">&nbsp;变更</i></a>&emsp;|' +
+                                    '<a class="changeR"><i class="fa fa-pencil-square-o">权限</i></a>&emsp;|'   +
+                                    '<a class="lockP"><i class="fa fa-ban">禁用</i></a>'+
+                                    '<a class="reSet"><i class="fa fa-ban">重置</i></a>';
+                        return html;
+                    }
+                }
+            ],
+            "language"     : { // 定义语言
+                "sProcessing"     : "加载中...",
+                "sLengthMenu"     : "每页显示 _MENU_ 条记录",
+                "sZeroRecords"    : "没有匹配的结果",
+                "sInfo"           : "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty"      : "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered"   : "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix"    : "",
+                "sSearch"         : "搜索:",
+                "sUrl"            : "",
+                "sEmptyTable"     : "表中数据为空",
+                "sLoadingRecords" : "载入中...",
+                "sInfoThousands"  : ",",
+                "oPaginate"       : {
+                    "sFirst"    : "首页",
+                    "sPrevious" : "上一页",
+                    "sNext"     : "下一页",
+                    "sLast"     : "末页"
+                },
+                "oAria"           : {
+                    "sSortAscending"  : ": 以升序排列此列",
+                    "sSortDescending" : ": 以降序排列此列"
+                }
+            }
+        });
+
+
+            // 相关按钮功能
+
+        // 添加新员工
+        $('#btnadd').on('click',function()
+        {
+            layer.open({
+                type: 2,
+                title: "",
+                end : function () {
+                    oTable.api().ajax.reload();
+                },
+                area : ['70%', '70%'],
+                content: "/Dwin/System/addStaff"
+            });
+        });
+
+        $(document).on('click', '.changeR', function()
+        {
+            var id = $(this).parent().parent().attr('id');
+            layer.open({
+                type: 2,
+                title: "",
+                area: ['100%', '90%'],
+                content: "/Dwin/System/roleManage/id/" + id //iframe的url
+            });
+        });
+
+        $(document).on('click', '.changeP', function()
+        {
+            var id = $(this).parent().parent().attr('id');
+            layer.open({
+                type: 2,
+                title: "",
+                end : function () {
+                    oTable.api().ajax.reload();
+                },
+                area: ['100%', '90%'],
+                content: "/Dwin/System/changePosition/id/" + id //iframe的url
+            });
+        });
+
+
+        $(document).on('click', '.lockP', function()
+        {
+            var id = $(this).parent().parent().attr('id');
+            layer.confirm('确定禁用此账号？',
+                {
+                    icon : 6
+                },
+                function(){
+                    $.ajax({
+                        type : 'POST',
+                        url : "/Dwin/System/lockStaff",
+                        data : {sid : id},
+                        success : function(msg) {
+                            if (msg == 2) {
+                                layer.msg('已禁用');
+                            } else {
+                                layer.msg('false');
+                            }
+                        }
+                    });
+                });
+        });
+        $(document).on('click', '.reSet', function()
+        {
+            var id = $(this).parent().parent().attr('id');
+            layer.confirm('确定重置此账号的密码？',
+                {
+                    icon : 6
+                },
+                function(){
+                    $.ajax({
+                        type : 'POST',
+                        url : "/Dwin/System/resetPwd",
+                        data : {sid : id},
+                        success : function(msg) {
+                            layer.msg(msg.msg);
+                        }
+                    });
+                });
+        });
+    });
+
+
+</script>
+</body>
+</html>

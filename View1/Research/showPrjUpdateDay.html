@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_data_tables.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:01 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>项目列表-数据表格</title>
+    <meta name="keywords" content="项目列表详情">
+    <meta name="description" content="项目列表页面">
+
+    <link rel="stylesheet" href="__PUBLIC__/Admin/css/base.css" />
+    <link rel="stylesheet" href="__PUBLIC__/Admin/css/info-mgt.css" />
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>项目列表</h5>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="__CONTROLLER__/addProject"><i class="fa fa-plus"></i> 新项目</a></div>
+                    <div class="fa-hover col-md-2 col-sm-6 "><a href="javascript:;" class="prj-list"><i class="fa fa-tv">项目首页</i></a></div>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="prj-24"><i class="fa fa-tv">今日项目进展</i></a></div>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="prj-7"><i class="fa fa-tv">近七日项目进展</i></a></div>
+
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <!--<h4>订单编号：&emsp;10001SDK</h4>-->
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>项目名称</th>
+                                <th>更新时间</th>
+                                <th>进度更新内容</th>
+                                <th>参与人</th>
+                                <th>审核状态</th>
+                                <th>操作</th>
+                            </tr>
+                            <volist name="data" id="vol">
+                                <tr style="text-align: center;">
+                                    <td>{$vol.proname}</td>
+                                    <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.prjcontent}</td>
+                                    <td>{$vol.name}</td>
+                                    <td>
+                                        <switch name="vol.audistatus">
+                                            <case value="1">未审核</case>
+                                            <case value="2">有效</case>
+                                            <case value="3">无效</case>
+                                        </switch>
+                                    </td>
+                                    <td><input type="checkbox" name="resCheckBox" class="checkValue" data="{$vol.auditorid}" value="{$vol.project_id}" ></td>
+                                </tr>
+                            </volist>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".dataTables-example").dataTable();
+    });
+
+    $('.prjDetail').on('click', function() {
+        var prjid = $(this).attr('data');
+        window.location.href = "__CONTROLLER__/showProjectDetail/id/" + prjid;
+    });
+
+    $(".prj-list").on('click', function() {
+        window.location.href = "__CONTROLLER__/showProjectList";
+    });
+    $(".prj-24").on('click', function() {
+        window.location.href = "__CONTROLLER__/showPrjUpdateDay/k/1";
+    });
+    $(".prj-7").on('click', function() {
+        window.location.href = "__CONTROLLER__/showPrjUpdateDay/k/7";
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--联系记录详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        .trhighlight{
+            background-color:skyblue;
+            color:red;
+        }
+        .dataTables-cusRecordList tbody .gradeX:hover{
+            cursor:pointer;
+            background-color: lightskyblue;
+            color:white;
+        }
+
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-cusRecordList" style="background-color: rgb(228,229,233);">
+                            <thead>
+                            <tr>
+                                <tr>
+                                    <th>客户名称</th>
+                                    <th>最近联系时间</th>
+                                    <th>负责人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="data" id="vol">
+                                <tr class="gradeX" id="{$vol.cid}">
+                                    <td>{$vol.cname}</td>
+                                    <td>{$vol.max_contact_time}</td>
+                                    <td>{$vol.uname}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="roleCon" value="{$Think.session.staffId}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    var dataTableCusRecord = $(".dataTables-cusRecordList");
+
+    function showDetail(dataTable, id, tr, url)
+    {
+        var table = dataTable.DataTable();
+        var row = table.row(tr);
+        if (row.child.isShown()) {
+            row.child.hide();
+        } else {
+            table.$('tr.show').removeClass('shown');
+            $(".dataTables-cusRecordList tbody tr").removeClass('shown');
+            var sonTable;
+            $.ajax({
+                type : 'post',
+                url  : url,
+                data : {
+                    cusId : id
+                },
+                success :function (ajaxData) {
+                    sonTable =
+                        '<table class="table table-condensed table-striped table-hover">' +
+                        '<tbody>';
+                    for(var i = 0; i < ajaxData.length; i ++)
+                    {
+                        sonTable +=
+                            '<tr>' +
+                                '<td rowspan="5" width="25%"><b>联系时间</b>：' + ajaxData[i]['posttime'] + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td><b>主题</b>：' + ajaxData[i]['theme'] + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td><b>类型</b>：' + ajaxData[i]['ctype'] + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td><b>时间</b>：' + ajaxData[i]['posttime'] + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td><b>联系内容</b>：' + ajaxData[i]['content'] + '</td>'+
+                            '</tr>';
+                    }
+                    sonTable += "</table>";
+                    row.child(sonTable).show();
+                    tr.addClass('shown');
+                }
+            });
+        }
+    }
+
+    $(document).ready(function() {
+        dataTableCusRecord.dataTable();//table end
+        dataTableCusRecord.on('click', 'tbody td', function () {
+            var id = $(this).parent().attr('id');
+            var tr = $(this).closest('tr');
+            showDetail(dataTableCusRecord, id, tr, "__CONTROLLER__/getRecordMsg");
+        });
+    });
+
+
+</script>
+</body>
+</html>

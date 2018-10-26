@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>账户操作记录</h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-bordered table-striped dataTables-staffLog">
+                        <thead>
+                        <tr>
+                            <!--         <th>编号</th>-->
+                            <th>员工名</th>
+                            <th>账户</th>
+                            <th>请求时间</th>
+                            <th>访问模块</th>
+                            <th>IP地址</th>
+                            <th>访问设备</th>
+                            <th>请求方式</th>
+                        </tr>
+                        </thead>
+                        <tbody >
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready( function () {
+        var height1 = $(window).height() - 220;
+        $(".dataTables-staffLog").DataTable({
+            "destroy": true,
+            "paging": true,
+            "autoWidth": false,
+            "pagingType": "full_numbers",
+            "lengthMenu": [10, 15, 20, 100],
+            "bDeferRender": true,
+            "processing": true,
+            "searching": true, //是否开启搜索
+            "serverSide": true,//开启服务器获取数据
+            "ajax": { // 获取数据
+                "url":  "__CONTROLLER__/logIndex",
+                "type": 'post'
+            },
+            "columns": [ //定义列数据来源
+                {'title': "员工名", 'data': "staff_name", 'class': "mouseOn cusDetail"},
+                {'title': "账户", 'data': "staff_account"},
+                {'title': "请求时间", 'data': "request_time"},
+                {'title': "访问模块", 'data': "request_module"},
+                {'title': "url", 'data': "url"},
+                {'title': "IP地址", 'data': 'request_ip'},
+                {'title': "访问设备", 'data': 'device'},
+                {'title': "请求方式", 'data': 'request_method'}
+                /* {'title':"负责人",'data':null,'class':"align-center"} // 自定义列   {'title':"负责人",'data':null,'class':"align-center"} // 自定义列*/
+            ],
+            "language": { // 定义语言
+                "sProcessing": "加载中...",
+                "sLengthMenu": "每页显示 _MENU_ 条记录",
+                "sZeroRecords": "没有匹配的结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            }
+
+        });
+    });
+</script>
+</body>
+</html>

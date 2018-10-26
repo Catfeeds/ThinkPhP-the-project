@@ -1,0 +1,506 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调拨制单</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css" rel="stylesheet">
+    <!--<link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+            font-size: 14px;
+        }
+        .selected{
+            background-color: #fbec88 !important;
+        }
+
+        .nav-tabs>li>a{
+            color: #555;
+        }
+        .nav-tabs>.active>a{
+            color: #000!important;
+        }
+        tr{
+            white-space: nowrap!important;
+        }
+        tbody td{
+            padding-top: 2px!important;
+            padding-bottom: 2px!important;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+        .btn{
+            margin-right: 1em;
+        }
+        .ibox{
+            padding:20px;
+        }
+        .el-select-option-span{
+            float: left;font-size: 12px;
+        }
+        .el-form-item__label{
+            width: 80px!important;
+        }
+        .el-form-item__content{
+            margin-left: 10px!important;
+        }
+        .el-form-item__content{
+            margin-right: 200px!important;
+        }
+        .el-row {
+            margin-bottom: 20px;
+        &:last-child {
+             margin-bottom: 0;
+         }
+        }
+        .el-col {
+            border-radius: 4px;
+        }
+        .bg-purple-dark {
+            background: #99a9bf;
+        }
+        .bg-purple {
+            background: #d3dce6;
+        }
+        .bg-purple-light {
+            background: #e5e9f2;
+        }
+        .grid-content {
+            border-radius: 4px;
+            min-height: 36px;
+        }
+        .row-bg {
+            padding: 10px 0;
+            background-color: #f9fafc;
+        }
+
+        .span-warning{
+            font-weight: 500;
+            color:red;
+        }
+        .span-success{
+            color:blue;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="productionDiv">
+                <div class="ibox-content" >
+                    <h3>调拨制单</h3>
+                    <div  v-cloak  id="buttonVm">
+                        <el-form :inline="true" ref="form" label-width="80px">
+                            <el-alert
+                                    title="填写点击确定后提交调拨单，二次审核后生效（制单人一审，出库库房二审）"
+                                    type="success"
+                                    show-icon
+                            >
+                            </el-alert>
+                            <el-form-item label="源单编号:">
+                                <span class="span-info">{{sourceOrder.production_code}}</span>
+                            </el-form-item>
+                            <el-form-item label="生产信息:">
+                                <span class="span-info">生产物料：{{sourceOrder.product_no}}&nbsp;({{sourceOrder.product_name}})；</span>
+                                <span class="span-info">完工数量：
+                                    <span class="span-success">{{sourceOrder.in_stock_num}}</span>/
+                                    <span class="span-warning">{{sourceOrder.plan_number}}</span>
+                                </span>
+                                <span class="span-info">&emsp;领料状态：{{sourceOrder.stock_status|stockFilter}}</span>
+                                <span class="span-info">&emsp;生产状态：{{sourceOrder.production_progress|processFilter}}</span>
+                            </el-form-item>
+                            <el-form-item label="单据类型:">
+                                <span class="span-info">生产调拨</span>
+                            </el-form-item>
+                            <el-form-item label="入库编号:">
+                                <el-input v-model="defaultInfo" readonly></el-input>
+                            </el-form-item>
+                            </el-form>
+                        <el-table :data="bomData"
+                                  border
+                                  style="width: 100%">
+                            <el-table-column
+                                    prop="bom_cate"
+                                    label="BOM类别"
+                                    >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="bom_id"
+                                    label="编号"
+                                    >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="production_product"
+                                    label="生产型号">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="product_no"
+                                    label="配料编号">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="num"
+                                    label="数量">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="substituted_no"
+                                    label="替换料">
+                            </el-table-column>
+                        </el-table>
+                        <el-form ref="form" label-width="120px">
+                            <el-form-item label="调拨备注:">
+                                <el-input type="textarea" v-model="stock.tips"></el-input>
+                            </el-form-item>
+                        </el-form>
+                        <el-table :data="productData"
+                                  border
+                                  style="width: 100%">
+                            <el-table-column
+                                    prop="product_no"
+                                    label="物料编号"
+                                    >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="product_name"
+                                    label="产品名"
+                                    >
+                            </el-table-column>
+                            <el-table-column
+                                    prop="push_num"
+                                    label="领料数量"
+                                    width="90px">
+                            </el-table-column>
+                            <el-table-column
+                                    prop="stock_total_number"
+                                    label="库存"
+                                    width="80px">
+                            </el-table-column>
+
+                            <el-table-column
+                                    prop="num"
+                                    label="调拨数量"
+                                    width="90px">
+                                <template slot-scope="scope">
+                                    <el-input
+                                            size="small"
+                                            data-vv-as="调拨数"
+                                            type="number"
+                                            v-model="scope.row.num"
+                                            @keyup.native = "checkNumber(scope.$index)"
+                                    >
+                                    </el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    prop="rep_id_out"
+                                    label="出库仓库">
+                                <template slot-scope="scope">
+                                    <el-select size="small" @change="repOutSelect(scope.$index)" v-model="scope.row.rep_id_out" placeholder="请选择物料出库仓库">
+                                        <el-option
+                                                v-for="key1 in selectInfo.warehouse"
+                                                :key="key1.warehouse_id"
+                                                :label="key1.warehouse_name"
+                                                :value="key1.warehouse_id">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    prop="rep_id_in"
+                                    label="入库仓库">
+                                <template slot-scope="scope">
+                                    <el-select size="small" @change="repInSelect(scope.$index)" v-model="scope.row.rep_id_in" placeholder="请选择物料入库仓库">
+                                        <el-option
+                                                v-for="key1 in selectInfo.warehouse"
+                                                :key="key1.warehouse_id"
+                                                :label="key1.warehouse_name"
+                                                :value="key1.warehouse_id">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    prop="reason"
+                                    label="调拨原因">
+                                <template slot-scope="scope">
+                                    <el-input
+                                            type="textarea"
+                                            size="small"
+                                            :rows="1"
+                                            data-vv-as="入库数量"
+                                            v-model="scope.row.reason">
+                                    </el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                    label="操作"
+                                    width="80px"
+                                    >
+                                <template slot-scope="scope">
+                                    <el-button size="small" type="button" size="sm" class="btn btn-warning" @click="productData.splice(scope.$index, 1)">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <el-button size="medium" type="primary" @click="submitStock">提交调拨单</el-button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script src="/Public/html/js/dwin/finance/common_finance.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script>
+
+    var data = <?php echo (json_encode($data )); ?>;
+    $(document).ready(function() {
+        var vm = new Vue({
+            el: "#buttonVm",
+            data : function () {
+                return {
+                    defaultInfo : "自动生成",
+                    selectInfo : [],
+                    stock : {
+                        transferType : 1,
+                        source_id : data.base.id
+                    },
+                    bomData : data.bomData,
+                    sourceOrder: data.base,
+                    productData: data.stockOutData
+                }
+            },
+            created: function (){
+                $.post('/Dwin/Stock/getSelectInfo', {
+                    type : 'getDept'
+                },function (res) {
+                    if (res.status !== 200) {
+                        layer.msg(res.msg);
+                        return false;
+                    }
+                    vm.selectInfo = [];
+                    vm.selectInfo   = res.data;
+                    var obj = {};
+
+                });
+            },
+            filters : {
+                stockFilter : function (data) {
+                    var arr = ['未领料', '领料中', '领料完成'];
+                    return arr[data];
+                },
+                processFilter :function (data) {
+                    var arr = ['未生产', '生产中', '生产完毕'];
+                    return arr[data];
+                }
+            },
+            computed : {
+                checkInfo : function () {
+                    this.taskUpdData.num = this.stockMaterial.num;
+
+                    return parseInt(this.preStock.task_number) - parseInt(this.preStock.complete_quantity);
+
+                }
+            },
+            methods: {
+                repInSelect: function(index) {
+                    var id = this.productData[index].rep_id_in;
+                    var warehouse = this.selectInfo.warehouse;
+                    var name = '';
+                    for (var i = 0; i < warehouse.length; i++) {
+                        if (id === warehouse[i].warehouse_id){
+                            name = warehouse[i].warehouse_name
+                        }
+                    }
+                    Vue.set(this.productData[index], 'repInArr', id + '_' + name)
+                },
+                repOutSelect: function(index){
+                    var id = this.productData[index].rep_id_out;
+                    var warehouse = this.selectInfo.warehouse;
+                    var name = '';
+                    for (var i = 0; i < warehouse.length; i++){
+                        if (id === warehouse[i].warehouse_id) {
+                            name = warehouse[i].warehouse_name
+                        }
+                    }
+                    Vue.set(this.productData[index], 'repOutArr', id + '_' + name)
+                    var product_id = this.productData[index].product_id;
+                    var thatIndex =this;
+                    $.post('/Dwin/Stock/getProductStockNumber', {
+                        product_id : product_id,
+                        warehouse_id : id
+                    }, function (res) {
+                        if (res.status === 200) {
+                            thatIndex.productData[index].stock_total_number = res.data;
+                        } else {
+                            thatIndex.productData[index].stock_total_number = 0;
+                        }
+                    })
+                },
+                typeSelect: function () {
+                    var id = this.stock.type_id;
+                    var auditorIds = this.selectInfo.stockInCate;
+                    var aud_name = "";
+                    for (var i = 0; i < auditorIds.length; i++){
+                        if (id === auditorIds[i].id){
+                            aud_name = auditorIds[i].name
+                        }
+                    }
+                    Vue.set(this.stock, 'typeArr', id + '_' + aud_name)
+                },
+                checkNumber : function (index) {
+                    var tmpNum = parseInt(vm.productData[index].num);
+                    if ( tmpNum > vm.productData[index].num_all) {
+                        layer.msg('不能超过最大可调拨数:' + vm.productData[index].num_all);
+                        vm.productData[index].num = 0;
+                    }
+                    if (tmpNum > vm.productData[index].stock_total_number) {
+                        layer.msg('调拨数高于目标库房的即时库存:' + vm.productData[index].stock_total_number);
+                        vm.productData[index].num = 0;
+                    }
+                },
+                beforeSubmit : function(){
+                    if (vm.productData.length == 0) {
+                        this.$notify({
+                            title: '不能不提交入库的物料',
+                            message: '失败',
+                            type: 'warning'
+                        });
+                        return false;
+                    }
+                    for (var i = 0; i < vm.productData.length; i++) {
+                        var j = i+1;
+                        if (!vm.productData[i].rep_id_out) {
+                            this.$notify({
+                                title: '第' + j + '行出库仓库未选择',
+                                message: '失败',
+                                type: 'warning'
+                            });
+                            return false;
+                        }
+                        if (!vm.productData[i].rep_id_in) {
+                            this.$notify({
+                                title: '第' + j +'行入库仓库未选择',
+                                message: '失败',
+                                type: 'warning'
+                            });
+                            return false;
+                        }
+                        if (vm.productData[i].rep_id_in === vm.productData[i].rep_id_out) {
+                            this.$notify({
+                                title: '第' + j +'行调拨仓库有问题，出库仓库和入库仓库相同！',
+                                message: '失败',
+                                type: 'warning'
+                            });
+                            return false;
+                        }
+                        if ((!vm.productData[i].num) || ((vm.productData[i].num - vm.productData[i].stock_total_number) > 0)) {
+                            this.$notify({
+                                title: '第' + j +'行调拨数量有问题(未填写或大于可出库库存)' + vm.productData[i].num + "|||" + vm.productData[i].stock_total_number,
+                                message: '失败',
+                                type: 'warning'
+                            });
+                            return false;
+                        }
+                        if (vm.productData[i].num <= 0) {
+                            this.$notify({
+                                title: '第' + j +'行调拨数量非法',
+                                message: '失败',
+                                type: 'warning'
+                            });
+                            return false;
+                        }
+                        if (!vm.productData[i].reason) {
+                            this.$notify({
+                                title: '第' + j +'行调拨原因未填写，请进行填写',
+                                message: '失败',
+                                type: 'warning'
+                            });
+                            return false;
+                        }
+
+                    }
+                    return true;
+                },
+                isInArray : function(arr,value) {
+                    var index = $.inArray(value,arr);
+                    if (index >= 0) {
+                        return true;
+                    }
+                    return false;
+                },
+                preSubmit : function () {
+                    var tmpOut = [],tmpIn = [];
+                    tmpOut.push(vm.productData[0].rep_id_out);
+                    tmpIn.push(vm.productData[0].rep_id_in);
+                    for (var p = 1; p < vm.productData.length; p++) {
+                        if (!vm.isInArray(tmpOut, vm.productData[p].rep_id_out)) {
+                            tmpOut.push(vm.productData[p].rep_id_out);
+                        }
+                        if (!this.isInArray(tmpIn, vm.productData[p].rep_id_in)) {
+                            tmpIn.push(vm.productData[p].rep_id_in);
+                        }
+                    }
+
+                    return tmpIn.length >= tmpOut.length ? tmpIn.length : tmpOut.length;
+                },
+                submitStock : function () {
+                    var flag = this.beforeSubmit();
+                    if (!flag) {
+                        return false;
+                    } else {
+                        var data = this.preSubmit();
+                        layer.confirm('根据您填写的数据，将生成' + data + "条调拨单据，生成时间等信息默认在调拨备注中显示，确认数据无误并提交？", {
+                            btn: ['确定','再检查一下'] //按钮
+                        }, function(){
+                            $.ajax({
+                                url : "/Dwin/Stock/addStockTransfer",
+                                type : 'post',
+                                data : {
+                                    base : vm.stock,
+                                    material : vm.productData,
+                                    length : data
+                                },
+                                success: function (res) {
+                                    if (res.status == 200) {
+                                        layer.confirm('成功提交调拨单,是否前往审核页面？', {
+                                            btn : ['前往', '关闭页面']
+                                        }, function () {
+                                            location.replace("/Dwin/Stock/showAuditTransferList");
+                                        }, function () {
+                                            var index = parent.layer.getFrameIndex(window.name);
+                                            parent.layer.close(index);
+                                        });
+
+                                    } else {
+                                        vm.$notify({
+                                            title: '报错',
+                                            message: res.msg,
+                                            type: 'warning'
+                                        });
+                                    }
+                                }
+                            })
+                        });
+                    }
+                }
+            }
+        })
+
+    });
+</script>
+</body>
+</html>

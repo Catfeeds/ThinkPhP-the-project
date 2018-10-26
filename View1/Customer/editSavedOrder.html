@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--编辑订单</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>{$data['cus_name']}客户订单编辑</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <form id="saleOrderSubmit" enctype="multipart/form-data" name="orderForm">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th colspan="9">订单基本信息</th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="orderName">订单名称：</label>
+                                            <input class="form-control" id="orderName" name="orderName" type="text" value="{$data.oname}" required>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="orderType">销货单类型</label>
+                                            <select class="form-control" name="orderType" id="orderType" required="true">
+                                                <volist name="orderInfo.orderType" id="vol">
+                                                    <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $data['order_type']">selected</if>>{$vol.type_name}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="staticType">业绩类型</label>
+                                            <select class="form-control" name="staticType" id="staticType" required="true">
+                                                <volist name="orderInfo.performanceType" id="vol">
+                                                    <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $data['static_type']">selected</if>>{$vol.performance_type_name}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th colspan="2">
+                                        <div class="input-group">
+                                            <label for="cusName">客户名称</label>
+                                            <input class="form-control" name="cusName" id="cusName" type="text" readonly required value="{$data.cu_name}">
+                                        </div>
+                                    </th>
+                                    <th colspan="3">
+                                        <div class="input-group">
+                                            <label for="cusAddr">地址</label>
+                                            <select name="cusAddr" id="cusAddr" class="form-control">
+                                                <option value="">请选择</option>
+                                                <volist name="addrData" id="vol" key="k" >
+                                                    <option value="{$vol}" <if condition="$vol eq $data['receiver_addr']">selected</if>>{$vol}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th colspan="2">
+                                        <div class="input-group">
+                                            <label for="cusContact">客户联系人</label>
+                                            <select id="cusContact" name="cusContact" class="form-control">
+                                                <option value="">请选择</option>
+                                                <volist name="contactData" id="vol">
+                                                    <option value="{$vol.phone}" <if condition="$vol['phone'] eq $data['receiver_phone']">selected</if>>{$vol.name}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="cpoId">订单编号：</label>
+                                            <input class="form-control" id="cpoId" name="cpoId" type="text" value="CPO{$orderId.order_id}" required readonly>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="staffName">业务员</label>
+                                            <input type="text" class="form-control" name='staffName' id='staffName' readonly required value="{$data.pic_name}" />
+                                        </div>
+
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="staffPhone">业务员电话</label>
+                                            <input type="text" class="form-control" name='staffPhone' id='staffPhone' readonly required value="{$data.pic_phone}" />
+                                        </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th colspan="9">物流信息</th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="logisticsType">运输方式</label>
+                                            <select class="form-control" name="logisticsType" id="logisticsType"  required>
+                                                <option value="">请选择</option>
+                                                <volist name="orderInfo['logisticsType']" id="vol">
+                                                    <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $data['logistics_type']">selected</if>>{$vol.logistics_type_name}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="freightPaymentMethod">运费支付方式</label>
+                                            <select class="form-control" name='freightPaymentMethod' id='freightPaymentMethod' required>
+                                                <option value="">请选择</option>
+                                                <volist name="orderInfo['freightPayMethod']" id="vol">
+                                                    <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $data['freight_payment_method']">selected</if>>{$vol.name}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="deliveryWarehouse">发货仓库</label>
+                                            <select class="form-control" name='deliveryWarehouse' id='deliveryWarehouse' required>
+                                                <volist name="orderInfo['repType']" id="vol">
+                                                    <option value="{$vol.repid}" <if condition="$vol['repid'] eq $data['delivery_ware_house']">selected</if>>{$vol.repname}</option>
+                                                </volist>
+                                            </select>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="receiver">收货人</label>
+                                            <input  required type="text" id="receiver" name="receiver" class="form-control" value="{$data.receiver}" required />
+                                        </div>
+                                    </th>
+                                    <th colspan="4">
+                                        <div class="input-group">
+                                            <label for="orderAddr">收货地址</label>
+                                            <input class="form-control" name="orderAddr" id="orderAddr" type="text" value="{$data.receiver_addr}" required>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="input-group">
+                                            <label for="orderPhone">收货人电话</label>
+                                            <input class="form-control" name="orderPhone" id="orderPhone" type="text" value="{$data.receiver_phone}" required>
+                                        </div>
+                                    </th>
+                                <tr>
+                                    <th colspan="9">
+                                        <div class="input-group">
+                                            <label for="logisticesTip">物流备注：</label>
+                                            <textarea class="form-control" name="logisticesTip" id="logisticesTip" cols="30" rows="3" value="{$data.logistices_tip}"></textarea>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </table>
+                            <table class="table table-bordered table-striped dataTables-list">
+                                <label class="fa-hover col-md-1 col-sm-1">产品信息</label>
+                                <thead>
+                                    <tr>
+                                        <th>产品类别</th>
+                                        <th>产品型号</th>
+                                        <th>单价（元）</th>
+                                        <th>数量（件）</th>
+                                        <th>金额（元）</th>
+                                        <th><button class="btn btn-primary btn-circle" type="button" id="cusAdd"><i class="fa fa-plus"></i></button></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <if condition="$prodData['0'] neq ''">
+                                    <volist name="prodData" id="vo" key="k">
+                                        <tr>
+                                            <td>
+                                                <select name="{$vo.prodType}" id="{$vo.prodType}" class="form-control" required>
+                                                    <volist name="orderInfo['prodType']" id="vol">
+                                                        <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $vo['product_type']">selected</if>>{$vol.prod_type_name}</option>
+                                                    </volist>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <!--<input class="form-control" name="{$vo.prodId}" id="{$vo.prodId}" type="text" placeholder="DMG48270M043-01WN" value="{$vo.product_id}">-->
+                                                <select name="{$vo.prodId}" id="{$vo.prodId}" class="chosen-select" required>
+                                                    <volist name="orderInfo['prodData']" id="vol">
+                                                        <if condition="$vol['pro_id'] eq $vo['product_id']">
+                                                            <option value="{$vol.pro_id}" selected>
+                                                                <else/>
+                                                            <option value="{$vol.pro_id}">
+                                                        </if>
+                                                        {$vol.pro_name}</option>
+                                                    </volist>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">&yen;</span>
+                                                    <input type="text" class="form-control" placeholder="000.00" aria-describedby="basic-addon1" name="{$vo.prodPrice}" id="{$vo.prodPrice}" onkeyup="jisuan({$k-1});" value="{$vo.product_price}" required>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="{$vo.prodNum}" id="{$vo.prodNum}" onkeyup="jisuan({$k-1});" value="{$vo.product_num}" required>
+                                                    <span class="input-group-addon">件</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon">&yen;</span>
+                                                    <input type="text" class="form-control" placeholder="000.00" aria-describedby="basic-addon1" name="{$vo.prodSinglePrice}" id="{$vo.prodSinglePrice}" readonly required value="{$vo.product_total_price}">
+                                                </div>
+                                            </td>
+                                            <td><button class="btn btn-primary btn-circle delButton" type="button"><i class="fa fa-times"></i></button></td>
+                                        </tr>
+                                    </volist>
+                                    <else/>
+                                         <tr>
+                                            <td>
+                                                <select name="productName0" id="productName0" class="form-control">
+                                                   <volist name="prodType" id="vol">
+                                                       <option value="{$vol.type_id}">{$vol.prod_type_name}</option>
+                                                   </volist>
+                                                </select>
+                                            </td>
+                                            <td>
+                                               <!-- <input class="form-control" name="productId0" id="productId0" type="text" placeholder="DMG48270M043-01WN">-->
+                                                <select name="productId0" id="productId0" class="chosen-select">
+                                                    <volist name="orderInfo['prodData']" id="vol">
+                                                        <if condition="$vol['pro_id'] eq $vo['product_id']">
+                                                            <option value="{$vol.pro_id}" selected>
+                                                                <else/>
+                                                            <option value="{$vol.pro_id}">
+                                                        </if>
+                                                        {$vol.pro_name}</option>
+                                                    </volist>
+                                                </select>
+                                            </td>
+                                             <td>
+                                                 <div class="input-group">
+                                                     <span class="input-group-addon">&yen;</span>
+                                                     <input type="text" class="form-control" placeholder="000.00" aria-describedby="basic-addon1" name="productprice0" required id="productprice0" onkeyup="jisuan(0);">
+                                                 </div>
+                                             </td>
+                                             <td>
+                                                 <div class="input-group">
+                                                     <input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="productNum0" id="productNum0" required onkeyup="jisuan(0);">
+                                                     <span class="input-group-addon">件</span>
+                                                 </div>
+                                             </td>
+                                             <td>
+                                                 <div class="input-group">
+                                                     <span class="input-group-addon">&yen;</span>
+                                                     <input type="text" class="form-control" placeholder="000.00" aria-describedby="basic-addon1" name="singlePrice0" id="singlePrice0" readonly required>
+                                                 </div>
+                                             </td>
+                                            <td><button class="btn btn-primary btn-circle delButton" type="button"><i class="fa fa-times"></i></button></td>
+                                       </tr>
+                                    </if>
+                               </tbody>
+                            </table>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th colspan="6">财务信息</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <th width="20%">
+                                            <label for="totalNum">订单总金额</label>
+                                            <div class="input-group">
+                                                <span class="input-group-addon">&yen;</span>
+                                                <input type="text" class="form-control" placeholder="000.00" aria-describedby="basic-addon1" name="totalNum" id="totalNum" readonly value="{$data.oprice}" required>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-group">
+                                                <label for="settlementMethod">结算方式</label>
+                                                <select class="form-control" name="settlementMethod" id="settlementMethod" required>
+                                                    <option value="">请选择</option>
+                                                    <volist name="orderInfo['settleType']" id="vol">
+                                                        <option value="{$vol.seid}" <if condition="$vol['seid'] eq $data['settlement_method']">selected</if>>{$vol.sename}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-group">
+                                                <label for="orderTime">订单时间</label>
+                                                <input required class="form-control" type="text" name="orderTime" id="orderTime" onclick="WdatePicker( {el:this,dateFmt:'yyyy-MM-dd HH:mm:ss'} )" <if condition="$data['otime'] neq ''" >value="{$data.otime|date='Y-m-d H:i:s',###}"</if> >
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-group">
+                                                <label for="invoiceSituation">票货情况</label>
+                                                <select class="form-control" name="invoiceSituation" id="invoiceSituation" required>
+                                                    <option value="">请选择</option>
+                                                    <volist name="orderInfo['invoiceSituation']" id="vol">
+                                                        <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $data['invoice_situation']">selected</if>>{$vol.name}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-group">
+                                                <label for="invoiceType">付款方式</label>
+                                                <select class="form-control" name='invoiceType' id="invoiceType" required>
+                                                    <option value="">请选择</option>
+                                                    <volist name="orderInfo['invoiceT']" id="vol">
+                                                        <option value="{$vol.type_id}" <if condition="$vol['type_id'] eq $data['invoice_type']">selected</if>>{$vol.name}</option>
+                                                    </volist>
+                                                </select>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <div class="input-group">
+                                                <label for="invoiceContact">发票收件人</label>
+                                                <input type="text" name="invoiceContact" class="form-control" id="invoiceContact" value="{$data.invoice_contact}" required>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="input-group">
+                                                <label for="invoicePhone">发票收件人电话</label>
+                                                <input class="form-control" name="invoicePhone" id="invoicePhone" type="text" value="{$data.invoice_phone}" required>
+                                            </div>
+                                        </th>
+                                        <th colspan="2">
+                                            <div class="input-group">
+                                                <label for="invoiceAddr">发票接收地址</label>
+                                                <input name="invoiceAddr" id="invoiceAddr" class="form-control" required type="text" value="{$data['invoice_addr']}" required>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="6" rowspan="1">财务备注：<textarea class="form-control" name="financeTip" id="financeTip" cols="30" rows="3" value="{$data.finance_tip}">{$data.finance_tip}</textarea></th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <input class="btn btn-outline btn-success" type="submit" id="addOrderOk" value="提交审核">&emsp;
+                            <input class="btn btn-outline btn-success" type="button" id="saveOrder" value="保存订单">&emsp;
+                            <input type="hidden" name="cusid" value="{$data.cus_id}">
+                            <input type="hidden" name="orderid" value="{$orderId.order_id}">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+
+<script>
+var controller = "__CONTROLLER__";
+var totalNum;
+var productPrice;
+var fnNum,contactName;
+var selectType = [],selectVal = [];
+var dataTableList     = $(".dataTables-list");
+var saveOrderDiv      = $("#saveOrder");
+var totalPriceInput   = $("#totalNum");
+var invoiceContactSel = $("#invoiceContact");
+var addOrderBtn     = $("#addOrderOk");
+$("#productName0 option").each(function () {
+    var txt = $(this).text();
+    var val = $(this).val();
+    selectVal.push(val);
+    selectType.push(txt);
+});
+var productNameArray = [], productIdArray = [];
+$("#productId0 option").each(function () {
+    var txt = $(this).text();
+    var val = $(this).val();
+    productIdArray.push(val);
+    productNameArray.push(txt);
+});
+$(document).ready( function() {
+    $(".chosen-select").chosen({
+        no_results_text: "该产品名不存在",//搜索无结果时显示的提示
+        search_contains:true,   //关键字模糊搜索，设置为false，则只从开头开始匹配
+        allow_single_deselect:true, //是否允许取消选择
+        width:'100%'
+    });
+    dataTableList.dataTable({
+                'autoWidth' : false,
+                'bSort'     : false,
+                'paging'    : false,
+                'searching' : false,
+                'info'      : false
+    });
+    var inputNum = dataTableList.find('input');
+    fnNum = (inputNum.length / 4) - 1;
+    var oTable = dataTableList.dataTable();
+    function getSelectionOption(productIdArray,productNameArray)
+    {
+        var option = "";
+        for(var j = 0; j < productIdArray.length; j++) {
+            option += "<option value="+ productIdArray[j] +">" + productNameArray[j] +"</option>";
+        }
+        return option;
+    }
+    var productOption = getSelectionOption(productIdArray, productNameArray);
+    var option = getSelectionOption(selectVal,selectType);
+
+    $("#cusAdd").on('click', function () {
+        fnNum++;
+    var option = "";
+        for(var i = 0; i < selectType.length; i++) {
+            option += "<option value="+ selectVal[i] +">" + selectType[i] +"</option>";
+        }
+        oTable.fnAddData([
+            "<select class='form-control' name='productName"+ fnNum + "'" + "id='productName" + fnNum + "'" + ">" + option + "</select>",
+            '<select name="productId' + fnNum + '" id="productId' + fnNum + '" class="chosen-select">' + productOption + '</select>',
+            '<div class="input-group">'
+                + '<span class="input-group-addon" id="basic-addon1">&yen;</span>'
+                + '<input class="form-control" placeholder="000.00" aria-describedby="basic-addon1" name="productprice' + fnNum + '" type="text" id="productprice' + fnNum + '" onkeyup="jisuan(' + fnNum + ');">'
+            + '</div>',
+            '<div class="input-group">'
+                + '<input class="form-control" placeholder="" aria-describedby="basic-addon1" name="productNum' + fnNum + '"' + ' type="text" id="productNum' + fnNum + '" onkeyup="jisuan(' + fnNum + ');">'
+                + '<span class="input-group-addon" id="basic-addon1">件</span>'
+            + '</div>',
+            '<div class="input-group">'
+                + '<span class="input-group-addon" id="basic-addon1">&yen;</span>'
+                + '<input class="form-control" placeholder="000.00" aria-describedby="basic-addon1" readonly="true" name="singlePrice' + fnNum + '" type="text" id="singlePrice' + fnNum + '"' +'>'
+            + '</div>',
+            '<button class="btn btn-primary btn-circle delButton" type="button"><i class="fa fa-times"></i></button>']);
+        oTable.fnDraw();
+        $(".chosen-select").chosen({
+            no_results_text: "该产品名不存在",//搜索无结果时显示的提示
+            search_contains:true,   //关键字模糊搜索，设置为false，则只从开头开始匹配
+            allow_single_deselect:true, //是否允许取消选择
+            width:'100%'
+        });
+        return fnNum;
+    });
+});
+
+var numArray;
+
+function jisuan(index) {
+    var pId         = "productprice" + index;
+    var pNumId      = "productNum" + index;
+    var priceIndex  = "singlePrice" + index;
+    productPrice    = parseFloat($("#" + pId + "").val());
+    totalNum        = parseFloat($("#" + pNumId + "").val());
+    var singlePrice = parseFloat(productPrice * totalNum).toFixed(2);
+    $("#" + priceIndex + "").val(singlePrice);
+    var oTable = dataTableList.dataTable();
+    numArray = [];
+    $(".dataTables-list tbody tr").each(function() {
+        numArray.push($(this).find('td').eq(4).children().children('input').val());
+    });
+    totolPrice = parseFloat(eval(numArray.join("+"))).toFixed(2);
+    totalPriceInput.val(totolPrice);
+}
+$(document).on('click', '.delButton', function () {
+    var trIndex = $(this).parent().parent().index();
+    var oTable = dataTableList.dataTable();
+    oTable.fnDeleteRow(trIndex);
+    numArray = [];
+    $(".dataTables-list tbody tr").each(function() {
+        numArray.push($(this).find('td').eq(4).children().children('input').val());
+    });
+    totolPrice = parseFloat(eval(numArray.join("+"))).toFixed(2);
+    totalPriceInput.val(totolPrice);
+});
+
+$("#cusAddr").on('change', function() {
+    var addr_1 = $(this).val();
+    $("#orderAddr").val(addr_1);
+});
+$("#cusContact").on('change', function() {
+    var contact_phone = $(this).val();
+    var contact_name  = $(this).children('option:selected').text();
+    $("#receiver").val(contact_name);
+    $("#orderPhone").val(contact_phone);
+});
+
+$("#saleOrderSubmit").validate({
+    ignore: ":hidden:not(select)",
+    submitHandler: function(form) {
+        addOrderBtn.attr('disabled','disabled');
+        contactName = $("#invoiceContact").val();
+        var datas   = $(form).serializeArray();
+        $.ajax({
+            type : 'POST',
+            url  : controller + '/addSaleOrder',
+            data : {
+                datas       : datas,
+                num         : fnNum,
+                invoiceName : contactName
+            },
+            success : function (msg) {
+                if(msg['status'] == 2) {
+                    var index = parent.layer.getFrameIndex(window.name);
+                    layer.msg(msg['msg'], function () {
+                        parent.layer.close(index);
+                    });
+                } else {
+                    layer.alert(msg['msg']);
+                    addOrderBtn.attr('disabled', false);
+                }
+            },
+            error : function (error) {
+                addOrderBtn.attr('disabled', false);
+            }
+        });
+    }
+});
+saveOrderDiv.on('click', function() {
+    saveOrderDiv.attr('disabled','disabled');
+    if ($("#staffPhone").val() == "") {
+        layer.alert('个人联系方式为空，请在系统中更新个人联系方式');
+        saveOrderDiv.attr('disabled', false);
+        return false;
+    }
+
+    var datas = $("#saleOrderSubmit").serializeArray();
+    $.ajax({
+        type : 'POST',
+        url  : controller + '/saveOwnOrder',
+        data : {
+            datas,
+            num         : fnNum,
+            invoiceName : contactName
+            },
+        success : function (msg) {
+            if(msg == 2) {
+            //var index = parent.layer.getFrameIndex(window.name);
+            layer.msg('保存成功');
+                saveOrderDiv.attr('disabled', false);
+            } else {
+                layer.alert("提交出错");
+                saveOrderDiv.attr('disabled', false);
+            }
+        },
+        error   : function (error) {
+            console.log(error);
+            saveOrderDiv.attr('disabled', false);
+        }
+    });
+});
+</script>
+</body>
+</html>
+

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--联系记录详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="signupForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">部门名称编辑：</label>
+                            <div class="col-sm-4">
+                                <input id="deptName" name="deptName" class="form-control" type="text" value="{$data.name}">
+                                <input id="dept" name="dept" class="form-control" type="hidden" value="{$data.name}">
+                                <input id='deptId' name="deptId" class="form-control" type="hidden" value="{$data.id}">
+                                <input id='deptPId' name="deptPId" class="form-control" type="hidden" value="{$data.parent_id}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-primary" type="button" id="addStaffSubmit">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $("#addStaffSubmit").on('click', function () {
+        if ($("#deptName").val() == "") { layer.alert('不能修改为空',{ icon: 5 } ); return false; }
+        if ($("#deptName").val() == $("#dept").val()) {
+            layer.alert('未做修改！',{ icon: 5 } ); return false;
+        }
+
+        var datas = $("#signupForm").serializeArray();
+
+        $("#addStaffSubmit").attr("disabled",'disabled');
+        var indexLoad = layer.load(1, {shade : [0.1, '#fff']});
+        $.ajax({
+            type : 'POST',
+            url  : '__CONTROLLER__/editDept',
+            data : datas,
+            success : function (msg) {
+                if(msg == 2) {
+                    layer.msg(
+                        '修改成功',
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                        function () {
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                            layer.close(indexLoad);
+                        }
+                    );
+                    parent.window.location.reload();
+                } else if(msg == 1)  {
+                    layer.alert("您填的部门名称已存在，请重新填写");
+                    layer.close(indexLoad);
+                    $("#addStaffSubmit").attr("disabled", false);
+                    return false;
+                } else if(msg ==3) {
+                    layer.alert("出错了");
+                    layer.close(indexLoad);
+                    $("#addStaffSubmit").attr("disabled", false);
+                    return false;
+                }
+            },
+            error   : function (error) {
+                layer.alert(error);
+                $("addStaffSubmit").attr('disabled', false);
+            }
+        });
+    });
+</script>
+</body>
+</html>

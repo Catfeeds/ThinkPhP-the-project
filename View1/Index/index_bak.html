@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="__PUBLIC__/favicon.ico">
+    <link rel="stylesheet" href="__PUBLIC__/html/css/dwin/index/base.css" />
+    <link rel="stylesheet" href="__PUBLIC__/html/css/dwin/index/index.css" />
+    <title>CRM销售客户关系管理</title>
+    <style type="text/css">
+    .logo > .crmName {
+            font-style: italic;
+            color: #b4d9ff;
+            font-family :"DejaVu Sans Mono";
+            font-weight: 400;
+            font-size: large;
+    }
+    </style>
+</head>
+<body>
+<div id="container">
+    <div id="hd">
+        <div class="hd-wrap ue-clear">
+            <div class="top-light"></div>
+            <h1 class="logo"><img src="__PUBLIC__/Admin/images/dwinlogo.png" alt="DoubleWin"><span class="crmName">客户关系管理</span></h1>
+            <div class="login-info ue-clear">
+                <div class="welcome ue-clear">
+                    <div  class="user-name">{$data.nickname}({$data.postname}-{$data.deptname})</div>
+                    <input type="hidden" value="{$Think.session.staffId}" id="uid">
+                </div>
+                <div class="login-msg ue-clear">
+                <!--    <a href="{:U('Sale/showBusinessListAudit')}" target="iframe" class="msg-txt">您有未读消息</a>-->
+                    <div class="msg-num1" style="float: left;"></div>
+                    <div class="msg-num2" style="float: left;"></div>
+                </div>
+            </div>
+   <div class="toolbar ue-clear"> <a href="__CONTROLLER__/editPwd" target="iframeTop" style="margin-right: 50px;color:#eb9316;font-size: larger;font-weight: bold;">修改密码</a><a id="editPhone" href="__CONTROLLER__/editPhone" target="iframeTop" style="margin-right: 50px;color:red;font-size: larger;font-weight: bold;">修改电话</a><a href="javascript:;" class="home-btn"  data="crmhome"></a> <a href="javascript:;" class="quit-btn exit"></a> </div>
+        </div>
+    </div>
+    <div id="bd">
+        <div class="wrap ue-clear">
+            <div class="sidebar">
+                <h2 class="sidebar-header">
+                    <p>CRM功能导航</p>
+                </h2>
+                <ul class="nav">
+                    <li class="dept saler" id="saler"></li>
+                    <li class="dept yanfa" id="yanfa"></li>
+		            <li class="dept finance" id="finance"></li>
+                    <li class="dept telManage" id="online"></li>
+                    <li class="dept cusService" id="saleservice"></li>
+                    <li class="dept system" id="system"></li>
+                </ul>
+            </div>
+            <div class="content">
+                <iframe src="crmhome" name="iframeTop" id="iframeTop" width="100%" frameborder="0" ></iframe>
+            </div>
+        </div>
+    </div>
+    <div id="ft" class="ue-clear">
+        <div class="ft-left">
+            <span>迪文科技</span> <em>CRM&nbsp;System</em>
+        </div>
+        <div class="ft-right"> <span>RC</span> <em>V1.1.1&nbsp;2017</em> </div>
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/common.js"></script>
+<script src="__PUBLIC__/html/js/dwin/core.js"></script>
+<script src="__PUBLIC__/html/js/dwin/index/index.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var id = $('#uid').val();
+        var html = [];
+        $.ajax({
+            type : 'POST',
+            url  : '__CONTROLLER__/checkPostInfo',
+            data : { uid : id },
+            success : function (msg) {
+                if (msg['customer'] == 2) {
+                    html['customer'] =  '<div class="nav-header"><a href="javascript:;" class="ue-clear"  date-src="__MODULE__/Customer/showBusinessList"><span>销售业务管理</span><i class="icon"></i></a></div>';
+                    html['customer'] +=
+                        '<ul class="subnav" style="display: none;">' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/Customer/showBusinessList">业务列表</a></li>' +
+                            '<li>' +
+                                '<a href="javascript:;" date-src="__MODULE__/Customer/showOrderList" id="orderSel" class="up-select">订单管理</a>' +
+                                '<ul class="hiddenClass" style="display: none;">' +
+                                    '<li><a href="javascript;" date-src="__MODULE__/Customer/showOrderList/k/1"></a>个人订单</li>' +
+                                    '<li><a href="javascript;" date-src="__MODULE__/Customer/showSaveOrder"></a>已保存订单</li>' +
+                                    '<li id="orderListAll"><a href="javascript;" date-src="__MODULE__/Customer/showOrderList/k/2"></a>下属订单</li>' +
+                                '</ul>' +
+                            '</li>' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/Customer/assignCustomer">客户转移</a></li>' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/cus/common">公共客户池</a></li>' +
+                            '<li class="CusAudit"><a href="javascript:;" date-src="__MODULE__/cus/audit">客户审核</a></li>' +
+                            '<li class="CusAudit"><a href="javascript:;" date-src="__MODULE__/cus/level">客户评级</a></li>' +
+                        '</ul>';
+                    $("#saler").html(html['customer']);
+                }
+
+                if (msg['project'] == 2) {
+                    html['project'] =  '<div class="nav-header"><a href="javascript:;" class="ue-clear" date-src="__MODULE__/own/doing/1"><span>研发业务管理</span><i class="icon"></i></a></div>';
+                    html['project'] +=
+                        '<ul class="subnav" style="display: none;">' +
+                            '<li><div href="javascript:;" class="up-select" date-src="__MODULE__/own/doing/1">本人项目</div>' +
+                                '<ul class="hiddenClass" style="display: none;">' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/own/doing/1">--进展中--</a></li>' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/own/delivery">--验收中--</a></li>' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/own/done">--月达成--</a></li>' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/own/audit">--审核中--</a></li>' +
+                                '</ul>' +
+                            '</li>' +
+                            '<li>' +
+                                '<div href="javascript:;" class="up-select" >项目公示</div>' +
+                                '<ul class="hiddenClass" style="display: none;">' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/public/app">--可申请--</a></li>' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/public/all/1">--进展中--</a></li>' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/public/all/2">--验收中--</a></li>' +
+                                    '<li><a href="javascript:;" date-src="__MODULE__/public/all/3">--月达成--</a></li>' +
+                                '</ul>' +
+                            '</li>' +
+                            '<li>' +
+                            '<div class="up-select" data="prj/audit">项目审核</div>' +
+                            '</li>' +
+                        '</ul>';
+                    $("#yanfa").html(html['project']);
+                }
+                
+                if (msg['finance'] == 2) {
+                    html['finance'] = '<div class="nav-header"><a href="javascript:;" class="ue-clear" date-src="__MODULE__/Finance/showOrderList"><span>财务相关</span><i class="icon"></i></a></div>';
+                    html['finance'] +=
+                        '<ul class="subnav" style="display: none;">' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/Finance/showOrderList">订单列表</a></li>' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/Finance/showOrderAudit">订单审核</a></li>' +
+                        '</ul>';
+                    $("#finance").html(html['finance']);
+                }
+
+                if(msg['saleservice'] == 2) {
+                    html['saleservice'] = '<div class="nav-header"><a href="javascript:;" class="ue-clear" date-src="__MODULE__/SaleService/showCustomer"><span>售后服务</span><i class="icon"></i></a></div>';
+                    html['saleservice'] += 
+                        '<ul class="subnav" style="display: none;">' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/SaleService/showCustomer">业务信息查询</a></li>' + 
+                            '<li><a href="javascript:;" date-src="__MODULE__/SaleService/showSaleServiceList">售后服务记录</a></li>' +
+                        '</ul>';
+                    $("#saleservice").html(html['saleservice']);
+                }
+
+                if (msg['online'] == 2) {
+                    html['onlineservice'] = '<div class="nav-header"><a href="javascript:;" class="ue-clear" date-src="__MODULE__/OnlineService/showCustomer"><span>电话客服</span><i class="icon"></i></a></div>';
+                    html['onlineservice'] += 
+                        '<ul class="subnav" style="display: none;">' + 
+                            '<li><a href="javascript:;" date-src="__MODULE__/OnlineService/showCustomer">业务信息查询</a></li>' +
+                            '<li><a href="javascript:;" date-src="__MODULE__/OnlineService/showServiceList">客服记录</a></li>' +
+                        '</ul>';
+                    $("#online").html(html['onlineservice']);
+                }
+
+                if (msg['sys'] == 2) {
+                    html['sys'] = '<div class="nav-header"><a href="javascript:;" class="ue-clear" date-src="__MODULE__/System/showDept"><span>系统管理</span><i class="icon"></i></a></div>';
+                    html['sys'] += '<ul class="subnav" style="display: none;">' +
+                               '<li><a href="javascript:;" class="sysSelect1" date-src="__MODULE__/System/showDept">部门管理</a></li>' +
+                               '<li><a href="javascript:;" class="sysSelect1" date-src="__MODULE__/System/showPosition">职位管理</a></li>' +
+                               '<li><a href="javascript:;" class="sysSelect2" date-src="__MODULE__/System/showStaff">员工管理</a></li>' +
+                               '<li><a href="javascript:;" class="sysSelect3" date-src="__MODULE__/System/editRole">审核权限管理</a></li>' +
+                               '<li><a href="javascript:;" date-src="__MODULE__/System/editRecordTime">记录可查看时间</a></li>' +
+                               '<li><a href="javascript:;" date-src="__MODULE__/System/showCusIndus">行业编辑</a></li>' +
+                       '</ul>';
+                    $("#system").append(html['sys']);
+                }
+            }
+        });
+    });
+
+
+    //点击显示二级导航栏下的子导航
+    $('.nav').on('click', '.up-select', function () {
+        $(".nav").find('.hiddenClass').each(function() {
+            $(this).css('display', 'none');
+        });
+        $(this).parent().children('.hiddenClass').css('display', 'block');
+    });
+
+    // 主页和退出按钮
+    $(".home-btn").on('click', function () {
+        var src = $(this).attr('data');
+        $("#iframeTop").attr('src', src);
+    });
+
+    $('.exit').click(function(){
+        layer.confirm('确定退出系统?',
+            {
+                icon : 6
+            },
+            function(){
+            window.location.href = "__MODULE__/Public/logout";
+        });
+    });
+
+    $(".dept").on('click', function () {
+        var id = $('#uid').val();
+        var dept = $(this).attr('id');
+        var childContent = $(this).children(".subnav");
+        $(".dept").find('.subnav').css("display", "none");
+        childContent.css("display", "block");
+    });
+    $(window).resize(function(e) {
+        $("#bd").height($(window).height() - $("#hd").height() - $("#ft").height()-6);
+        $(".wrap").height($("#bd").height()-6);
+        $(".nav").css("minHeight", $(".sidebar").height() - $(".sidebar-header").height()-1);
+        $("#iframeTop").height(($(window).height() - $("#hd").height() - $("#ft").height()));
+    }).resize();
+
+    $(".nav>li").css({"borderColor":"#dbe9f1"});
+    $(".nav>.current").prev().css({"borderColor":"#7ac47f"});
+
+
+    function getMsgCount(){
+        //ajax
+        //当前控制器是Index
+        $.get("{:U('Index/getMsgCount')}", function(data) {
+            //修改未读数量的显示
+            if (data != "") {
+                var innerHtml = '';
+                if (data['cusCount']) {
+                    innerHtml += '<a class="msg-txt ue-clear cusCount" href="__MODULE__/Customer/showCustomerAudit" target="iframeTop">待审核客户：' + data['cusCount'] + '</a>';
+                }
+                if (data['prjCount']) {
+                    innerHtml += '<a class="msg-txt ue-clear prjCount" href="__MODULE__/Research/showPrjAudit" target="iframeTop">待审核项目：' + data['prjCount'] + ' </a>';
+                }
+	        if (data['orderCount']) {
+                    innerHtml += '<a class="msg-txt ue-clear orderCount" href="__MODULE__/Finance/showOrderAudit" target="iframeTop">待审订单：' + data['orderCount'] + ' </a>';
+                }
+                if (data['prjProgressCount']) {
+                    innerHtml += '<a class="msg-txt ue-clear prjAudit" href="__MODULE__/Research/showProgressAuditList" target="iframeTop">待审项目进度：' + data['prjProgressCount'] + '</a>';
+                }
+                if (data['saleCount']) {
+                    innerHtml += '<a class="msg-txt ue-clear saleCount" target="iframeTop" href="__MODULE__/Customer/showUnCheckServiceList">待审售后记录：' + data['saleCount'] + '</a>';
+                }
+                if (data['onlineCount']) {
+                    innerHtml += '<a class="msg-txt ue-clear onlineCount" target="iframeTop" href="__MODULE__/Customer/showUnCheckOnlineList">待审客服记录：' + data['onlineCount'] + '</a>';
+                }
+                if (data['prjUNum']) {
+                    innerHtml += '<a class="msg-txt ue-clear selPrjCount" target="iframeTop" href="__MODULE__/Research/showPublicPrj">研发可申请项目数：' + data['prjUNum'] + '</a>';
+                }
+            }
+            $('.msg-num1').html("");
+            $(".msg-num1").append(innerHtml);
+        });
+    }
+    //定义页面载入事件
+    $(function(){
+        //声明反复性定时器
+        setInterval('getMsgCount()',5000);
+    });
+
+    $(".nav").on("click","li",function(e){
+        var aurl = $(this).find("a").attr("date-src");
+        $("#iframeTop").attr("src",aurl);
+        $(".nav>li").css({"borderColor":"#dbe9f1"});
+        $(".nav>.current").prev().css({"borderColor":"#7ac47f"});
+        return false;
+    });
+    
+    $("#orderSel").on('click', function () {
+        if ($(this).siblings('ul').length != 0) {
+            var disp = $(this).siblings('ul').css('display');
+            if (disp == "block") {
+                $('#orderSel').siblings("ul").css("display", 'none');
+            } else {
+                $('#orderSel').siblings("ul").css("display", 'block');
+            }
+        }
+    });
+
+    function isInArray(arr,value){
+        for(var i = 0; i < arr.length; i++){
+            if(value === arr[i]){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    $("#showAffiche").on('click', function () {
+        var datasrc = $(this).attr('data');
+        $('#iframeTop').attr('src', datasrc);
+    });
+    $("#feedBack").on('click', function () {
+        var datasrc = $(this).attr('data');
+        $('#iframeTop').attr('src', datasrc);
+    });
+</script>
+</html>

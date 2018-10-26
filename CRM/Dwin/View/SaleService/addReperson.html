@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目更新列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+	<style type="text/css">
+        body {
+            color: black;
+        }
+        /*.chosen-select{
+            color : black;
+        }!important*/
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12"> 
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>编辑维修记录</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1"> 
+                        <form id="addSaleRepairingForm1" method="post">                      
+                            <table class="table table-bordered table-striped dataTables-list" id="table1">
+                                <label class="fa-hover col-md-1 col-sm-1">维修品基本信息</label>
+                                <thead>
+                                    <tr>
+                                        <th>产品类别</th>
+                                        <th>产品型号</th>                                        
+                                        <th>数量（件）</th>
+                                        <th>条码日期</th>
+                                        <th>客户反馈</th>
+                                        <th>售后方式</th>                                         
+                                        <th>客户名称</th>                                         
+                                        <th>业务名称</th>                                         
+                                        <th>收货时间</th>                                         
+                                        <th>收货快递单号</th> 
+                                        <th>返回地址</th>                             
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <volist name="result" id="vol">
+                                        <input type="hidden" name="sid" id="sid" value="{$vol.sid}">
+                                    <tr>
+                                        <td>{$vol.name}</td>                                        
+                                        <td>{$vol.product_name}</td>
+                                        <td>{$vol.num}</td>
+                                        <td>{$vol.barcode_date}</td>
+                                        <td>{$vol.customer_question}</td>                                       
+                                        <td>{$vol.sale_mode}</td>  
+                                        <td>{$vol.cusname}</td>  
+                                        <td>{$vol.salename}</td>  
+                                        <td>{$vol.repair_date|date='Y-m-d H:i:s',###}</td>  
+                                        <td>{$vol.courier_number}</td>  
+                                        <td>{$vol.reback_address}</td>                                     
+                                    </tr>
+                                        <input type="hidden" value="{$vol.is_over}" id="over">
+                                        <input type="hidden" id="shname" value="{$vol.sale_commissioner}"> 
+                                        <input type="hidden" id="finish" value="{$vol.sale_way}"> 
+                                    </volist>                  
+                               </tbody>
+                            </table> 
+                        
+                            <table class="table table-bordered table-striped dataTables-list" id="table2">    
+                                <label class="fa-hover col-md-1 col-sm-1">编辑维修单信息</label>                   
+                            </table> 
+                            <table class="table table-bordered table-striped dataTables-list">    
+                                <tr>
+                                    <th style="width: 160px;">人工费用(元)：<textarea class="form-control" id="rgmoney" name = "rgmoney">0</textarea></th>
+                                    <th>
+                                        备注信息：<textarea class="form-control" name="note" id="note"></textarea>
+                                    </th>
+                                </tr>                   
+                            </table>    
+                            <button class="btn btn-outline btn-success" id="addauditinfo1" type="button">提交审核</button>
+                            <button class="btn btn-outline btn-success" id="addbasicinfo1" type="button">保存编辑</button>
+                            <button class="btn btn-outline btn-success" id="finishbasicinfo" type="button" style="display: none">完结流程</button>
+                            <input type="hidden" id="user_name" value="{$Think.session.staffId}">
+                        </form>                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- <script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script> -->
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script>
+
+$(".dataTables-list").ready(function(){
+    $("#addauditinfo1").attr('disabled', true);
+    window.onload = function(){
+        var biao = $("#table1").find('tr').length;
+        var hang = biao - 1;
+        //通过上面表格的行数来控制下面显示几行
+        for (var fnNum = 1; fnNum <= hang; fnNum++) {
+            $("#table2").append(                  
+                    '<tr>'+                                        
+                        '<td>'+
+                            '<div class="input-group">'+
+                                '<span style="font-weight: bold;font-size: 18px;">产品型号'+
+                                    '<button type="button" onclick="addnow('+fnNum+');" style="background-color: #1AB394; margin-left:5px;" class="btn btn-default btn-xs "><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>'+
+                                    '<button type="button" onclick="removenow('+fnNum+');" style="background-color: #1AB394; margin-left:5px;" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>'+
+                                '</span>'+
+                            '</div>'+
+                            '<div class="input-group">'+
+                                '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="rproduct_name'+ fnNum +'" id="rproduct_name'+ fnNum +'">'+ 
+                            '</div>' +                                          
+                        '</td>' +                                          
+                        '<td>'+
+                            '<table class="table table-bordered table-striped dataTables-list" id = "smalltable'+ fnNum +'">'+
+                                '<thead>'+
+                                    '<th>维修员</th>' +                                          
+                                    '<th>数量（件）</th>'+
+                                    '<th>状态</th>'+
+                                    '<th>故障现象</th>'+
+                                    '<th>维修方式</th>'+
+                                    '<th>故障类型</th>'+
+                                    '<th>维修费用(元)</th>'+
+                                    '<th>计件工资</th>'+
+                                '</thead>'+
+                                                                       
+                            '</table>' +
+                        '</td>'+                                                                            
+                    '</tr>'
+            );
+            var a = $('#table1 tr:eq('+ fnNum +') td:nth-child(2)').text(); 
+            $('#'+'rproduct_name'+ fnNum).attr("value",a);
+            var username = $("#user_name").val();
+            var shname = $("#shname").val();
+            if(username != shname){
+                $(":button").attr("disabled",true);
+            }
+        }
+
+    }
+}); 
+
+//是否完结流程
+var over = $("#over").val();
+if(over == 1){
+    $(":button").attr("disabled",true);
+}
+        
+//追加当前维修人行内部表格
+var anumber = 0;
+function addnow(fnNum){
+    //获取select赋值给隐藏的td    
+    $("#"+ "smalltable" + fnNum).append(
+        '<tr>'+
+            '<td style="display:none;">'+
+                '<div class="input-group">'+
+                    '<input type="text" class="form-control" placeholder="" aria-describedby="basic-addon1" name="a_name'+ anumber +'" id="a_name'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+
+                    '<select class="chosen-select" name="reperson_name'+ anumber +'"  id="reperson_name'+ anumber +'">'+
+                    '<volist name="result3" id="vol">'+   
+                        '<option value="{$vol.id}">{$vol.name}</option>'+
+                    '</volist>'+
+                    '</select>'+  
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+
+                    '<input type="text" style="width:80px;" class="form-control" name="re_num'+ anumber +'" id="re_num'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' + 
+                    '<select class="form-control" name="re_status'+ anumber +'" style="width: 110px;" id="re_status'+ anumber +'">'+   
+                        '<volist name="rst" id="vol">'+
+                            '<option value="{$vol.id}">{$vol.name}</option>'+
+                        '</volist>'+
+                    '</select>'  +                                          
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group" style="float: left;">'+
+                    '<textarea class="form-control" id="situation" name="situation'+ anumber +'" ></textarea>'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">'+                                                                   
+                    '<select class="form-control" name="re_mode'+ anumber +'"  id="re_mode'+ anumber +'">'+   
+                        '<volist name="rst1" id="vol">'+
+                            '<option value="{$vol.id}">{$vol.name}</option>'+
+                        '</volist>'+
+                    '</select>'  + 
+                '</div>'+
+                '<div class="input-group" style="float: left;">'+
+                    '<textarea class="form-control" placeholder="附加说明（可不填）" id="mode_info" name="mode_info'+ anumber +'" ></textarea>'+
+                '</div>'+
+            '</td>'+
+            '<td>'+                
+                '<div class="input-group">'+
+                        '<select class="form-control" name="reperson_question'+ anumber +'" id="reperson_question'+ anumber +'">' +  
+                            '<volist name="rst2" id="vol">'+
+                                '<option value="{$vol.id}">{$vol.name}</option>'+
+                            '</volist>'+
+                        '</select>'+                                                
+                    '</div>'+                                        
+                    '<div class="input-group" style="float: left;">'+
+                        '<textarea class="form-control" placeholder="收费明细" id="fault_info" name="fault_info'+ anumber +'" ></textarea>'+
+                    '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' +                                               
+                    '<input type="text" class="form-control" placeholder="￥0.00"  name="piece_wage'+ anumber +'" onchange="changebutton();" id="piece_wage'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+            '<td>'+
+                '<div class="input-group">' +                                               
+                    '<input type="text" class="form-control" placeholder="￥0.00" name="meter_piece'+ anumber +'" id="meter_piece'+ anumber +'">'+
+                '</div>'+
+            '</td>'+
+        '</tr>'
+        );
+        $(".chosen-select").chosen({
+            no_results_text: "",//搜索无结果时显示的提示
+            search_contains:true,   //关键字模糊搜索，设置为false，则只从开头开始匹配
+            allow_single_deselect:true, //是否允许取消选择
+            max_selected_options:6,  //当select为多选时，最多选择个数
+            width:'100%'
+        });
+        //获取数量赋值
+        var a = $('#table1 tr:eq('+ fnNum +') td:nth-child(3)').text();        
+        $('#'+'re_num'+ anumber).attr("value",a);
+        //获取产品名赋值给隐藏td
+        var b = $('#table1 tr:eq('+ fnNum +') td:nth-child(2)').text();
+        $('#'+'a_name'+ anumber).attr("value",b);
+    anumber++;
+    return anumber;
+}
+//是否发货
+var finish = $("#finish").val();
+if(finish != 0){
+    $("#finishbasicinfo").css("display","inline");
+}
+
+//删除当前维修人行内部表格
+function removenow(fnNum) {   
+    $("#"+ "smalltable" + fnNum).children().children().last("tr").remove();
+    anumber--;
+    return anumber;
+}
+
+function checkMsg(idname)
+{
+    var data = $("#" + idname + "").val();
+    return data;
+}
+
+//有维修费用button可点击
+function changebutton(){
+    $("#addauditinfo1").attr('disabled', false); 
+}
+//addauditinfo1
+$("#addauditinfo1").on('click', function () { 
+    $("#addauditinfo1").attr('disabled', true);
+    var data = [];
+    data.push(checkMsg('rproduct_name0'), checkMsg('reperson_name0'), checkMsg('re_num0'), checkMsg('re_status0'));
+    var index = $.inArray("", data);
+    if (index !== -1) {
+        layer.alert("信息填写不完整，请查验后提交");
+        $("#addauditinfo1").attr('disabled', false);
+        return false;
+    }
+    var data = $("#addSaleRepairingForm1").serializeArray();  
+    $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/addSaleRepairing",
+            data : {
+            data: data,
+            anumber : anumber,
+            money : 1,
+            flag : 2,
+        },
+            success : function (msg) {
+                if(msg == 1) {
+                    layer.msg("ok,提交成功",
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                    function () {
+                        window.parent.location.reload();
+                    }
+                    );
+                } else {
+                    layer.alert("提交出错");
+                    $("#addauditinfo1").attr('disabled', false);
+                }
+            },            
+        });    
+}); 
+//addbasicinfo
+$("#addbasicinfo1").on('click', function () { 
+    $("#addbasicinfo").attr('disabled', true);
+    var data = [];
+    data.push(checkMsg('rproduct_name0'), checkMsg('reperson_name0'), checkMsg('re_num0'), checkMsg('re_status0'));
+    var index = $.inArray("", data);
+    if (index !== -1) {
+        layer.alert("信息填写不完整，请查验后提交");
+        $("#addbasicinfo").attr('disabled', false);
+        return false;
+    }
+    var data = $("#addSaleRepairingForm1").serializeArray();  
+    $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/addSaleRepairing",
+            data : {
+            data: data,
+            anumber : anumber,
+            money : 0,
+            flag : 2,
+        },
+            success : function (msg) {
+                if(msg == 1) {
+                    layer.msg("ok,提交成功",
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                    function () {
+                        window.parent.location.reload();
+                    }
+                    );
+                } else {
+                    layer.alert("提交出错");
+                    $("#addbasicinfo").attr('disabled', false);
+                }
+            },            
+        });    
+}); 
+//finishbasicinfo 完结流程
+$("#finishbasicinfo").on('click', function () { 
+    $("#finishbasicinfo").attr('disabled', true);
+    var sid = $("#sid").val();
+    layer.confirm('确定产品已入库？'+ '<br/>' +'点击确定将不能再对次记录进行编辑！',
+        {
+            icon  : 3,
+            title :'确认',
+        shadeClose : true,
+            btn   : ['确定', '再想想']
+        },
+    
+    function (){  
+    $.ajax({
+            type : 'POST',
+            url  : "__CONTROLLER__/singleFinish",
+            data : {
+            sid  : sid,
+            flag : 1,
+        },
+            success : function (msg) {
+                if(msg == 1) {
+                    layer.msg("ok,提交成功",
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                    function () {
+                        window.location.reload();
+                    }
+                    );
+                } else {
+                    layer.alert("提交出错");
+                    $("#finishbasicinfo").attr('disabled', false);
+                }
+            },            
+        });
+    },function (){
+        $("#finishbasicinfo").attr('disabled', false);
+    });    
+});
+</script>
+</body>
+</html>
+

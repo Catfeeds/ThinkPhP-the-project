@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>入库申请</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style>
+        .ibox-content {
+            padding-left: 2em;
+        }
+
+        .ibox-content > .row {
+
+        }
+
+        .ibox-content > .row > div {
+            padding: 1em;
+        }
+
+        .ibox-content > .row > .col-xs-2 {
+            text-align: right;
+            border-bottom: 1px solid #999c9e;
+            font-weight: bold;
+        }
+
+        .ibox-content > .row > .col-xs-3 {
+            margin-right: 1em;
+            border-bottom: 1px solid #999c9e;
+        }
+
+        .btn {
+            margin: 2px;
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins ">
+                <div class="ibox-title ">
+                    <h5>提交审核</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-xs-2">订单号</div>
+                        <div class="col-xs-3">{$plan.production_order}</div>
+                        <div class="col-xs-2">备货方式</div>
+                        <div class="col-xs-3">{$plan.stock_cate}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2">业务员</div>
+                        <div class="col-xs-3">{$plan.proposer}</div>
+                        <div class="col-xs-2">产品名</div>
+                        <div class="col-xs-3">{$plan.product_name}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2">计划生产量</div>
+                        <div class="col-xs-3">{$plan.production_plan_number}</div>
+                        <div class="col-xs-2">生产地</div>
+                        <div class="col-xs-3">{$plan.production_company}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2">生产线</div>
+                        <div class="col-xs-3">{$plan.production_line}</div>
+                        <div class="col-xs-2">计划创建时间</div>
+                        <div class="col-xs-3">{$plan.create_time}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2">期待交货时间</div>
+                        <div class="col-xs-3">{$plan.delivery_time}</div>
+                        <div class="col-xs-2">备注</div>
+                        <div class="col-xs-3">{$plan.tips | default = '空' }</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-2">生产计划状态</div>
+                        <div class="col-xs-3">
+                            <switch name="plan.production_status">
+                                <case value="1">等待单据审核</case>
+                                <case value="2">等待产线确认</case>
+                                <case value="3">等待齐料登记</case>
+                                <case value="4">正在生产</case>
+                            </switch>
+                        </div>
+                    </div>
+                    <if condition="$plan.production_status != 4">
+                        <div class="row">
+                            <div class="col-xs-2">审核备注</div>
+                            <div class="col-xs-3"><input type="text" class="form-control tips"
+                                                         style="padding: 0;margin: 0;height: 19px;"></div>
+                        </div>
+                        <if condition="$plan.production_status == 3">
+                            <div class="row">
+                                <hr>
+                                <h4>物料登记表</h4>
+                                <table class="table table-bordered table-striped table-hover" id="wuliaoModel">
+                                    <tr>
+                                        <th>产品</th>
+                                        <th>数量</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    <tr v-for="v in list">
+                                        <td>{{v.product_name}}</td>
+                                        <td>{{v.num}}</td>
+                                        <td>{{v.tips}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form action="" class="form-inline">
+                                                <input type="text" class="form-control product" style="width: 200px;"
+                                                       placeholder="输入物料名称" id="product_name">
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form action="" class="form-inline">
+                                                <input type="number" class="form-control product" style="width: 200px;"
+                                                       min="0" placeholder="请输入产品数量" id="num">
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" id="tips">
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary tianjia">添加</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            确认物料齐全后,点击通过审核
+                        </if>
+                        <div class="row">
+                            <div class="col-xs-2" style="border: none">
+                                <button class="btn btn-success">通过审核</button>
+                            </div>
+                            <if condition="$plan.production_status == 1">
+                                <div class="col-xs-2" style="border: none">
+                                    <button class="btn btn-warning">不通过审核</button>
+                                </div>
+                            </if>
+                        </div>
+                    </if>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var orderNumber = '{$plan.production_order}';
+    var production_status = {$plan.production_status} + 1;
+    var tips = $('.tips').val();
+    $('.btn-success').on('click', function () {
+        var that = this;
+        $(that).attr('disabled', true);
+        $.ajax({
+            type: 'post',
+            data: {
+                'production_order': orderNumber,
+                'tips': tips,
+                'production_status': production_status,
+                'audit_type': production_status,
+                'audit_result': 1
+            },
+            success: function (data) {
+                if (data.status > 0) {
+                    layer.msg(data.msg, {
+                        icon: 1
+                    }, function (index) {
+                        layer.close(index);
+                        index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index)
+                    })
+                } else {
+                    layer.msg(data.msg, {
+                        icon: 1
+                    })
+                }
+                $(that).attr('disabled', false);
+            }
+        })
+    });
+    $('.btn-warning').on('click', function () {
+        $.ajax({
+            type: 'post',
+            data: {
+                'production_order': orderNumber,
+                'tips': tips,
+                'production_status': production_status,
+                'audit_type': production_status,
+                'audit_result': 2
+            },
+            success: successCallback
+        })
+    })
+    $('.choose').on('click', function () {
+        layer.open({
+            type: 2,
+            title: '点击选择产品选择产品',
+            content: "{:U('chooseProduct')}",
+            area: ['100%', '100%'],
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                var product = JSON.parse(localStorage.product);
+                $('#product_id').val(product.id);
+                $('#product_name').val(product.name);
+                layer.close(index); //如果设定了yes回调，需进行手工关闭
+            }
+        })
+    });
+    <if condition = "$plan.production_status == 3" >
+        var vm = new Vue({
+            el: '#wuliaoModel',
+            data: function () {
+                return {
+                    list: {$plan.prepare}
+                }
+            }
+        });
+
+    $('.tianjia').on('click', function () {
+        var that = this;
+        $(that).attr('disabled', true);
+        var product_name = $('#product_name');
+        var num = $('#num');
+        var data = {
+            // product_id: product_id.val(),
+            product_name: product_name.val(),
+            num: num.val(),
+            tips: tips.val(),
+            production_order_number: '{$plan.production_order}'
+        };
+        $.post('{:U("addPrepareRecord")}', data, function (res) {
+            if (res.status > 0) {
+                layer.msg(res.msg, {
+                    icon: 1
+                });
+                vm.list.push(data);
+                // product_id.val(null);
+                product_name.val(null);
+                num.val(null)
+            } else {
+                layer.msg(res.msg, {
+                    icon: 2
+                });
+            }
+            $(that).attr('disabled', false);
+        })
+    })
+    </if>
+</script>
+</body>
+</html>

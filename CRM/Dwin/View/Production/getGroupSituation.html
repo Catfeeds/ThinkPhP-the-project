@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>各班组排产情况</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css" rel="stylesheet">
+    <!--<link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+            font-size: 12px;
+        }
+        .selected{
+            background-color: #fbec88 !important;
+        }
+
+        .nav-tabs>li>a{
+            color: #555;
+        }
+        .nav-tabs>.active>a{
+            color: #000!important;
+        }
+        tr{
+            white-space: nowrap!important;
+        }
+        tbody td{
+            padding-top: 2px!important;
+            padding-bottom: 2px!important;
+        }
+        .btn{
+            margin-right: 1em;
+        }
+        .ibox{
+            padding:20px;
+        }
+        /*.delayComplain{*/
+            /*display: none;*/
+        /*}*/
+        /*.dataTables_scrollHeadInner{*/
+            /*width: 100%!important;*/
+        /*}*/
+        /*.dataTables_scrollHeadInner table{*/
+            /*width: 100%!important;*/
+        /*}*/
+
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="productionGroupDiv">
+                <div class="ibox-content">
+                    <h3>班组排产情况</h3>
+                    <form class="form-inline">
+                        <button type="button" class="btn btn-info btn-sm refresh">刷新</button>
+
+                        <label for="production_line">产线筛选</label>
+                        <select name="" id="production_line" class="form-control change-data">
+                            <option value="">所有</option>
+                            <volist name="line" id="vol">
+                                <option value="{$vol.id}">{$vol.production_line}</option>
+                            </volist>
+                        </select>
+                    </form>
+
+                    <div class="table-responsive1">
+                        <table class="table table-striped table-bordered table-hover table-full-width dataTables-productionList" id="productionGroup">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<!--<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>-->
+<!--<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/finance/common_finance.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script>
+    var oTable,groupTable;
+    var controller = "__CONTROLLER__";
+    var tableDiv = $("#productionPlan");
+    var groupDiv = $("#productionGroup");
+    var selectedID,selectedOrder;
+
+    $(document).ready(function() {
+        tableDiv.on('mouseenter','tbody td', function () {
+            var tdIndex = $(this).parent()['context']['cellIndex'];
+            if (tdIndex === 9) {
+                var dataTips = $(this).find('span').attr('data');
+                var num = $(this).parent();
+                if (dataTips) {
+                    layer.tips(
+                        dataTips, num, {
+                            tips: [1, '#3595CC'],
+                            area: '900px',
+                            time: 100000
+                        });
+                }
+            } else {
+                return false;
+            }
+        });
+        tableDiv.delegate('tbody td', 'mouseleave',function(e) {
+            layer.closeAll('tips');
+        });
+
+        groupTable = groupDiv.DataTable({
+            "scrollY": 400,
+             "scrollX": true,
+            "scrollCollapse": true,
+            "destroy"      : true,
+            "paging"       : true,
+            "autoWidth"	   : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 25, 50, 100],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true, //开启服务器获取数据
+            "ajax"         :{ // 获取数据
+                "url"   : controller + "/getGroupSituation",
+                "type"  : 'post',
+                "data"  : {
+                    "productionLine" : function () {
+                        return document.getElementById('production_line').value;
+                    },
+                    "timeLimit" : function () {
+                        return parseInt(Date.parse(new Date()) / 1000);
+                    }
+                }
+            },
+            "order": [[ 1, "desc" ]],
+            "columns": [
+                {data:'group_name', title:'组名'},
+                {data:'unfinished_number', title:'未完成任务'},
+                {data:'group_ability', title:'默认产能'},
+                {data:'can_assign_number', title:'可分配产能'},
+                {data:'select_time', title:'时间'},
+                {data:'assign_number_with_time', title:'当前分配任务'},
+                {data:'assign_task', title:'任务id'},
+                {data:'task_product_no', title:'分配型号'}
+
+            ],
+            "columnDefs": [ //自定义列
+//            {
+//                "targets": 9,
+//                "data": 'tips',
+//                "render": function (data, type, row) {
+//                    if (row.tips.length > 14) {
+//                        var html = "<span data='" + row.tips + "'>" + row.tips.substring(0,14) + "...</span>";
+//                    } else {
+//                        var html = "<span>" + row.tips + "</span>";
+//                    }
+//                    return html;
+//                }
+//            }
+            ]
+        });
+
+    });
+
+    // 当dataTables变动时取消选中
+    $('table').on('processing.dt', function () {
+        selectedID = undefined;
+        $('tr').removeClass('selected')
+    });
+</script>
+</body>
+</html>

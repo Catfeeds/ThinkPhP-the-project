@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head> 
+   <meta charset="utf-8"> 
+   <title>售后维修记录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css"> 
+        body{
+            color:black;
+        }
+        td{
+            cursor:pointer; 
+        }
+        .selected{
+            background-color: #5BC0DE !important;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper wrapper-content">
+    <div class="row" style="border-bottom: #0a6aa1 1px solid;">
+        <div class="col-md-2">
+            <button type="button" class="btn btn-outline btn-success" id="addSaleRepairing">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true">添加维修记录</span>
+            </button>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger btn-outline" id="assignStaffBtn">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true">维修单转接</span></button>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-info btn-outline" id="dataExport">
+                <span class="glyphicon glyphicon-align-left" aria-hidden="true">维修数据报表</span>
+            </button>         
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-success btn-outline" id="showRecord">
+                显示最近业务审核
+            </button>
+        </div>
+    </div>
+    <div class="col-sm-2" id="prj_order_type" style=" margin-top: 10px;">
+        <select name="order_type" class='form-control' id="order_type"> 
+            <option value="0">全部记录</option>
+            <option value="1">待检测记录</option>
+            <option value="2">待收费确认记录</option>
+            <option value="3">待维修记录</option>
+        </select>
+    </div>
+    <div class="row" style="margin-top: 20px;">
+        <div class="col-md-12" style="margin-top: 10px;">            
+          <table class="table table-striped table-bordered table-hover dataTables-example" id="table0">  
+            <thead>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+          <input type="hidden" id="user_name" value="{$Think.session.staffId}">
+        </div>        
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+
+var controller = "__CONTROLLER__";
+$(document).ready(function() {
+    $('.dataTables-example').dataTable({
+            "order"        : [[0,'desc']],
+            "paging"       : true,
+            "autoWidth"    : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 15, 20, 100],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true,//开启服务器获取数据
+            "ajax"         :{ // 获取数据
+                "type"  : "post",
+                "url"   : controller + "/showSaleRepairing",  
+                "data"  : {                    
+                    "prj_order_type" : function () {
+                        return document.getElementById('order_type').value;
+                    }
+                }
+                          
+            },
+        "columns" :[ //定义列数据来源
+                {'title' : "售后单号",   'data' : 'sale_number','class': 'active'},
+                {'title' : "收货快递单号",'data' : 'courier_number'},
+                {'title' : "客户名称",   'data' : "cusname"},
+                {'title' : "业务员",     'data' : "salename"},
+                {'title' : "售后<br>专员",   'data' : "sale_commissioner_name"},
+                {'title' : "送修<br>时间",   'data' : "start_t"},
+                {'title' : "故障<br>类型",   'data' : "reperson_question"},
+                {'title' : "维修品<br>状态",' data' : "is_ok"},
+                {'title' : "业务<br>审核",   'data' : "is_show"},
+                {'title' : "是否<br>有售后维修单",'data' : "is_repairorder"},
+                {'title' : "结束<br>时间",   'data' : "over_t"},
+                {'title' : "流程<br>状态",   'data' : "is_over"}, // 自定义列
+            ],
+        "columnDefs"   : [ //自定义列 
+                {
+                    "targets" : 1,
+                    "data" : 'courier_number',
+                    "visible": false,
+                    "render" : function(data, type, row) {
+                        var html = row.courier_number;
+                        return html;
+                    }
+                },
+                {
+                    "targets":  7 ,
+                    "data"   : 'is_ok',
+                    "render" : function(data, type, row) {
+                        var html = row.is_ok;
+                        return html;
+                    }
+                },
+                {
+                    "targets" : 8,
+                    "data" : 'is_show',
+                    "render" : function(data, type, row) {
+                        var html = row.is_show;
+                        if (html == 1) {
+                            html = '有效';
+                            return html;
+                        } else if (html == 2) {
+                            html = '无效';
+                            return html;
+                        } else {
+                            html = '未审核';
+                            return html;
+                        }
+                    }
+                },
+                {
+                    "targets" : 11,
+                    "data" : 'is_over',
+                    "render" : function(data, type, row) {
+                        var html = row.is_over;
+                        if(html == 1){
+                            html = '完结';
+                            return html;
+                        }else{
+                            html = '进行中';
+                            return html;
+                        }
+                    }
+                }
+            ],
+
+        "language"     : { // 定义语言
+                "sProcessing"     : "加载中...",
+                "sLengthMenu"     : "每页显示 _MENU_ 条记录",
+                "sZeroRecords"    : "没有匹配的结果",
+                "sInfo"           : "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty"      : "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered"   : "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix"    : "",
+                "sSearch"         : "搜索:",
+                "sUrl"            : "",
+                "sEmptyTable"     : "表中数据为空",
+                "sLoadingRecords" : "载入中...",
+                "sInfoThousands"  : ",",
+                "oPaginate"       : {
+                    "sFirst"    : "首页",
+                    "sPrevious" : "上一页",
+                    "sNext"     : "下一页",
+                    "sLast"     : "末页"
+                },
+                "oAria"           : {
+                    "sSortAscending"  : ": 以升序排列此列",
+                    "sSortDescending" : ": 以降序排列此列"
+                }
+            }
+    });
+    var table = $('.dataTables-example').DataTable();
+    $('.dataTables-example').on( 'keyup', function () {
+        table.search( this.value ).draw();
+    });
+});
+$('.dataTables-example tbody').on( 'click', 'tr', function () {
+    if ( $(this).hasClass('selected') ) {
+        $(this).removeClass('selected');
+    }
+    else {
+        $('.dataTables-example').find('tr.selected').removeClass('selected');
+        $(this).addClass('selected');
+    }
+});
+//onchange 事件刷新ajax
+// 点击获取对应数据
+$("#order_type").on('change', function () {
+    var oTable = $(".dataTables-example").DataTable();
+    oTable.ajax.reload();
+});
+//跳转对应状态页面
+$(document).on("click",'tbody .active', function (e) {
+    var sid = $(this).parent()[0].id;
+    e.stopPropagation();
+    layer.open({
+        type: 2,
+        title: '编辑维修记录',
+        shadeClose : true,
+        area: ['100%', '100%'],
+        content: "__CONTROLLER__/editSaleRepairing/sid/" + sid //iframe的url
+    }); 
+});
+
+//添加
+$("#addSaleRepairing").on('click', function () {
+    layer.open({
+        type: 2,
+        shadeClose : true,
+        title: '添加维修记录',
+        area: ['100%', '100%'],
+        content: "__CONTROLLER__/addSaleRepairing"  //iframe的url
+    });
+});
+
+//数据报表生成
+$("#dataExport").on('click', function () {
+    layer.open({
+        type: 2,
+    shadeClose : true,
+        title: '数据报表',
+        area: ['100%', '100%'],
+        content: "__CONTROLLER__/saledataExport"  //iframe的url
+    });
+});
+
+$(document).on('click','#assignStaffBtn',function(){
+    $('#assingStaffBtn').attr('disabled', 'disabled');
+    var orderId;
+    $(".dataTables-example tbody tr").each(function () {
+        if ($(this).hasClass('selected')) {
+            orderId = $(this).attr('id');
+        }
+    });
+    if (orderId) {
+        layer.open({
+            type: 2,
+            title: '维修单业务员变更',
+            content: controller + "/assignSale/sale_id/" + orderId,
+            area: ['40%', '70%'],
+            end: function(index, layero){
+                $(".dataTables-example tbody tr").each(function () {
+                    if ($(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+                    }
+                });
+                layer.close(index); //如果设定了yes回调，需进行手工关闭
+            }
+        });
+    } else {
+        layer.alert("请选择要变更负责人的售后维修单");
+        $('#auditbutton').attr('disabled', false);
+    }
+});
+$('#showRecord').on('click', function () {
+    layer.open({
+        type: 2,
+        title: '最近业务审核通过',
+        area: ['100%', '100%'],
+        content: 'showRecentlySaleManRecord'
+    })
+})
+</script>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>客户文件上传</title>
+
+</head>
+<body>
+<form action="__CONTROLLER__/uploadFile" method="post">
+    <input type="hidden" value="{$Think.get.cusId}" id="userId">
+    <input type="file">
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>

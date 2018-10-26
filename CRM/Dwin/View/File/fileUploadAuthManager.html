@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>员工上传权限</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content" id="app" v-loading="loading">
+    <el-form :inline="true">
+        <el-form-item label="员工姓名">
+            {{staff.name}}
+        </el-form-item>
+        <br>
+        <el-form-item label="文件大小限制(MB)">
+            <el-input v-model="maxSize" placeholder="以MB为单位" type="number"></el-input>
+        </el-form-item>
+        <br>
+        <el-form-item label="文件类型限制">
+            <el-checkbox-group v-model="fileType">
+                <el-checkbox v-for="item in fileTypeArr" :label="item.value" :key="item.label">{{item.label}}</el-checkbox>
+            </el-checkbox-group>
+        </el-form-item>
+    </el-form>
+    <button class='btn btn-primary' @click="submit">提交</button>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var staff = {$staff | json_encode};
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                loading: false,
+                staff: staff,
+                fileType: [],
+                maxSize: null,
+                fileTypeArr: [  // 文件类型限制, 如果修改此处, fileUploadAuthManagerIndex页面中的相关内容也需要修改
+                    {
+                        label: '.rar',
+                        value: ['application/x-rar-compressed','application/rar','application/octet-stream']
+                    },
+                    {
+                        label: '.pdf',
+                        value: ['application/pdf']
+                    },
+                    {
+                        label: '.zip',
+                        value: ['application/x-zip-compressed','application/zip']
+                    },
+                    {
+                        label: '.xls',
+                        value: ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','application/vnd.ms-excel','application/x-excel']
+                    },
+                    {
+                        label: '.png/.jpg',
+                        value: ['image/jpeg','image/png','image/x-png']
+                    }
+                ]
+            }
+        },
+        created: function () {
+            var vm = this
+            if (this.staff.allowed_upload_type) {
+                this.fileType = this.staff.allowed_upload_type.split(',')
+                this.staff.allowed_upload_type = []
+                var labelTempArr = []
+                for (var i = 0; i < this.fileType.length; i++){
+                    for (var j = 0; j < this.fileTypeArr.length; j++){
+                        if (this.fileTypeArr[j].value.indexOf(this.fileType[i]) != -1){
+                            labelTempArr.push(this.fileTypeArr[j].label)
+                        }
+                    }
+                }
+                var labelArr = []
+                labelTempArr.forEach(function (value) {
+                    if (labelArr.indexOf(value) == -1){
+                        labelArr.push(value)
+                    }
+                })
+                this.fileType = []
+                this.fileTypeArr.forEach(function (value) {
+                    if (labelArr.indexOf(value.label) != -1){
+                        vm.fileType.push(value.value)
+                    }
+                })
+            }
+            // 将字节换算成mb
+            if (this.staff.max_upload_file_size) {
+                this.maxSize = parseFloat(this.staff.max_upload_file_size / 1024 / 1024).toFixed(2)
+            }
+        },
+        methods: {
+            submit: function () {
+                var vm = this
+                this.loading = true
+                if (this.fileType.length != 0){
+                    var arr = []
+                    this.fileType.forEach(function (value1) {
+                        value1.forEach(function (value2) {
+                            arr.push(value2)
+                        })
+                    })
+                    this.staff.allowed_upload_type = arr.join(',')
+                }else {
+                    this.staff.allowed_upload_type = null
+                }
+                if (this.maxSize){
+                    this.staff.max_upload_file_size = this.maxSize * 1024 * 1024
+                }else {
+                    this.staff.max_upload_file_size = null
+                }
+                $.post('', {data: this.staff}, function (res) {
+                    layer.msg(res.msg, function () {
+                        if (res.status == 200){
+                            parent.layer.close(parent.layer.getFrameIndex(window.name))
+                        }
+                    })
+                    vm.loading = false
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

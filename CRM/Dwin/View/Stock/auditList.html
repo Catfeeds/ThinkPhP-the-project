@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存管理</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+
+        .selected {
+            background: #d0d27e !important;
+        }
+
+        .hiddenDiv {
+            display: none;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>出入库审核管理</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-inline">
+                        <label for="">按出入库筛选</label>
+                        <select name="" class="audit_type form-control">
+                            <option value="1">入库</option><!--
+                            <option value="2">出库</option>-->
+                        </select>
+                        <label for="">按审核状态筛选</label>
+                        <select name="" class="audit_status form-control">
+                            <option value="1">未审核</option>
+                            <option value="2">审核通过</option>
+                            <option value="3">审核未通过</option>
+                        </select>
+                        <span class="patch">
+                            <button type="button" class="btn btn-info patch_pass">批量通过</button>
+                            <button type="button" class="btn btn-warning patch_fail">批量拒绝</button>
+                        </span>
+                    </form>
+                    <div class="ibox-content" style="margin-top: 15px;">
+                        <table id="table" class="table table-striped table-bordered table-full-width" width="100%">
+                            <thead>
+                            <tr>
+                                <th>申请号</th>
+                                <th>id</th>
+                                <th>型号</th>
+                                <th>库房编号</th>
+                                <th>数量</th>
+                                <th>出/入库</th>
+                                <th>类型</th>
+                                <th>备注</th>
+                                <th>状态</th>
+                                <th>审核备注</th>
+                                <th>更新时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var audit_type = $('.audit_type').val();
+    var audit_status = $('.audit_status').val();
+    var auditArr = [];
+    var table = $('#table').DataTable({
+        serverSide: true,
+        ajax: {
+            type: 'post',
+            data: {
+                type: audit_type,
+                audit_status: audit_status
+            }
+        },
+        order: [[10, 'desc']],
+        columns: [
+            {data: 'audit_order_number', searchable: true},
+            {data: 'id', searchable: true},
+            {data: 'product_name', searchable: true},
+            {data: 'warehouse_number', searchable: false},
+            {data: 'num', searchable: false},
+            {
+                data: 'type', searchable: false, render: function (data) {
+                    var arr = ['', '入库', '出库'];
+                    return arr[data];
+                }
+            },
+            {data: 'cate_name', searchable: false},
+            {data: 'tips', searchable: false},
+            {
+                data: 'audit_status', searchable: false, render: function (data) {
+                    var arr = ['', '未审核', '审核通过', '审核不通过'];
+                    return arr[data];
+                }
+            },
+            {
+                data: 'audit_tips', searchable: false, render: function (data, type, row) {
+                    if (row.audit_status == 1) {
+                        return '<input class="form-control tips">'
+                    }
+                    return data
+                }
+            },
+            {data: 'update_time', searchable: false},
+            {
+                data: null,
+                render: function (row) {  //根据状态设置按钮
+                    if (row.audit_status == 1) {
+                        return "<button class='btn btn-success btn-xs audit_pass' type='button'>通过</button> <button class='btn btn-warning btn-xs audit_fail' type='button'>不通过</button>";
+                    } else {
+                        return "<button class='btn btn-info btn-xs' type='button' disabled>该申请已审核完毕</button>"
+                    }
+                },
+                orderable: false
+            }
+        ]
+    });
+    $('.audit_status').on('change', function () {
+        audit_status = $(this).val();
+        if (audit_status != 1) {
+            $('.patch').hide()
+        } else {
+            $('.patch').show()
+        }
+        table.settings()[0].ajax.data.audit_status = audit_status;
+        table.ajax.reload();
+        auditArr = []
+    });
+    $('.audit_type').on('change', function () {
+        audit_type = $(this).val();
+        if (audit_type != 1) {
+            $('.patch').hide()
+        } else {
+            $('.patch').show()
+        }
+        table.settings()[0].ajax.data.type = audit_type;
+        table.ajax.reload();
+        auditArr = []
+    });
+    // 通过审核
+    $("#table tbody").on("click", ".audit_pass", function () {
+        $(this).attr('disabled', true)
+        var that = this
+        var id = table.row($(this).parents('tr')).data().id;
+        $.ajax({
+            url: 'editStockAuditStatus',
+            type: 'post',
+            data: {
+                auditID: id,
+                audit_tips: $(this).parents('tr').children('td').children('.tips').val(),
+                audit_status: 2
+            },
+            success: function (data) {
+                $(that).attr('disabled', false)
+                layer.msg(data.msg, {icon: 1, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                    table.ajax.reload();
+                });
+                return false;
+            }
+        })
+    });
+
+    //未通过审核
+    $("#table tbody").on("click", ".audit_fail", function () {
+        $(this).attr('disabled', true)
+        var that = this
+        var id = table.row($(this).parents('tr')).data().id;
+        $.ajax({
+            url: 'editStockAuditStatus',
+            type: 'post',
+            data: {
+                auditID: id,
+                audit_tips: $(this).parents('tr').children('td').children('.tips').val(),
+                audit_status: 3
+            },
+            success: function (data) {
+                $(that).attr('disabled', false)
+                layer.msg(data.msg, {icon: 1, time: 1500, shade: 0.1}, function (index) {
+                    layer.close(index);
+                    table.ajax.reload();
+                });
+                return false;
+            }
+        })
+    })
+    $("#table tbody").on('click', 'tr', function () {
+        if (audit_type == 1 && audit_status == 1) {
+            var id = table.row(this).data().id;
+            var res = $(this).hasClass('selected');
+            for (var i = 0; i < auditArr.length; i++) {
+                if (id == auditArr[i].auditID) {
+                    auditArr.splice(i, 1)
+                }
+            }
+            if (res == false) {
+                $(this).addClass('selected');
+                var tips = $(this).children('td').children('.tips').val()
+                var obj = {
+                    auditID: id,
+                    tips: tips
+                };
+                auditArr.push(obj);
+            } else {
+                $(this).removeClass('selected');
+            }
+        }
+    })
+    $('.patch_pass').on('click', function () {
+        if (auditArr.length == 0) {
+            return false
+        }
+        var that = this
+        var index = layer.confirm('是否批量提交通过?', {icon: 3, title: '提示'}, function (index) {
+            $(that).attr('disabled', true)
+            for (var i = 0; i < auditArr.length; i++) {
+                auditArr[i].audit_status = 2;
+            }
+            $.post('editStockAuditStatusMulti', {data: auditArr}, function (res) {
+                $(that).attr('disabled', false)
+                layer.msg(res.msg);
+                table.ajax.reload();
+            });
+            layer.close(index);
+        })
+    })
+    $('.patch_fail').on('click', function () {
+        if (auditArr.length == 0) {
+            return false
+        }
+        var that = this
+        var index = layer.confirm('是否批量提交不通过?', {icon: 3, title: '提示'}, function (index) {
+            $(that).attr('disabled', true)
+            for (var i = 0; i < auditArr.length; i++) {
+                auditArr[i].audit_status = 3;
+            }
+            $.post('editStockAuditStatusMulti', {data: auditArr}, function (res) {
+                $(that).attr('disabled', false)
+                layer.msg(res.msg);
+                table.ajax.reload();
+            });
+            layer.close(index);
+        })
+    })
+
+</script>
+</body>
+</html>

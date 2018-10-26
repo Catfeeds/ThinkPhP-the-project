@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        .add_bomName{
+            text-align: left;
+            margin-top: 5px;
+        }
+        .addTable_name{
+            margin-bottom: 0px;
+            border: 1px solid #ccc;
+        }
+        .addTable_name tr{
+            height: 40px;
+        }
+        .addTable_name tr td,.addTable_name tr th{
+            border: 1px solid #ccc;
+            text-align: center
+        }
+        .el-form-item__content{
+            text-align: left
+        }
+    </style>
+</head>
+<body>
+    <div id="app" style="text-align: center">
+        <h1>湖南迪文有限公司BOM详情</h1>
+        <br><br><br>
+        <el-form ref="form" :model="form" size="medium" label-width="150px" @submit.native.prevent v-loading="loading">
+            <el-row>
+                <el-col :span="22" :offset="1">
+                    <p style="text-align: left;"><b>一、BOM基本信息 ：</b></p>
+                    <el-col>
+                        <el-col :span="7">
+                            <el-form-item label="生产物料型号：">
+                                <b>
+                                    {{form.product_no}}
+                                </b>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-form-item label="BOM编号：">
+                                {{form.bom_id}}
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="8">
+                            <el-form-item label="bom组别名称：">
+                                {{form.bom_type_name}}
+                            </el-form-item>
+                        </el-col>
+                        <el-row>
+                            <el-col>
+                                <p style="text-align: left;"><b>二、添加物料信息：</b></p>
+                                <table class="table table-border table-hover table-striped addTable_name">
+                                    <tr>
+                                        <th style="width:25%">物料编号</th>
+                                        <th style="width:25%">产品型号</th>
+                                        <th style="width:25%">产品名称</th>
+                                        <th style="width:25%">数量</th>
+                                    </tr>
+                                    <tr v-for="(product,index) in productData">
+                                        <td>{{product.product_no}}</td>
+                                        <td>{{product.product_number}}</td>
+                                        <td>{{product.product_name}}</td>
+                                        <td>{{product.num}}</td>
+                                    </tr>
+                                </table>  
+                            </el-col>
+                        </el-row>
+                    </el-row>
+                    <br>
+                    <br>
+                    <br>
+                </el-col>
+            </el-row>
+        </el-form>
+    </div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var bomSub = {$bomSub|json_encode};
+    var bom = {$bom|json_encode};
+    var groupMap = {$groupMap|json_encode};
+    console.log(bomSub)
+    console.log(bom)
+    console.log(groupMap)
+    var vm = new Vue({
+        el: '#app',
+        data : function(){
+            return {
+               form:{
+                   id:'',
+                   product_id:'',
+                   product_no:'',
+                   bom_id:'',
+                   bom_type:'',
+                   bom_type_name:''
+               },
+               productData: [],
+               searchProduct: {
+                    name: ''
+                },
+                search:{
+                    pur_no:''
+                },
+                searchProductRes:[],
+                searchProductRes_no:[],
+                options_sex:groupMap
+            }
+        },
+        created () {
+            this.loading = false
+            this.form = bom
+            this.productData = bomSub
+        },
+        mounted() {   
+        },
+        methods :{
+            
+        }
+    })
+</script>
+</html>

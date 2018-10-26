@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>111111</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black!important;
+        }
+        .selected{
+            background-color: #2a83cf !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>出库单出库记录</h5>
+                    <div class="ibox-content">
+                        <button class="btn btn-success btn-outline" type="button" id="record-audit-btn">出库记录审核</button>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-orderTable">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="ibox-content" id="alertBox">
+                    <el-dialog title="其他出库单审核：" class="selsctDialog" :visible.sync="dialogVisible" width="30%">
+                        <el-button type="primary" @click="auditRecord(2)">合 格</el-button>
+                        <el-button type="primary" @click="auditRecord(1)" style="margin-left: 54px">不合格</el-button>
+                    </el-dialog>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/finance/common_finance.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+
+<script>
+    var controller = "__CONTROLLER__";
+    var orderTableDiv = $(".dataTables-orderTable");
+    var orderTableTBodyDiv = $(".dataTables-orderTable tbody");
+    var addOutStockLogBtn = $("#stock-out-btn");
+    var addOtherFormStockBtn = $("#market-out-btn");
+    var auditRecordBtn = $("#record-audit-btn");
+    var oTable;
+    var audit_status = {$auditMap|json_encode};  //出库类型名称
+    var selectedID = null;
+    var auditStatus = null;
+
+    var vm = new Vue({
+        el: '#alertBox',
+        data: function () {
+            return {
+                dialogVisible:false,
+                bandname : 1,  // 在html中调用vm里面的数据需要以这种方式调用{{bandname}}}
+
+        }
+        },
+        computed : {
+        },
+        methods : {
+            // 可以将function写在这里
+            auditRecord(status) {
+                var vm = this
+                var data = {
+                    'id': selectedID,
+                    'status':status
+                }
+                $.post('{:U("Dwin/Stock/auditStockOut")}', data , function (res) {
+                    if(res.status == 200){
+                        oTable.ajax.reload()
+                        vm.dialogVisible = false
+                    }
+                    layer.msg(res.msg)
+                })
+            }
+        },
+        filters : {
+            
+        }
+    });
+    $(document).ready(function () {
+        $.fn.dataTable.ext.errMode = 'none';
+        oTable = orderTableDiv.DataTable({
+            "paging"       : true,
+            "autoWidth"    : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [5, 10, 20, 35, 50],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true,//开启服务器获取数据
+            "searchable"   : false,
+            "ajax"         : { // 获取数据
+                "url"   : controller + "/stockRecordList",
+                "type"  : 'post',
+                'data'  : {
+                    
+                }
+            },
+            "columns" :[ //定义列数据来源
+                {'title' : "出库单编号",   'data' : 'stock_no','class' : 'orderDetail'},
+                {'title' : "物料编号",'data' : 'product_no'},
+                {'title' : "物料名称",'data' : 'product_number'},
+                {'title' : "出库数量",'data' : 'num'},
+                {'title' : "库房库存剩余数量",'data' : 'stock_number'},
+                {'title' : "库房锁库数量",'data' : 'o_audit'},
+                {'title' : "库房待出库数量",'data' : 'out_processing'},
+                {'title' : "审核状态", "data": 'status',render: function (data){return audit_status[+data]}},
+            ]
+        });
+    });
+
+    // 点击审核按钮，弹出弹框
+    auditRecordBtn.on('click', function (e) {
+        if (selectedID) {
+            if(audit_status > 0){
+                vm.$message({
+                    showClose: true,
+                    message: '该项审核已通过,不能再次审核！！',
+                    type: 'warning'
+                });
+            }else{
+                vm.dialogVisible = true
+            }
+        }else {
+            layer.alert('请选中待出库的订单');
+        }
+    });
+
+    // 点击某一行，获取当前行的数据
+    orderTableTBodyDiv.on( 'click', 'tr', function () {
+        var recordData = oTable.row(this).data();
+        selectedID = recordData.id;        // 入库记录主键
+        auditStatus = recordData.status;   // 入库记录审核状态
+
+        // 在选中行中添加selected 的class
+        if ( $(this).hasClass('selected') ) {
+            $(this).removeClass('selected');
+        }
+        else {
+            oTable.$('tr.selected').removeClass('selected');
+            $(this).addClass('selected');
+        }
+    });
+
+
+
+</script>
+</html>

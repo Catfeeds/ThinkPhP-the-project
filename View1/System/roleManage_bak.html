@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--人员管理</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+	<style type="text/css">
+        body {
+            color: black;
+        }
+        .chosen-select{
+            width : 300px;
+        }
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>系统访问权限设置</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                    <input type="hidden" name="user_id" value="{$baseInfo.user_id}" id="user_id"/>
+                        <form id="ruleEditSubmit" enctype="multipart/form-data" name="ruleForm">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th colspan="9">{$baseInfo.user_name}</th>
+                                </tr>
+                                <tr>
+                                    <th>职位</th>
+                                    <th colspan="4">当前访问权限</th>
+                                    <th colspan="4">设置权限</th>
+				                </tr>
+				                <tr>
+                                    <th>{$baseInfo.pos_name}</th>
+                                    <th colspan="4">
+                                        <table class="table table-bordered table-striped dataTables-userDataTable">
+                                        <thead>
+                                            <tr>
+                                                <th>可访问功能节点</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <volist name="staffRule" id="vol" >
+                                        <tr>
+                                            <th>|—————{$vol.user_rule_name}——|</th> 
+                                        </tr>
+                                        </volist>
+                                        </tbody>
+                                        
+                                        </table>
+                                    </th>
+                                    <th colspan="4">
+                                        <table class="table table-bordered table-striped dataTables-rulesTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>功能节点列表</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                           <volist name="ruleArray" id="vol" key="k">
+                                            <tr>
+                                                <th>
+                                                    <div class="checkbox checkbox-primary">
+
+                                                        <input id="check_{$k}" name="check_{$k}" type="checkbox" <in name="vol['rule_id']" value="{$staffString}">checked="true"</in>>
+                                                        <label for="check_{$k}">
+                                                           |—————{$vol.rule_name}——|
+                                                        </label>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                      
+                                            </volist>
+                                            </tbody>
+
+                                        </table>
+                                    </th>
+                                </tr>
+                            </table>
+                            <input class="btn btn-outline btn-success" type="button" id="saveRule" value="保存访问权限">&emsp;
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>日常管理权限设置</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <form id="roleEditSubmit" enctype="multipart/form-data" name="roleForm">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th colspan="9">{$baseInfo.user_name}</th>
+                                </tr>
+                                <tr>
+                                    <th>职位</th>
+                                    <th>|————————流程分类————————|</th>
+                                    <th colspan="4">当前直属下属</th>
+                                    <th colspan="3">选择</th>
+                                </tr>
+                                <tr>
+                                    <th rowspan="5">{$baseInfo.pos_name}</th>
+                                    <th>
+                                        <div class="checkbox checkbox-info">
+                                            <input id="check_cus" name="check_cus" type="checkbox" onclick="return false;" <in name="cusManage" value="{$staffString}">checked="true"</in>>
+                                            <label for="check_cus">
+                                               |—————客户查看——|
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th colspan="4">
+                                        <volist name="childIds['cus']" id="vol">
+                                            <span id="{$vol.id}">{$vol.name}&emsp;</span>
+                                        </volist>
+                                    </th>
+                                    <th colspan="3">
+                                     <div class="input-group">
+                                        <select name="cusStaffList" id="cus_staff_list" data-placeholder="选择下属" class="chosen-select" multiple="multiple" tabindex="4">
+                                             <volist name="staffData['cus']" id="vol">
+                                               <option value="{$vol.id}" <in name="vol['id']" value="$staString['cus']">selected</in>>{$vol.name}</option>
+                                            </volist>
+                                        </select>
+                                    </div>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox checkbox-primary">
+                                            <input  id="check_order" name="check_order" onclick="return false;" type="checkbox" <in name="orderManage" value="{$staffString}">checked="true"</in>>
+                                            <label for="check_order">
+                                               |—————订单查看——|
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th colspan="4">
+                                        <volist name="childIds['order']" id="vol">
+                                            <span id="{$vol.id}">{$vol.name}&emsp;</span>
+                                        </volist>
+                                    </th>
+                                    <th colspan="3">
+                                        <select name="orderStaffList" data-placeholder="选择下属" class="chosen-select" multiple="multiple"  tabindex="4">
+                                             <volist name="staffData['order']" id="vol">
+                                             <option value="{$vol.id}" <in name="vol['id']" value="$staString['order']">selected</in>>{$vol.name}</option>
+                                            </volist>
+                                        </select>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox checkbox-warning">
+                                            <input id="check_online" name="check_online" type="checkbox" onclick="return false;" <in name="onlineManage" value="{$staffString}">checked="true"</in>>
+                                            <label for="check_online">
+                                               |—————客服记录查看——|
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th colspan="4">
+                                        <volist name="childIds['online']" id="vol">
+                                            <span id="{$vol.id}">{$vol.name}&emsp;</span>
+                                        </volist>
+                                    </th>
+                                    <th colspan="3" id="selectTd">
+                                        <select name="onlineStaffList" data-placeholder="选择下属" class="chosen-select" multiple="multiple"  tabindex="4">
+                                             <volist name="staffData['online']" id="vol">
+                                             <option value="{$vol.id}" <in name="vol['id']" value="$staString['online']">selected</in>>{$vol.name}</option>
+                                            </volist>
+                                        </select>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox checkbox-success">
+                                            <input id="check_sale" name="check_sale" type="checkbox" onclick="return false;" <in name="saleManage" value="{$staffString}">checked="true"</in>>
+                                            <label for="check_sale">
+                                               |—————售后记录查看——|
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th colspan="4">
+                                        <volist name="childIds['sale']" id="vol">
+                                            <span id="{$vol.id}">{$vol.name}&emsp;</span>
+                                        </volist>
+                                    </th>
+                                    <th colspan="3">
+                                        <select name="saleStaffList" data-placeholder="选择下属" class="chosen-select" multiple="multiple"  tabindex="4">
+                                             <volist name="staffData['sale']" id="vol">
+                                             <option value="{$vol.id}" <in name="vol['id']" value="$staString['sale']">selected</in>>{$vol.name}</option>
+                                            </volist>
+                                        </select>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox checkbox-danger">
+                                            <input id="check_prj" name="check_prj" type="checkbox" onclick="return false;" <in name="prjManage" value="{$staffString}">checked="true"</in>>
+                                            <label for="check_prj">
+                                               |—————项目查看——|
+                                            </label>
+                                        </div>
+                                    </th>
+                                    <th colspan="4">
+                                        <volist name="childIds['prj']" id="vol">
+                                            <span id="{$vol.id}">{$vol.name}&emsp;</span>
+                                        </volist>
+                                    </th>
+                                    <th colspan="3">
+                                        <select name="prjStaffList" data-placeholder="选择下属" class="chosen-select" multiple="multiple" tabindex="4">
+                                             <volist name="staffData['prj']" id="vol">
+                                             <option value="{$vol.id}" <in name="vol['id']" value="$staString['prj']">selected</in>>{$vol.name}</option>
+                                             </volist>
+                                        </select>
+                                    </th>
+                                </tr>
+                            </table>
+                            <input class="btn btn-outline btn-success" type="button" id="saveManage" value="保存管理权限">&emsp;
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/iCheck/icheck.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+
+<script>
+var controller = "__CONTROLLER__";
+
+$(document).ready( function() {
+   var ruleTable = $(".dataTables-rulesTable").DataTable({
+                    "scrollY": 400,
+                    "scrollX": true,
+                    "scrollCollapse": true,
+                    "paging":   false,
+                    "ordering": false,
+                    "info":     false,
+                    'searching' : false
+
+                });
+
+   var userTable = $(".dataTables-userDataTable").DataTable({
+                    "scrollY": 400,
+                    "scrollX": true,
+                    "scrollCollapse": true,
+                    "paging":   false,
+                    "ordering": false,
+                    "info":     false,
+                    'searching' : false
+
+                });
+});
+var staffId = $("#user_id").val();
+
+// 修改职员访问系统的权限
+$("#saveRule").on('click', function () {
+    $(this).attr('disabled', 'disabled');
+    var ruleData = $("#ruleEditSubmit").serializeArray();
+
+    $.ajax({
+        type : 'POST',
+        url  : controller + "/roleManage",
+        data : {
+            rule : ruleData,
+            changeId : staffId
+        },
+        success : function (msg) {
+            if (msg == 2) {
+                layer.msg("修改成功");
+                window.location.reload();
+            } else {
+                layer.msg("未做修改");
+                $("#saveRule").attr('disabled', false);
+            }
+        }
+    });
+});
+
+// 修改管理权限
+$("#saveManage").on('click', function () {
+    $("#saveManage").attr('disabled', true);
+    var manageData = $("#roleEditSubmit").serializeArray();
+    $.ajax({
+        type : 'POST',
+        url  : controller + "/roleManage",
+        data : {
+            manage : manageData,
+            changeId : staffId
+        },
+        success : function (msg) {
+            if (msg == 2) {
+                layer.msg("修改成功");
+                window.location.reload();
+            } else {
+                layer.msg("未做修改");
+                $("#saveManage").attr('disabled', false);
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>
+

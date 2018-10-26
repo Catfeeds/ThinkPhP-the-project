@@ -1,0 +1,10 @@
+
+/*分页*/
+.pagination{ margin-top:10px;padding:0 10px;}
+.pagination .pxofy{float:left;color:#d1d1d1;}
+.pagination .pagin-list{float:right;}
+.pagination .goto{float:right;margin-left:10px;}
+.pagination .goto .text{padding:0;}
+.pagination .goto input[type=text]{float:left;width:25px;height:22px;border:1px solid #8EB2D2;outline:none; text-align:center;}
+
+

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调拨</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+
+        .hiddenDiv {
+            display: none;
+        }
+        .selected-highlight {
+            color:red;
+            background-color: #FFFFCC !important;
+        }
+        .span-set {
+            font-weight: 400;
+            font-size: small;
+            text-align: center;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        li.active > a{
+            background-color: #1c84c6 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>调拨记录</h5>
+                </div>
+                <div class="ibox-content">
+                    <div  class="ibox-content" style="margin-top: 15px;">
+                        <table id="table" class="table table-striped table-bordered table-full-width" width="100%">
+                            <thead>
+                            <tr>
+                                <th>调拨单号</th>
+                                <th>制单时间</th>
+                                <th>制单人</th>
+                                <th>源单类型</th>
+                                <th>审核状态</th>
+                                <th>备注</th>
+                                <th>更新时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="ibox-content">
+                        <div v-cloak class="table-responsive1" id="detailsModel">
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#productData" aria-controls="productData" role="tab" data-toggle="tab">入库单情况</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="productData">
+                                    <br>
+                                    <div v-if="productData.length">
+                                        <div class="col-md-12">
+                                            <el-form :inline="true" ref="form" label-width="80px">
+                                                <el-form-item label="打印次数:">
+                                                    <span class="span-info">{{baseData.print_time}}</span>
+                                                </el-form-item>
+                                                <el-form-item label="单据编号:">
+                                                    <span class="span-info">{{baseData.transfer_id}}</span>
+                                                </el-form-item>
+                                                <el-form-item label="源单类型:">
+                                                    <el-input v-model="sourceType" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="制单人:">
+                                                    <el-input v-model="baseData.create_name" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="制单时间:">
+                                                    <el-input v-model="baseData.create_time" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="保管人:">
+                                                    <el-input v-model="baseData.keep_name" readonly disabled></el-input>
+                                                </el-form-item>
+                                                <el-form-item label="验收人:">
+                                                    <el-input v-model="baseData.check_name" readonly disabled></el-input>
+                                                </el-form-item>
+                                            </el-form>
+                                        </div>
+                                        <table class="table table-striped table-bordered table-hover table-full-width dataTables-productData">
+                                            <thead>
+                                            <tr>
+                                                <th>物料代码</th>
+                                                <th>产品名称</th>
+                                                <th>规格型号</th>
+                                                <th>调拨数量</th>
+                                                <th>出库仓库</th>
+                                                <th>入库仓库</th>
+                                                <th>调拨原因</th>
+                                                <th>创建时间</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr v-for="v in productData">
+                                                <td>{{v.product_no}}</td>
+                                                <td>{{v.product_number}}</td>
+                                                <td>{{v.product_name}}</td>
+                                                <td>{{v.num}}</td>
+                                                <td>{{v.rep_name_out}}</td>
+                                                <td>{{v.rep_name_in}}</td>
+                                                <td>{{v.remark}}</td>
+                                                <td>{{v.create_time}}</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-else class="col-xs-12 span-set">
+                                        <span class="selected-highlight">选中行查看调拨单详情后，点击审核按钮下推供出库库房审核</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script>
+    $(document).ready(function () {
+        var thisId = {$Think.session.staffId};
+        var tableTBody = $("#table tbody");
+        $.fn.dataTable.ext.errMode = 'throw';
+        var table = $('#table').DataTable({
+            "scrollY": 400,
+            // "scrollX": true,
+            "scrollCollapse": true,
+            "destroy"      : true,
+            "paging"       : true,
+            "autoWidth"	   : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 25, 50, 100],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true, //开启服务器获取数据
+            ajax: {
+                type: 'post'
+            },
+            order: [[1, 'desc']],
+            columns: [
+                {data: 'transfer_id', searchable: true},
+                {data: 'create_time', searchable: true},
+                {data: 'create_name', searchable: false},
+                {data: 'source_type', searchable: true},
+                {data: 'audit_status', searchable: false},
+                {data: 'tips',         searchable: false},
+                {data: 'update_time',  searchable: false}
+            ],
+            "columnDefs"   : [ //自定义列
+                {
+                    "targets" : 4,
+                    "data" : "audit_status",
+                    "render" : function(data, type, row) {
+                        var arr = ['待制单人审核', '单据不合格', '待出库库房审核', '单据完成'];
+                        return arr[data];
+                    }
+                },
+                {
+                    "targets" : 3,
+                    "data"    : "source_type",
+                    "render"  : function(data, type, row) {
+                        var arr = ['', '领料单调拨', '其他调拨', ''];
+                        return arr[data];
+                    }
+                }
+            ]
+        });
+        var vm = new Vue({
+            el: '#detailsModel',
+            data: function () {
+                return {
+                    productData : [],
+                    baseData : []
+                }
+            },
+            computed : {
+                sourceType : function () {
+                    var arr = ['', '领料单调拨', '其他调拨', ''];
+                    return arr[this.baseData.source_type];
+                }
+            },
+            methods : {
+                afterAudit : function () {
+                    this.productData = [];
+                    this.baseData = [];
+                    this.form = {};
+                }
+            }
+        });
+
+
+        tableTBody.on("click", "tr", function () {
+            $('tr').removeClass('selected-highlight')
+            $(this).addClass('selected-highlight');
+            selectedID = table.row(this).data().id;
+            vm.baseData = table.row(this).data();
+            $.post('/Dwin/Stock/getTransferDataWithId', {'orderId': selectedID}, function (res) {
+                if (res.status === 200) {
+                    vm.productData = res.data;
+                } else {
+                    layer.msg(res.msg);
+                }
+            });
+        });
+
+
+    });
+
+
+
+</script>
+</body>
+</html>

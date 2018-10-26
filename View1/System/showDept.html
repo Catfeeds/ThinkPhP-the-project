@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>公司组织架构列表-数据表格</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;;
+        }
+
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins col-sm-8">
+                <div class="ibox-title">
+                    <h5>公司部门信息</h5>
+                    <a style="float: right;" href="javascript:;" id="addDept"><i class="fa fa-plus"></i> 添加部门</a>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-bordered table-striped dataTables-DeptList">
+                        <thead>
+                        <tr>
+                            <!--         <th>编号</th>-->
+                            <th>部门</th>
+                            <th>修改|删除</th>
+                        </tr>
+                        </thead>
+                        <tbody >
+                        <volist name="dept" id="vol">
+                            <tr class="grade" >
+                                <if condition="$vol.level lt 5">
+                                    <!--<td style="padding: 0px;" >{$vol.id}</td>-->
+                                    <td>{$vol.level|str_repeat="&emsp;&emsp;",###*3}{$vol.name}</td>
+                                    <td>
+                                        <a class="edit" data="{$vol.id}" lv="{$vol.level}"><i class="fa fa-pencil-square-o"></i></a>&emsp;&emsp;&emsp;
+                                        <a class="delete" data="{$vol.id}" lv="{$vol.level}"><i class="fa fa-trash"></i></a>
+                                    </td>
+                                </if>
+                            </tr>
+                        </volist>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+$(document).ready( function () {
+    var height1 = $(window).height() - 220;
+    $(".dataTables-DeptList").DataTable({
+        "scrollY" : height1,
+        "scrollX" : true,
+        "scrollCollapse" : true,
+        "paging" : false,
+        "ordering" : false,
+        "info" : false,
+        'searching' : false
+
+    });
+});
+$(".edit").on("click", function () {
+    var id = $(this).attr('data');
+    var lv = $(this).attr('lv');
+    layer.open({
+        type: 2,
+        title: '修改部门名称',
+        area: ['80%', '80%'],
+        content: "__CONTROLLER__/editDept/dId/" + id //iframe的url
+    });
+});
+
+$(".delete").on("click", function () {
+    var id = $(this).attr('data');
+    var lv = $(this).attr('lv');
+    layer.confirm('解散选择的部门（包括下辖部门）？',
+        {
+            icon  : 3,
+            title :'alert',
+            btn   : ['确认', '再想想']
+        },
+        function(){
+            $.ajax({
+                type : 'POST',
+                url  : '__CONTROLLER__/changeDept',
+                data : {
+                    dId : id,
+                    dLevel : lv
+                },
+                success : function (msg) {
+                    if (msg == 2) {
+                        layer.msg('该部门已删除',function () {
+                            window.location.reload();
+                        });
+
+                    } else {
+                        layer.msg('删除失败');
+                    }
+                } 
+            });
+        }
+    );
+});
+$("#addDept").on('click', function () {
+    layer.open({
+        type: 2,
+        title: '添加新部门',
+        end : function () {
+            window.location.reload();
+        },
+        area: ['60%', '60%'],
+        content: "__CONTROLLER__/addDept"
+    });
+});
+</script>
+</body>
+</html>

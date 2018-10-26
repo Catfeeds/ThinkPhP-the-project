@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CRM--订单列表</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.0/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/layer/3.1.0/theme/default/layer.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/plugins/laydate/theme/default/laydate.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.3/chosen.min.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .selected{
+            background-color: #2a83cf !important;
+        }
+        .dataTables-orderTable table th,td{
+            white-space: nowrap!important;
+        }
+        .dataTables-orderTable table th{
+            white-space: nowrap!important;
+        }
+
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>数据统计</h5>
+                    <div class="ibox-tools"></div>
+
+                </div>
+                <div class="ibox-content">
+                    <div class="col-sm-12" style="margin: 10px 0;">
+                        <div class="fa-hover col-sm-2 col-sm-2">
+                            <div class="layui-inline">
+                                <label class="layui-form-label">时间范围</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" class="layui-input form-control" id="timeRange" placeholder=" - ">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fa-hover col-sm-4 col-sm-2">
+                            <label for="industry">客户行业</label>
+                            <select class='form-control chosen-select' id="industry">
+                                <option value="">所有</option>
+                                <volist name="industry" id="vol">
+                                    <option value="{$vol.id}">{$vol.name}</option>
+                                </volist>
+                            </select>
+                        </div>
+                        <div class="fa-hover col-sm-1 col-sm-1">
+                            <label for="kpi">是否KPI客户</label>
+                            <select class='form-control chosen-select' id="kpi">
+                                <option value="0,1">所有</option>
+                                <option value="1">是</option>
+                                <option value="0">否</option>
+                            </select>
+                        </div>
+                        <!--<div class="fa-hover col-sm-1 col-sm-1">-->
+                            <!--<label for="dept">部门分组</label>-->
+                            <!--<select class='form-control' id="dept">-->
+                                <!--<option value="">所有</option>-->
+                                <!--<volist name="dept" id="vol">-->
+                                    <!--<option value="{$vol.id}">{$vol.name}</option>-->
+                                <!--</volist>-->
+                            <!--</select>-->
+                        <!--</div>-->
+                        <div class="fa-hover col-sm-1 col-sm-1">
+                            <label for="staffId">业务员</label>
+                            <select class='form-control chosen-select chosen-customer-type' id="staffId">
+                                <option value="">所有</option>
+                                <volist name="staff" id="vol">
+                                    <option value="{$vol.id}">{$vol.name}</option>
+                                </volist>
+                            </select>
+
+                        </div>
+                        <div class="fa-hover col-sm-1 col-sm-1">
+                            <button type="button" class="btn btn-outline btn-success" style="margin-top: 22px;" id="createBtn">生成报表</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-orderTable">
+                            <thead><tr style="white-space: nowrap!important;"></tr></thead>
+                            <tbody><tr></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/layer/3.0.3/layer.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/finance/common_finance.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.3/chosen.jquery.min.js"></script>
+<script src="__PUBLIC__/html/plugins/laydate/laydate.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    var module = "__MODULE__";
+    var orderTableDiv = $(".dataTables-orderTable");
+    var orderTableTBodyDiv = $(".dataTables-orderTable tbody");
+    var oTable;
+    var chosenSel = $(".chosen-select");
+    $(document).ready(function () {
+
+        laydate.render({
+            elem : '#timeRange'
+            ,type: 'month'
+            ,range: true
+            ,theme: '#6d9eeb'
+            ,min: -366*3
+            ,max: +31
+        });
+        var config = {
+            baseColumns:[],
+            canInitFlag : false,
+            statisticSet : {
+                startT : '',
+                endT   : '',
+                industry : '',
+                kpiFlag :"",
+                staff : ''
+            },
+            getBaseConfig : function (startT,endT) {
+                $.ajax({
+                    type : "post",
+                    url  : controller + '/getCusStatusField',
+                    dataType: 'json',async: false,
+                    data : {
+                        startT : startT,
+                        endT : endT
+                    },
+                    success : function (res) {
+                        config.baseColumns = [];
+                        for (var i in res) {
+                            console.log(res[i].data);
+                            config.baseColumns.push({data: res[i].data,
+                                title: res[i].title});
+                        }
+                        config.canInitFlag = true;
+                        console.log(config.baseColumns);
+                    }
+                });
+            },
+            chosenConfig : function (selector) {
+                selector.chosen({
+                    no_results_text: "没搜索到您想要的结果",//搜索无结果时显示的提示
+                    search_contains:true,   //关键字模糊搜索，设置为false，则只从开头开始匹配
+                    allow_single_deselect:true, //是否允许取消选择
+                    width:'100%'
+                });
+            }
+        }
+        config.getBaseConfig();
+        config.chosenConfig(chosenSel);
+        var table = {
+            initTable : function () {
+                oTable = orderTableDiv.DataTable({
+                    "paging"       : true,
+                    'destroy' : true,
+                    "autoWidth"    : false,
+                    "scrollX" :true,
+                    "pagingType"   : "full_numbers",
+                    "lengthMenu"   : [10, 20, 35, 50],
+                    "bDeferRender" : true,
+                    "processing"   : true,
+                    "searching"    : true, //是否开启搜索
+                    "serverSide"   : true,//开启服务器获取数据
+                    "ajax"         : {  //获取数据
+                        "url"   : controller + "/showCusStatus",
+                        "type"  : 'post',
+                        "data"  : {
+                            "startT" : function () {
+                                return config.statisticSet.startT;
+                            },
+                            "endT" : function () {
+                                return config.statisticSet.endT;
+                            },
+                            "kpiFlag" : function () {
+                                return config.statisticSet.kpiFlag;
+                            },
+                            'industry' : function () {
+                                return config.statisticSet.industry;
+                            },
+                            'staffId' : function () {
+                                return config.statisticSet.staff;
+                            }
+                        }
+                    },
+                    "columns" :config.baseColumns
+                });
+            }
+        }
+        if (config.canInitFlag) {
+            oTables = table.initTable();
+        } else {
+            console.log(112);
+        }
+
+        var btn = $("#createBtn");
+        btn.on('click', function () {
+//            $(this).attr('disabled', true);
+            var str= '-';
+            config.statisticSet.startT = $("#timeRange").val() === "-" ? "" : $("#timeRange").val().substring(0,7);
+            config.statisticSet.endT   = $("#timeRange").val() === "-" ? "" : $("#timeRange").val().substring(9);
+            config.statisticSet.kpiFlag  = $("#kpi").val();
+            config.statisticSet.industry = $("#industry").val();
+            config.statisticSet.staff = $("#staffId").val();
+            config.canInitFlag = false;
+            config.getBaseConfig(config.statisticSet.startT, config.statisticSet.endT);
+            if (config.canInitFlag) {
+                oTable.destroy();
+                orderTableDiv.empty();
+                oTables = table.initTable();
+            } else {
+                console.log(112);
+            }
+        })
+
+
+    });
+
+</script>
+</html>

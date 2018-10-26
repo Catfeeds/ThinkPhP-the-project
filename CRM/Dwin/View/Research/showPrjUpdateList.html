@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目更新列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        .mouseOn{  cursor:pointer;  }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>项目进度</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-prjUpdateList">
+                            <thead>
+                                <tr>
+                                    <th>项目名称</th>
+                                    <th>更新时间</th>
+                                    <th>进度更新内容</th>
+                                    <th>更新人</th>
+                                    <th>审核状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                           <tbody>
+                               <volist name="data" id="vol">
+                                   <tr>
+                                       <td>{$vol.prjname}</td>
+                                       <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                       <td class="prjUpdContent mouseOn" data="{$vol.prjcontent}">{$vol.prjcontent|subtext=30}</td>
+                                       <td>{$vol.prjername}</td>
+                                       <td>
+                                           <switch name="vol.audistatus">
+                                               <case value="1"><span class="noCheckYet">未审核</span></case>
+                                               <case value="2"><span class="checkYes">有效</span></case>
+                                               <case value="3"><span class="checkNot">无效</span></case>
+                                           </switch>
+                                       </td>
+                                       <td><input type="checkbox" name="progressCheck" class="checkValue" dat="{$vol.id}"  data="{$vol.prjer_id}" value="{$vol.project_id}" ></td>
+                                   </tr>
+                               </volist>
+                           </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="rolePrj" value="{$Think.session.staffId}">
+                        <input class="btn btn-outline btn-success" type="button" id="checkProgress" value="选中项审核" onclick="jqchk2('progressCheck');" style="width: 10%; text-align: center;">
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".dataTables-prjUpdateList").dataTable({
+            'bFilter' : true,
+            'bLengthChange' : false,
+            'bInfo' :　true,
+            'bAutoWidth': false,
+            'iDisplayLength' :　10
+        });
+        var layera;
+        $('.dataTables-prjUpdateList tbody').on('mouseover','.prjUpdContent', function () {
+            var content = $(this).attr('data');
+                layera = layer.tips( content , this,{
+                    tips : [1, '#3595CC'],
+                    area : '500px',
+                    time : 100000
+                });
+                return layera;
+        });
+        $('.dataTables-prjUpdateList tbody').on('mouseout','.prjUpdContent', function () {
+            layer.close(layera);
+        });
+    });
+    var controller = "__CONTROLLER__";
+</script>
+<script src="__PUBLIC__/html/js/dwin/research/research.js"></script>
+</body>
+</html>

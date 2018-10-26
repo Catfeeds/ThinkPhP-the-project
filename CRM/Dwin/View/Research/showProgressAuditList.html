@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目更新列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        .mouseOn{  cursor:pointer;  }
+        .selected {
+          background-color: #2acf93 !important;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>项目进度</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-prjUpdateList">
+                            <thead>
+                                <tr>
+                                    <th>项目名称</th>
+                                    <th>更新时间</th>
+                                    <th>进度更新内容</th>
+                                    <th>更新人</th>
+                                    <th>审核状态</th>
+                                </tr>
+                            </thead>
+                           <tbody>
+                               <volist name="data" id="vol">
+                                   <tr id="{$vol.id}">
+                                       <td>{$vol.prjname}</td>
+                                       <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                       <td class="prjUpdContent mouseOn" data="{$vol.prjcontent}">{$vol.prjcontent|subtext=30}</td>
+                                       <td>{$vol.prjername}</td>
+                                       <td>
+                                           <switch name="vol.audistatus">
+                                               <case value="1"><span class="noCheckYet">未审核</span></case>
+                                               <case value="2"><span class="checkYes">有效</span></case>
+                                               <case value="3"><span class="checkNot">无效</span></case>
+                                           </switch>
+                                       </td>
+                                   </tr>
+                               </volist>
+                           </tbody>
+                        </table>
+                        <input class="btn btn-outline btn-success" type="button" id="checkProgress" value="选中项审核" style="width: 10%; text-align: center;">
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    /**
+     * [checkBoxSel 点击选中行]
+     * @param  {[string]} dataTableClass [表格dataTables-dataTablesClass]
+     * @return {[mix]}                [无返回值，添加行选择高亮]
+     */
+    function checkBoxSel(dataTableClass)
+    {
+        $(".dataTables-" + dataTableClass + " tbody").on('click', 'tr', function (e) {
+            var oTables = $('.dataTables-' + dataTableClass + '').DataTable();
+            if ( $(this).hasClass('selected') ) {
+                $(this).removeClass('selected');
+            } else {
+                oTables.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+    }
+
+    /**
+     * [getSelectedValue 获取表中选中行的值]
+     * @param  {[string]} dataTableClass [表格dataTables-dataTablesClass]
+     * @return {[string]} id               [行id的值]
+     */
+    function getSelectedValue(dataTableClass)
+    {
+        var id;
+        $(".dataTables-" + dataTableClass + " tbody tr").each(function () {
+            if ($(this).hasClass('selected')) {
+                id = $(this).attr('id');
+            }
+        });
+        return id;
+    }
+    $(document).ready(function () {
+        $(".dataTables-prjUpdateList").dataTable({
+            'bFilter' : true,
+            'bLengthChange' : false,
+            'bInfo' :　true,
+            'bAutoWidth': false,
+            'iDisplayLength' :　10
+        });
+        var layera;
+        $('.dataTables-prjUpdateList tbody').on('mouseover','.prjUpdContent', function () {
+            var content = $(this).attr('data');
+                layera = layer.tips(content, this,{
+                    tips : [1, '#3595CC'],
+                    area : '500px',
+                    time : 100000
+                });
+                return layera;
+        });
+        $('.dataTables-prjUpdateList tbody').on('mouseout','.prjUpdContent', function () {
+            layer.close(layera);
+        });
+    });
+    var controller = "__CONTROLLER__";
+    checkBoxSel('prjUpdateList');
+    $("#checkProgress").on('click', function() {
+      // 审核项目进度记录 ：需要审核的记录的id,审核记录的项目参与人id
+      var p_id = getSelectedValue('prjUpdateList');
+      if (p_id) {
+          layer.confirm(
+              '审核选项',
+              {
+                  btn : ['有效','无效']
+              },
+              function() {
+                  $.ajax({
+                      type : 'POST',
+                      url  : controller + '/checkProgress',
+                      data : {
+                          prjid : p_id,
+                          k     : 2
+                      },
+                      success : function(data2) {
+                        console.log(data2);
+                          switch (data2) {
+                              case 2 : 
+                                  layer.msg('审核通过',
+                                      {
+                                          icon : 6,
+                                          time : 500
+                                      },
+                                      function () {
+                                          window.location.reload();
+                                      });break;
+                              case 3 :
+                                  layer.msg('审核失败，联系管理员',
+                                      {
+                                          icon : 6,
+                                          time : 500
+                                      },
+                                      function () {
+                                          window.location.reload();
+                                      });break;
+                              case 4 :
+                                  layer.msg('无权限审核',
+                                      {
+                                          icon : 6,
+                                          time : 500
+                                      },
+                                      function () {
+                                          window.location.reload();
+                                      });break; 
+                          }
+                      }      
+                  });
+              },
+              function() {
+                  $.ajax({
+                      type : 'POST',
+                      url  : controller + '/checkProgress',
+                      data : {
+                          prjid : p_id,
+                          k     : 1
+                      },
+                      success : function(data3) {
+                          switch (data3) {
+                              case 2 : 
+                                  layer.msg('审核成功',
+                                      {
+                                          icon : 6,
+                                          time : 500
+                                      },
+                                      function () {
+                                          window.location.reload();
+                                      });break;
+                              case 3 :
+                                  layer.msg('审核失败，联系管理员',
+                                      {
+                                          icon : 6,
+                                          time : 500
+                                      },
+                                      function () {
+                                          window.location.reload();
+                                      });break; 
+                              case 4 :
+                                  layer.msg('无权限审核',
+                                      {
+                                          icon : 6,
+                                          time : 500
+                                      },
+                                      function () {
+                                          window.location.reload();
+                                      });break; 
+                          }
+                      }
+                  });
+              });
+                      
+      } else {
+          layer.alert('请选中客户');
+      }
+    });
+</script>
+</body>
+</html>

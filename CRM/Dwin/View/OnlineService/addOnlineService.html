@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加联系记录</title>
+    <style type='text/css'>
+        select {
+            background: rgba(0, 0, 0, 0) url("__PUBLIC__/Admin/images/inputbg.png") repeat-x scroll 0 0;
+            border: 1px solid #c5d6e0;
+            height: 28px;
+            outline: medium none;
+            padding: 0 8px;
+            width: 240px;
+        }
+        .main p input {
+            float:none;
+            height:20px;
+        }
+        .main p label{ float:left; width:88px; text-align:left;}
+    </style>
+</head>
+<body>
+<div class="title"><h2>添加客服记录</h2></div>
+<form action="__CONTROLLER__/addOk" method="post" enctype="multipart/form-data">
+    <div class="main">
+        <p class="short-input ue-clear">
+            <label>业务名称：</label>
+            <select name="number" id="">
+                <option value="1">xxx屏幕订单</option>
+                <option value="2">xxx芯片订单</option>
+                <option value="3">xxx订单</option>
+            </select>
+        </p>
+        <p class="short-input ue-clear">
+            <label>客户信息：</label>
+            <select name="hangye" id="">
+                <option value="">XXX公司</option>
+                <option value="">xxx公司</option>
+            </select>
+        </p>
+        <p class="short-input ue-clear">
+            <label>业务负责：</label>
+            <select name="gonsixingzhi" id="">
+                <option value="">xxx</option>
+                <option value="">3w</option>
+                <option value="">dfs</option>
+            </select>
+        </p>
+        <p class="short-input ue-clear">
+            <label>客服内容：</label>
+            <textarea style="width: 240px;"></textarea>
+        </p>
+        <p class="short-input ue-clear">
+            <label>解决方式：</label>
+            <textarea style="width: 240px;"></textarea>
+        </p>
+        <p class="short-input ue-clear">
+            <label>服务时间：</label>
+            <input type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm:ss'});"/>
+        </p>
+    </div>
+    <div class="btn ue-clear">
+        <a href="javascript:;" class="confirm" id='btnSubmit'>确定</a>
+        <a href="javascript:;" class="clear" id='btnReset'>清空内容</a>
+    </div>
+</form>
+
+</body>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+</html>

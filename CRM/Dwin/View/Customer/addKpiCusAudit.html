@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加KPI客户</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>添加KPI客户</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="addSonDeptForm"  method="post">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">客户名:</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" name="oldname" value="{$cusInfo.cname}" type="text" required readonly>
+                                <input class="form-control" name="cusid" value="{$cusInfo.cid}" type="hidden">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">潜力：</label>
+                            <div class="col-sm-4">
+                                <select name="kpi_potential" class="form-control required" required>
+                                    <option value="1-5万台" selected>1-5万台</option>
+                                    <option value="5-10万台">5-10万台</option>
+                                    <option value="10万台以上">10万台以上</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">客户背景：</label>
+                            <div class="col-sm-4">
+                                <textarea name="kpi_background" class="form-control required"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">客户行业：</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control required" name="kpi_industry" value="{$cusInfo.industry}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">客户近12月采购金额：</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control required" name="kpi_annual_turnover">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">产品具体应用：</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control required" name="kpi_application">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="auth_id">请选择审核人：</label>
+                            <div class="col-sm-4">
+                                <select name="auth_id" id="auth_id" class="form-control required">
+                                    <volist name="staffData" id="vo">
+                                        <option value="{$vo.id}">{$vo.name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-primary" type="submit" id="addCategoryButton">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script>
+    var addBtn = $("#addCategoryButton");
+    $("#addSonDeptForm").validate({
+        ignore: ":hidden:not(select)",
+        submitHandler: function(form) {
+            addBtn.attr('disabled','disabled');
+            var formData = $(form).serializeArray();
+            $.ajax({
+                type : 'POST',
+                url : '__CONTROLLER__/addKpiCusAudit',
+                data : {
+                    formData :formData
+                },
+                success : function (res) {
+                    layer.msg(res.msg, function () {
+                        if (res.status > 0){
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        }
+                    });
+                },
+                error : function (error) {
+                    console.log(error);
+                    addBtn.attr('disabled', false);
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--客户名变更申请</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body { color: black;}
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>客户名称变更</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="editAddr">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">现客户名称：</label>
+                                <p>{$data.cname}</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">修改客户为：</label>
+                            <div class="col-sm-4">
+                                <input name="companyName" class="form-control required" type="text">
+                                <input name="cid" class="form-control" type="hidden" value="{$data.cid}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">修改原因：</label>
+                            <div class="col-sm-4">
+                                <textarea class="form-control required" name="changeReason" ></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label  class="col-sm-3 control-label">审核人：</label>
+                            <div class="col-sm-4">
+                            <select class="form-control required" name="audi" id="authorSele">
+                                <option value="">请选择审核人</option>
+                                <volist name="auth" id="vol">
+                                    <option value="{$vol.id}">{$vol.name}</option>
+                                </volist>
+                            </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-sm btn-outline btn-primary" type="submit" id="cusCSubmit">提交修改申请</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(".chosen-select").chosen({
+        no_results_text : "没搜索到您输入的客户",
+        search_contains : true
+    });
+    var editCusSubmitBtn = $("#cusCSubmit");
+    var submitForm = $("#editAddr");
+    submitForm.validate({
+        submitHandler: function(form) {
+            var datas = $("#editAddr").serializeArray();
+            editCusSubmitBtn.attr('disabled', 'disabled');
+            $.ajax({
+                type : 'POST',
+                url : '__CONTROLLER__/editCustomerName',
+                data : datas,
+                success : function (msg) {
+                    if (msg['status'] == 200) {
+                        layer.msg(msg['msg'],
+                            {
+                                icon : 5,
+                                time : 500
+                            },
+                            function () {
+                                var index = parent.layer.getFrameIndex(window.name);
+                                parent.layer.close(index);
+                            }
+                        );
+                    } else {
+                        layer.msg( msg['msg'],
+                            {
+                                icon : 5,time:1000
+                            }
+                        );
+                        $("#cusCSubmit").attr('disabled', false);
+                    }
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

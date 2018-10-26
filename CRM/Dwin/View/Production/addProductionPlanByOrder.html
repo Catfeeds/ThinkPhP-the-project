@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>添加生产任务</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+    <style>
+        .row {
+            margin-bottom: 1em;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper wrapper-content" id="app" v-loading="loading">
+    <h4>订单内容</h4>
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th>产品名</th>
+            <th>订单数量</th>
+            <th>产品库存</th>
+            <th>正在生产数量</th>
+            <th>已生产数量</th>
+            <th>状态</th>
+        </tr>
+        <tr v-for="item in orderItem">
+            <td>{{item.product_name}}</td>
+            <td>{{item.product_num}}</td>
+            <td>{{item.stock_number}}</td>
+            <td>{{0 + +item.producing_number}}</td>
+            <td>{{0 + +item.produced_number}}</td>
+            <td>{{item.status | statusFilter}}</td>
+        </tr>
+    </table>
+    <form method="post" class="form-inline" id="aaa" v-for="(form, formIndex) in dataList">
+        <div class="row">
+            <div class="col-md-6">
+                <label>物料型号:</label>
+                <select v-model="form.product_id" v-validate="'required'" class="form-control" @change="selectProduct(formIndex)">
+                    <option value="" hidden>---请选择---</option>
+                    <option :value="item.product_id" v-for="item in productAbleList">{{item.product_name}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>备货方式:</label>
+                <select name="stock_cate" v-validate="'required'" v-model="form.stock_cate" class="form-control" style="width: 200px">
+                    <option :value="item.id" v-for="item in stockCate">{{item.stock_cate_name}}</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label>生产数量:</label>
+                <input type="number" v-validate="'required'" v-model="form.production_plan_number" class="form-control" id="num" name="production_plan_number" min="0" @input="productionNumberValidate(formIndex)">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>业务员&emsp;:</label>
+                <input type="text" class="form-control" value="{$staffName}" readonly>
+            </div>
+            <div class="col-md-4">
+                <label>期望交期:</label>
+                <el-date-picker
+                        v-validate="'required'"
+                        v-model="form.delivery_time"
+                        type="date"
+                        format="yyyy 年 MM 月 dd 日"
+                        value-format="yyyy-MM-dd"
+                        :picker-options="elData"
+                        placeholder="选择日期">
+                </el-date-picker>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <label>生产地&emsp;:</label>
+                <select name="production_company" v-validate="'required'" v-model="form.production_company" class="form-control" style="width: 200px">
+                    <option :value="item.id" v-for="item in productionCompany">{{item.production_company}}</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label>生产线&emsp;:</label>
+                <select name="production_line" v-validate="'required'" v-model="form.production_line" class="form-control" style="width: 200px">
+                    <option :value="item.id" v-for="item in productionLine">{{item.production_line}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <label>特殊要求:</label>
+                <textarea name="tips" v-model="form.tips" class="form-control" cols="30" placeholder="选填"></textarea>
+            </div>
+        </div>
+        <hr>
+        <input type="hidden" name="TOKEN" value="{:session('TOKEN')}">
+    </form>
+    <button class="btn btn-warning" @click="delDataList">删除</button>
+    <button class="btn btn-info" @click="addDataList">添加生产计划</button>
+    <hr>
+    <button class="btn btn-primary" @click="submit" :disabled="disabled">提交所有生产计划</button>
+
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/vee-validate.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.5.1/bluebird.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+
+
+<script>
+
+    Vue.use(VeeValidate);
+    var orderItem = {$orderItem | json_encode};
+    var productionCompany = {$productionCompany | json_encode};
+    var productionLine = {$productionLine | json_encode};
+    var stockCate = {$stockCate | json_encode};
+    var staffName = '{:session("nickname")}';
+    var orderID = '{$orderID}';
+    var staffID = '{:session("staffId")}';
+    var orderInfo = {$orderInfo | json_encode};
+    //
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                elData: {
+                    disabledDate: function(time) {
+                        return time.getTime() <= Date.now() - 86400000;
+                    }
+                },
+                orderItem: orderItem,
+                dataList: [{
+                    product_id: '',
+                    stock_cate: 3,
+                    production_company: 1,
+                    production_line: 1
+                }],
+                productionCompany: productionCompany,
+                productionLine: productionLine,
+                stockCate: stockCate,
+                orderInfo: orderInfo,
+                disabled: false,
+                loading: false
+            }
+        },
+        computed: {
+            productAbleList: function () {
+                var nameArr = []
+                var maxNumberArr = []
+                this.orderItem.forEach(function (v,i) {
+                    var index = nameArr.indexOf(v.product_name);
+                    if (index === -1){
+                        nameArr.push(v.product_name)
+                        var obj = {
+                            product_name: v.product_name,
+                            product_id: v.product_id,
+                            maxNumber: +v.product_num - v.produced_number - v.producing_number
+                        }
+                        maxNumberArr.push(obj)
+                    }else {
+                        maxNumberArr[index].maxNumber += +v.product_num - v.produced_number
+                    }
+                })
+
+                return maxNumberArr;
+            }
+        },
+        methods: {
+            addDataList: function () {
+                this.dataList.push({
+                    product_id: '',
+                    stock_cate: 3,
+                    production_company: 1,
+                    production_line: 1
+                })
+            },
+            delDataList: function () {
+                this.dataList.pop()
+            },
+            productionNumberValidate: function (index){
+                // 检查是否选择了产品型号
+                if (this.dataList[index].product_id == '' || this.dataList[index].product_id == null){
+                    layer.msg('请先选择产品');
+                    this.dataList[index].production_plan_number = null;
+                    return false;
+                }
+                // 获取允许最大数
+                var productID = this.dataList[index].product_id;
+                var max = 0;
+                for (var i = 0; i < this.productAbleList.length; i++){
+                    if (productID == this.productAbleList[i].product_id){
+                        max = this.productAbleList[i].maxNumber;
+                    }
+                }
+                var sum = +this.dataList[index].production_plan_number
+                for (i = 0; i < this.dataList.length; i++){
+                    this.dataList[i].order_id = orderID;
+                    this.dataList[i].staff_id = staffID;
+                }
+                // if (sum > max){
+                //     layer.msg('生产数量不得超过订单上的生产数量');
+                //     this.dataList[index].production_plan_number = null;
+                // }
+                if (sum <= 0){
+                    layer.msg('生产数量不得小于等于0');
+                    this.dataList[index].production_plan_number = null;
+                }
+            },
+            selectProduct: function (index){
+                var id = this.dataList[index].product_id;
+                for (var i = 0; i < this.dataList.length; i++){
+                    if (i == index){
+                        continue
+                    }
+                    if (id == this.dataList[i].product_id){
+                        this.dataList.splice(index, 1);
+                        layer.msg('不可重复选择产品');
+                        return
+                    }
+                }
+                this.productionNumberValidate(index)
+            },
+            submit: function () {
+                this.disabled = true;
+                this.loading = true;
+                var that = this;
+                this.$validator.validateAll().then(function (res) {
+                    if (res === true){
+                        $.post(
+                            '',
+                            {
+                                data: that.dataList,
+                                orderID: orderID
+                            },
+                            function (res) {
+                                layer.msg(res.msg);
+                                if (res.status > 0){
+                                    for (var i = 0; i < that.dataList.length; i++){
+                                        var id = that.dataList[i].product_id;
+                                        var num = +that.dataList[i].production_plan_number;
+                                        for (var j = 0; j < that.orderItem.length; j++){
+                                            if (id == that.orderItem[j].product_id) {
+                                                that.orderItem[j].producing_number = +that.orderItem[j].producing_number;
+                                                that.orderItem[j].producing_number += num;
+                                                that.orderItem[j].status = 2;
+                                            }
+                                        }
+                                    }
+                                }
+                                that.disabled = false;
+                                that.loading = false;
+                            }
+                        )
+                    } else {
+                        layer.msg('表单中有未填项');
+                        that.loading = false;
+                        that.disabled = false;
+                    }
+                })
+            }
+        },
+        filters: {
+            statusFilter: function (data) {
+                var arr = ['待处理', '待出库', '待生产'];
+                return arr[+data];
+            }
+        }
+    });
+</script>
+</body>
+</html>

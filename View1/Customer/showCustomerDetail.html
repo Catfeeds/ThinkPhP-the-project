@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>CRM--客户详情</title>
+    <meta name="keywords" content="业务">
+    <meta name="description" content="响应式">
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>客户基本信息</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="grid_options.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <th>客户名称：
+                                    <middle>北京TCL</middle></th>
+                                <th>
+                                    客户编号：
+                                    <middle>MD501</middle>
+                                </th>
+                                <th>
+                                    公司网址：
+                                    <middle><a href="http://www.test.com.cn/" target="_blank">http://www.test.com.cn/</a></middle>
+                                </th>
+                                <th>
+                                    企业联系人：
+                                    <middle>Jessica</middle>
+                                </th>
+                                <th>
+                                    联系方式：
+                                    <middle>010-31882154</middle>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th class="text-nowrap">员工人数：501-1000人</th>
+                                <td>公司所在地：北京市</td>
+                                <td colspan="3">公司地址：北京市海淀区西三环xx路xx大厦</td>
+                            </tr>
+                            <tr>
+                                <th class="text-nowrap">行业：制造业</th>
+                                <td>公司性质：外资企业</td>
+                                <td>客户来源：展会</td>
+                                <td>客户级别：1级</td>
+                                <td>采购记录：<a href="#orders">2</a>次</td>
+                            </tr>
+                            <tr>
+                                <td>采购金额：200000元</td>
+                                <th class="text-nowrap">负责业务员：Lidn</th>
+                                <th class="text-nowrap">
+                                    <div class="fa-hover col-md-3 col-sm-4"><a href="#file"><i class="fa fa-file"></i> 客户资料</a></div>
+                                </th>
+                                <th class="text-nowrap">
+                                    <div class="fa-hover col-md-3 col-sm-4"><a href="__CONTROLLER__/uploadFile"><i class="fa fa-file"></i> 资料上传</a></div>
+                                </th>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox float-e-margins" >
+                <div class="ibox-title" id="contactrecords">
+
+                    <h5>企业联系人</h5>
+                    <div class="fa-hover col-md-3 col-sm-4"><a href="__CONTROLLER__/addContact"><i class="fa fa-plus"></i> 新联系人</a></div>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content" >
+                    <div class="table-responsive">
+                        <h4>客户信息：&emsp;lgd</h4>
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <td>姓名</td>
+                                <td>职务</td>
+                                <td>公司</td>
+                                <td>联系方式</td>
+                            </tr>
+                            <tr>
+                                <td>Yaoming</td>
+                                <td>总经理</td>
+                                <td>xxxlgd有限公司</td>
+                                <td>15234268569</td>
+                            </tr>
+                            <tr>
+                                <td>CoCo</td>
+                                <td>采购经理</td>
+                                <td>xxxlgd有限公司</td>
+                                <td>15234268569</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>采购记录</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>订单编号</th>
+                                <th>产品名称</th>
+                                <th>产品类型</th>
+                                <th>数量</th>
+                                <th>订单时间</th>
+                                <th>订单金额</th>
+                            </tr>
+                            <tr style="text-align: center;">
+                                <td>10001SDK</td>
+                                <td>xxx产品</td>
+                                <td>新研发产品</td>
+                                <td>1000件</td>
+                                <td>2017.08.06</td>
+                                <td>120000元</td>
+                            </tr>
+                            <tr style="text-align: center;">
+                                <td>10003SDK</td>
+                                <td>xxx产品</td>
+                                <td>新研发产品</td>
+                                <td>1000件</td>
+                                <td>2016.08.06</td>
+                                <td>10000元</td>
+                            </tr>
+                            <tr style="text-align: center;">
+                                <td>10023SDK</td>
+                                <td>xxx产品</td>
+                                <td>新研发产品</td>
+                                <td>1000件</td>
+                                <td>2015.08.06</td>
+                                <td>200000元</td>
+                            </tr>
+                            <tr style="text-align: center;">
+                                <td>10231SDK</td>
+                                <td>xxx产品</td>
+                                <td>新研发产品</td>
+                                <td>1000件</td>
+                                <td>2014.08.06</td>
+                                <td>20000元</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery.min.js?v=2.1.4"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/peity/jquery.peity.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/iCheck/icheck.min.js"></script>
+<script src="__PUBLIC__/html/js/demo/peity-demo.min.js"></script>
+<script>
+    $(document).ready(function(){$(".i-checks").iCheck({checkboxClass:"icheckbox_square-green",radioClass:"iradio_square-green",})});
+</script>
+</body>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/grid_options.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:53 GMT -->
+</html>

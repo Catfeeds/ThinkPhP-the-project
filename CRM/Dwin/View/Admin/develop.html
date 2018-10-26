@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body{
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <h3 style="padding: 20px;">员工发展</h3>
+    <button class="btn btn-info" @click="addDevelop" v-if="addAble">添加记录</button>
+    <table class="table table-striped table-hover table-bordered">
+        <tr>
+            <th width="200">记录类别</th>
+            <th>详细信息</th>
+            <th width="200">添加时间</th>
+            <th width="150">操作</th>
+        </tr>
+        <tr v-for="(item, index) in develop" v-if="item.flag!='del'">
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.record_type}}
+                </span>
+                <el-select v-model="item.record_type" placeholder="请选择" v-if="item.flag != 'get'">
+                    <el-option
+                            :key="'面试情况记录'"
+                            :label="'面试情况记录'"
+                            :value="'面试情况记录'">
+                    </el-option>
+                    <el-option
+                            :key="'试用期情况记录'"
+                            :label="'试用期情况记录'"
+                            :value="'试用期情况记录'">
+                    </el-option>
+                    <el-option
+                            :key="'考核情况记录'"
+                            :label="'考核情况记录'"
+                            :value="'考核情况记录'">
+                    </el-option>
+                    <el-option
+                            :key="'重大奖惩情况记录'"
+                            :label="'重大奖惩情况记录'"
+                            :value="'重大奖惩情况记录'">
+                    </el-option>
+                </el-select>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.detail_information}}
+                </span>
+                <el-input type="textarea" v-if="item.flag != 'get'" :rows="5" v-model="item.detail_information"></el-input>
+            </td>
+            <td>{{item.add_time}}</td>
+            <td>
+                <button class="btn btn-warning" @click="delDevelop(index)" v-if="item.flag == 'get'">删除</button>
+                <button class="btn btn-info" @click="editDevelop(index)" v-if="item.flag == 'get' && addAble">修改</button>
+                <button class="btn btn-primary" @click="saveDevelop(index)" v-if="item.flag != 'get'">保存</button>
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var id = {$id|json_encode};
+    var vm = new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                develop: [],
+                loading: true,
+                id: id
+            }
+        },
+        computed: {
+            addAble: function () {
+                return this.develop.every(function (value) {
+                    return value.flag == 'get'
+                })
+            }
+        },
+        created: function () {
+            this.getData();
+        },
+        methods: {
+            getData: function () {
+                this.loading = true
+                var vm = this;
+                $.post('', {}, function (res) {
+                    vm.develop = res.data;
+                    vm.loading = false
+                })
+            },
+            delDevelop: function(index){
+                var vm = this
+                layer.confirm('确认删除?', function (aaa) {
+                    vm.loading = true
+                    $.post('{:U("delDevelop")}', {id: vm.develop[index].id}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                        layer.close(aaa)
+                        vm.loading = false
+                    })
+                })
+            },
+            editDevelop: function(index){
+                this.develop[index].flag = 'put'
+            },
+            saveDevelop: function(index){
+                var vm = this
+                var data = this.develop[index]
+                if (data.flag == 'add'){
+                    data.employee_id = vm.id
+                    $.post('{:U("postDevelop")}', {data: data}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+                if (data.flag == 'put'){
+                    $.post('{:U("putDevelop")}', {data: data}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+            },
+            addDevelop: function(){
+                var obj = {
+                    flag: 'add'
+                }
+                this.develop.unshift(obj)
+            },
+            submit: function () {
+                var vm = this
+                layer.confirm('确认提交?', function (index) {
+                    vm.loading = true
+                    $.post('', {data: vm.develop,method: 'put'}, function (res) {
+                        layer.msg(res.msg)
+                        vm.getData();
+                    })
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

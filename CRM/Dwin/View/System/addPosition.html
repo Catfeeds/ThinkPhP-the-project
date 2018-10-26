@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--添加新职位</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>新职位添加</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="addPositionForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">新职位名称：</label>
+                            <div class="col-sm-4">
+                                <input id="addPositionName" name="name" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">上级职位：</label>
+                            <div class="col-sm-4">
+                                <select name="id" id="parentPosition" class="form-control">
+                                    <option value="">请选择</option>
+                                    <volist name="roleData" id="vol"> 
+                                        <option value="{$vol.id}">{$vol.level|str_repeat="&emsp;&emsp;",###*2}{$vol.name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">职位权限：</label>
+                            <div class="col-sm-4">
+                                <select name="rule" id="rules"  class="chosen-select" multiple="multiple" tabindex="8" style="width:100%;">
+                                    <volist name="groupData" id="vol">
+                                        <option value="{$vol.group_id}">{$vol.group_name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-primary" type="button" id="addPositionButton">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+
+//判断是否是汉字、字母、数字组成 
+function isChinaOrNumbOrLett(s) {
+    var regu = "^[0-9a-zA-Z\u4e00-\u9fa5]+$";   
+    var re = new RegExp(regu);
+    if (re.test(s)) { 
+        return true; 
+    } else{ 
+        return false; 
+    }  
+}
+
+var addPositionButton = $("#addPositionButton");
+addPositionButton.on('click', function () {
+    addPositionButton.attr("disabled",'disabled');
+    var newName   = $("#addPositionName").val();
+    var flag_name = isChinaOrNumbOrLett(newName);
+    var parentId  = $("#parentPosition option:selected").val();
+    var rules     = $("#rules option:selected").val();
+
+    if (!newName) {
+        addPositionButton.attr("disabled", false);
+        layer.alert("名字不能为空",
+            { 
+                icon : 5
+            }
+        );
+        return false;
+    }
+    if (!flag_name) {
+        layer.alert("名字不合法，只能为汉字、字母和数字组合",
+            {
+                icon : 5
+            },
+            function () {
+                addPositionButton.attr("disabled", false);
+            }
+        );
+        return false;
+    }
+
+    if (!parentId) {
+        layer.alert("未选择上级职位",
+            { 
+                icon : 5
+            },
+            function () {
+                addPositionButton.attr("disabled", false);
+            }
+        );
+        return false;    
+    }
+    if (!rules) {
+        layer.alert("添加的职位未选择权限",
+            {
+                icon : 5
+            },
+            function () {
+                $("#addPositionButton").attr("disabled", false);
+            }
+        );
+        return false;
+    }
+
+    var seltetedRole = [];
+    $("#rules option:selected").each(function () {
+        seltetedRole.push($(this).val());
+    });
+    var ruleIds = seltetedRole.join(",");
+
+    $.ajax({
+        type : 'POST',
+        url  : '__CONTROLLER__/addPosition',
+        end  : function () {
+            window.location.reload();
+        },
+        data : {
+            id   : parentId,
+            name : newName,
+            rule : ruleIds
+        },
+        success : function (msg) {
+            //layer.close(indexLoad);
+            if(msg == 2) {
+                layer.msg(
+                    '提交成功',
+                    {
+                        icon : 6,
+                        time : 500
+                    },
+                    function () {
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    }
+                );
+            } else {
+                layer.alert("提交出错");
+                addPositionButton.attr("disabled", false);
+                return false;
+            }
+        },
+        error : function (error) {
+            layer.alert(error);
+            addPositionButton.attr("disabled", false);
+        }
+    });
+});
+</script>
+</body>
+</html>

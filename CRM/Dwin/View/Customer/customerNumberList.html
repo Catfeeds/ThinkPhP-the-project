@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.2.6/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css" rel="stylesheet">
+
+    <style>
+        body{
+            color:black;
+        }
+        .selected{
+            background: #d0d27e!important;
+        }
+        #staff th,td{
+            white-space: nowrap!important;
+        }
+
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+                <div class="title">
+                        <h4>负责人名下客户数量</h4>
+                        <div>
+                            <button class="btn btn-xs btn-outline btn-success refresh">刷 新</button>
+                        </div>
+                    </div>
+            <div class="table-responsive">
+                <table id="staff" class="table table-bordered table-hover table-striped">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/js/dataTables.bootstrap.min.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+
+<script>
+    var table = $('#staff'). DataTable({
+        ajax: {
+            type: 'post',
+            data: {
+                flag: 1
+            }
+        },
+        "scrollY": 400,
+        "scrollCollapse": true,
+        "destroy"      : true,
+        "paging"       : true,
+        "autoWidth"	   : true,
+        "pageLength": 25,
+        serverSide: true,
+        // order:[[21, 'desc']],    
+        columns: [                                                                                                                       
+            {title:'负责人',searchable: true, data: 'name'},
+            {title:'部门分组',searchable: true, data: 'dep_name'},
+            {title:'客户总数</br>（不包含子公司）',searchable: false, data: 'main_customers'},
+            {title:'kpi客户数',searchable: false, data: 'kpi_customers'},
+//            {title:'去除cus_pid有值的客户数',searchable: false, data: 'main_customers'},
+        ],
+        oLanguage: {
+            "oAria": {
+                "sSortAscending": " - click/return to sort ascending",
+                "sSortDescending": " - click/return to sort descending"
+            },
+            "LengthMenu": "显示 _MENU_ 记录",
+            "ZeroRecords": "对不起，查询不到任何相关数据",
+            "EmptyTable": "未有相关数据",
+            "LoadingRecords": "正在加载数据-请等待...",
+            "Info": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录。",
+            "InfoEmpty": "当前显示0到0条，共0条记录",
+            "InfoFiltered": "（数据库中共为 _MAX_ 条记录）",
+            "Processing": "<img src='../resources/user_share/row_details/select2-spinner.gif'/> 正在加载数据...",
+            "Search": "搜索：",
+            "Url": "",
+            "Paginate": {
+                "sFirst": "首页",
+                "sPrevious": " 上一页 ",
+                "sNext": " 下一页 ",
+                "sLast": " 尾页 "
+            }
+        }
+    })
+</script>
+</body>
+</html>

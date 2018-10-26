@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户列表-数据表格</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="http://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet">
+<!--     <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet"> -->
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+	   .selected {
+            background-color: #1a7bb9 !important;
+        }
+        .tdClass {
+            width:20%;
+        }!important;
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>客户列表</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                                        <input type='hidden' name='importId' id='importId' value="{:I('get.cusInfo')}">
+                    <table class="table table-striped table-bordered table-hover dataTables-TempCus">
+                        
+
+                        <thead>
+                            <td>分类</td>
+                            <td>疑似重名客户</td>
+                            <td>客户名称</td>
+                            <td>联系人</td>
+                            <td>联系方式</td>
+                            <td>行业</td>
+                            <td>所在城市</td>
+                            <td>地址</td>
+
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+<!--                     <input class="btn btn-outline btn-success businessBtn" type="button" id="removeSel" value="放弃客户"  style="width: 10%; text-align: center;">&emsp;
+<input class="btn btn-outline btn-success businessBtn" type="button" id="addOrder" value="添加订单" >&emsp;
+<input class="btn btn-outline btn-success businessBtn" type="button" id="addContact" value="添加业务记录" style="width: 10%; text-align: center;">&emsp;
+<input class="btn btn-outline btn-success businessBtn" type="button" id="addContacter" value="添加联系人" style="width: 10%; text-align: center;">&emsp;
+<input class="btn btn-outline btn-success businessBtn" type="button" id="changeCus" value="修改客户信息" style="width: 10%; text-align: center;"> -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<!-- <script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script> -->
+<script src="http://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+<!-- <script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script> -->
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    var k = $("#importId").val();
+    $(document).ready(function() {
+        $(".dataTables-TempCus").dataTable({
+            "scrollX"      : true,
+            'scrollY'      : '400',
+            'paging'       : false,
+            'searching'    : false,
+            "dom"          : '<"toolbar">frtip',
+	        "autoWidth"	   : false,
+            "processing"   : true,
+            "serverSide"   : true,//开启服务器获取数据
+            "ajax"         : { // 获取数据
+                "url"   : controller + "/showTempCusList",
+                "type"  : 'post',
+		        "data"  : {
+                    "importId": function () {
+                        return document.getElementById('importId').value;
+                }
+            }
+            },
+            "columns"     : [ //定义列数据来源
+                {'title' : "分类", 'data'  : 'cus_type'},
+                {'title' : "疑似重名客户", 'data' : 'similar_name', 'class' : 'tdClass'},
+                {'title' : "客户名称", 'data' : 'cus_name'},
+                {'title' : "联系人", 'data' : "contact"},
+                {'title' : "电话", 'data' : "contact_phone"},
+                {'title' : "行业", 'data' : "indus"},
+                {'title' : "所在地", 'data' : "city"},
+                {'title' : "详细地址", 'data' : "address"}
+            ],
+            "columnDefs"   : [ //自定义列
+		        {
+                    "targets" : 0,
+                    "data" : 'cus_type',
+                    "render" : function(data, type, row) {
+                        var check_cus;
+                        switch(data) {
+                            case "1" : 
+                                check_cus = "<span class='check_info' style='color:green;' data=" + data + ">字数小于4</span>";
+                                break;
+                            case "2" : 
+                                check_cus = "<span class='check_info' style='color:yellow;' data=" + data + ">非法名称</span>";
+                                break;
+                            case "3" : 
+                                check_cus = "<span class='check_info' style='color:bule;' data=" + data + ">合格</span>";
+                                break;
+                            case "4" : 
+                                check_cus = "<span class='check_info' style='color:red;' data=" + data + ">疑似重名</span>";
+                                break;
+                            case "5" : 
+                                check_cus = "<span class='check_info' style='color:#f7a54a;' data=" + data + ">重复</span>";
+                                break;
+                            default : 
+                                check_cus = "<span class='check_info' style='color:black;' data=" + data + ">未知</span>";
+                                break;
+                            }
+
+                            return check_cus;
+                    }
+                },
+                {
+                    "targets" : 1,
+                    "data" : 'similar_name',
+                    "render" : function(data, type, row) {
+                        var similar_name = "<span style='color:red;'" + data +"</span>"
+                            return similar_name;
+                    }
+                },
+                {
+                    "targets" : 2,
+                    "data" : 'cus_name',
+                    "render" : function(data, type, row) {
+                        var cus_name = "<input class='form-control'style='width:100%;' type='text' name='cusName' value='"+ data +"'>"
+                            return cus_name;
+                    }
+                },
+                                {
+                    "targets" : 3,
+                    "data" : 'contact',
+                    "render" : function(data, type, row) {
+                        var check_cus = "<input class='form-control'style='width:100%;' type='text' name='contact' value='"+ data +"'>"
+                            return check_cus;
+                    }
+                },
+                {
+                    "targets" : 4,
+                    "data" : 'contact_phone',
+                    "render" : function(data, type, row) {
+                        var contact_phone = "<input class='form-control' style='width:100%;' type='text' name='contact_phone' value='" + data + "'>"
+                            return contact_phone;
+                    }
+                },
+                {
+                    "targets" : 5,
+                    "data" : "indus",
+                    "render" : function (data, type, row) {
+
+                        var industry = "<select name='industry' class='form-control'>";
+                        for (var i = 0; i < data['sel_indus'].length; i++) {
+                            if (data['indus_id'] == data['sel_indus'][i]['id']) {
+                                industry += "<option value='"+ data['sel_indus'][i]['id'] + "' selected='true'>" + data['sel_indus'][i]['name'] + "</option>";
+                            } else {
+                                industry += "<option value='"+ data['sel_indus'][i]['id'] + "' >" + data['sel_indus'][i]['name'] + "</option>";
+                            }
+                        } 
+                        industry += "</select>";
+                        return industry;
+                    }
+                },
+                {
+                    "targets" : 6,
+                    "data" : "city",
+                    "render" : function (data, type, row) {
+
+                        var city = "<input class='form-control' style='width:100%;' type='text' name='city' value='" + data + "'>";
+                        return city;
+                    }
+                },
+                {
+                    "targets" : 7,
+                     "data" : "address",
+                    'render' : function (data, type ,row) {
+                        var address = "<input class='form-control' type='text' name='address' value='" + data + "'>";
+                        return address;
+                    }
+                }
+            ],
+            "language"     : { // 定义语言
+                "sProcessing"     : "加载中...",
+                "sLengthMenu"     : "每页显示 _MENU_ 条记录",
+                "sZeroRecords"    : "没有匹配的结果",
+                "sInfo"           : "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty"      : "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered"   : "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix"    : "",
+                "sSearch"         : "搜索:",
+                "sUrl"            : "",
+                "sEmptyTable"     : "表中数据为空",
+                "sLoadingRecords" : "载入中...",
+                "sInfoThousands"  : ",",
+                "oPaginate"       : {
+                    "sFirst"    : "首页",
+                    "sPrevious" : "上一页",
+                    "sNext"     : "下一页",
+                    "sLast"     : "末页"
+                },
+                "oAria"           : {
+                    "sSortAscending"  : ": 以升序排列此列",
+                    "sSortDescending" : ": 以降序排列此列"
+                }
+            }
+        });//table end
+
+        var innerHtml = '<div class="col-sm-6">' +
+                            '<select class="form-control" name="check_info" id="check_info" style="float:left; width:30%">' +
+                                '<option value="" selected>所有</option>' +
+                                '<option value="2">名称不合法</option>' +
+                                '<option value="1">小于4个字</option>' +
+                                '<option value="4">疑似重名</option>' +
+                                '<option value="3">合格</option>' +
+                                '<option value="5">重名</option>' +
+                            '</select>&emsp;' +
+                            '<input type="button" class="btn btn-warning" value="删除" id="tempCusDelBtn">&emsp;' +
+                            '<input type="button" class="btn btn-primary" value="保存" id="tempCusSaveBtn">&emsp;' +
+                            '<input type="button" class="btn btn-success" value="提交至客户池" id="cusSubmitBtn">' +
+                        '</div>';
+        $("div.toolbar").html(innerHtml);
+        var Id = $("#importId").val();
+        /**
+         * 点击高亮选中行，
+         * @param  {[type]} ) {                       alert(1);        } [description]
+         * @return {[type]}   [description]
+         */
+        $(".dataTables-TempCus tbody").on('click', 'tr', function () {
+            var oTables = $('.dataTables-TempCus').DataTable();
+            if ( $(this).hasClass('selected') ) {
+                $(this).removeClass('selected');
+            } else {
+                // oTables.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        /**[getIdSelect 获取选中行的id数组]
+         * [getIdSelect 获取选中行的id数组]
+         * @return {[array]} [选中行的id]
+         */
+        function getIdSelect()
+        {
+            var idArray = [];
+            $('.dataTables-TempCus tbody tr').each(function () {
+                if ($(this).hasClass('selected')) {
+                    idArray.push($(this).attr('id'));
+                }
+            });
+            return idArray;
+        }
+        /**
+         * [delAction 执行删除操作]
+         * @return {[mixed]} [返回提示信息]
+         */
+        function buttonAction(action, Flag, Id, idString, msg)
+        {
+            $.ajax({
+                type : 'POST',
+                url  : '__CONTROLLER__/' + action,
+                data : {
+                    Flag     : Flag,
+                    Id       : Id,
+                    idString : idString
+                },
+                success : function (msg) {
+                    switch(msg) {
+                        case 1 : 
+                            layer.msg( msg + "失败，请联系开发人员",
+                                    {
+                                        icon : 5,
+                                        time : 500
+                                    },
+                                    function () {
+                                        $("#saveTable").attr('disabled', false);
+                                    }
+                                );
+                            break;
+                        case 2 : 
+                            layer.msg("已" + msg + "本次选中的信息",
+                                    {
+                                        icon : 5,
+                                        time : 500
+                                    },
+                                    function () {
+                                        window.location.reload();
+                                    }
+                                );
+                            break;
+                        default : 
+                            layer.msg("结果未知，请联系开发人员",
+                                    {
+                                        icon : 5,
+                                        time : 500
+                                    },
+                                    function () {
+                                        $("#saveTable").attr('disabled', false);
+                                    }
+                                );
+                            break;
+                    }
+                }
+            }); 
+        }
+        /**[点击删除按钮]
+         * [点击删除按钮，删除选中的数据，未选中时删除所有不合格数据]
+         *   
+         * 
+         */
+        $("#tempCusDelBtn").on('click', function () {
+            var delId = $("#importId").val();
+            if($(".dataTables-TempCus tbody tr").hasClass('selected')) {
+                var idArray = [];
+                idArray = getIdSelect();
+                var idString = idArray.join(",");
+                layer.confirm('将删除选中的' + idArray.length + '条数据',
+                    {
+                        icon : 3,
+                        title : 'alert',
+                        btn : ['确定', '取消']
+                    },
+                    function () {
+                        buttonAction('delTempCus', 1, delId, idString, '删除');
+                    }
+                );
+            } else {
+                // 未选中，删所有不合格数据
+                var idString = "";
+                layer.confirm('未选择要删除的信息，将删除所有不合格数据',
+                    {
+                        icon  : 3,
+                        title :'alert',
+                        btn   : ['确定', '不删除']
+                    },
+                    function(){
+                        buttonAction('delTempCus', 2, delId, idString, '删除');
+                    },
+                    function () {
+                        $("#saveTable").attr('disabled', false);
+                    }
+                    );
+            }
+        });
+
+        /**[点击保存按钮]
+         * [点击保存按钮]
+         * @todo 后续需要开发此功能
+         */
+        $("#tempCusSaveBtn").on('click', function () {
+            var saveId = $("#importId").val();
+            if($(".dataTables-TempCus tbody tr").hasClass('selected')) {
+                var idArray  = idArray = getIdSelect();
+                var idString = idArray.join(",");
+                layer.alert("还未开发保存功能，敬请期待");
+/*                layer.confirm('将保存选中的' + idArray.length + '条数据',
+                    {
+                        icon : 3,
+                        title : 'alert',
+                        btn : ['确定', '取消']
+                    },
+                    function () {
+                    }
+                );*/
+            } else {
+                // 未选中，删所有不合格数据
+                var idString = "";
+                layer.confirm('未选择需要保存的信息，暂时未设置批量保存',
+                    {
+                        icon  : 3,
+                        title :'alert',
+                        btn   : ['知道了', '取消']
+                    },
+                    function(){
+                    },
+                    function () {
+                        $("#saveTable").attr('disabled', false);
+                    }
+                );
+            }
+        });
+
+        /**[将数据提交至客户池]
+         * 分选中和不选 ： 不选中将判定为合格的导入至客户池，选中择将对应的导入。
+         */
+        $("#cusSubmitBtn").on('click', function () {
+            if ($(".dataTables-TempCus tbody tr").hasClass('selected')) {
+                var idArray = [];
+                idArray = getIdSelect();
+                var idString = idArray.join(",");
+                layer.confirm('将导入选中的' + idArray.length + '条数据到客户池',
+                    {
+                        icon : 3,
+                        title : 'alert',
+                        btn : ['确定', '取消']
+                    },
+                    function () {
+                        buttonAction('submitTempCus', 1, Id, idString, '导入');
+                    }
+                );
+            } else {
+                var idString = "";
+                layer.confirm('未选择需提交的客户，批量导入客户池',
+                    {
+                        icon  : 3,
+                        title : 'alert',
+                        btn   : ['OK', '取消']
+                    },
+                    function () {
+                        buttonAction('submitTempCus', 2, Id, idString, '导入');
+                    }
+                );
+            }
+        });
+    }); //inintTable END
+</script>
+</body>
+</html>

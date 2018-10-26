@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户放弃申请</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <script src="__PUBLIC__/Admin/js/jsAddresss.js"></script>
+    <style type="text/css">
+        body {
+            color: black;}
+        .importTip{
+            color : red;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="iform">
+                <div class="col-sm-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-content">
+			                <h3 style="text-align: center;">客户放弃申请</h3>
+                                <div>
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                        <tr>
+                                            <td>客户名：{$data.cusName}</td>
+                                            <td>是否有关联公司：{$data.hasPid}</td>
+                                            <td>
+                                                <select name="auth" id="authData"  data-placeholder="..." class="form-control" tabindex="2">
+                                                    <option value="">请选择审核人</option>
+                                                    <volist name="authData" id="vol">
+                                                        <option name="{$vol.name}" value="{$vol.id}" hassubinfo="true">{$vol.name}</option>
+                                                    </volist>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                    <input class="btn btn-success" type="button" id="btnSubmit" value="提交">
+                            </div>
+                        </div>
+                    </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/area.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+
+
+<script type="text/javascript">
+    var cusData = {$data|json_encode};
+    var controller = "__CONTROLLER__";
+    $(function(){
+        $('#btnSubmit').on('click',function(){
+            $("#btnSubmit").attr('disabled', true);
+            if ($("#authData").val() == "") { layer.msg('请选择审核人！', {icon: 5});$("#btnSubmit").attr('disabled', false);return false;}
+             $.ajax({
+                 type : 'POST',
+                 url  : controller + "/removeCustomer",
+                 data : {
+                     cusId : cusData.cusId,
+                     authId : $("#authData").val()
+                 },
+                 success : function(data) {
+                     switch (data['status']) {
+                         case 1 :
+                             layer.msg('操作成功,审核人受理后生效',
+                                 {
+                                     icon: 6,
+                                     time : 500
+                                 },
+                                 function () {
+                                     $("#removeSel").attr('disabled',false);
+                                     var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                     parent.layer.close(index);  // 关闭layer
+                                 });
+                             break;
+                         case 2 :
+                             layer.msg('好像出错了',
+                                 {
+                                     icon : 5,
+                                     time : 500
+                                 },
+                                 function () {
+                                     $("#removeSel").attr('disabled', false);
+                                 });
+                             break;
+                         case 3 :
+                             layer.msg('仅本人可放弃',
+                                 {
+                                     icon : 5,
+                                     time : 500
+                                 },
+                                 function () {
+                                     $("#removeSel").attr('disabled', false);
+                                     var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                     parent.layer.close(index);  // 关闭layer
+                                 });
+                             break;
+                         case 4 :
+                             layer.confirm('该客户为' + data['name'] + '的子公司,如果放弃，该客户的上级公司及对应子公司将被放弃',
+                                 {
+                                     btn : ['确定放弃', '返回']
+                                 },
+                                 function () {
+                                     $.ajax({
+                                         type : 'POST',
+                                         url  : controller + "/removeCustomer",
+                                         data : {
+                                             cusId : cusData.cusId,
+                                             authId : $("#authData").val(),
+                                             flag : 4
+
+                                         },
+                                         success : function (data) {
+                                             if (data['status'] == 1) {
+                                                 layer.msg('操作成功，审核人受理后完毕',
+                                                     {
+                                                         icon : 5,
+                                                         time : 500
+                                                     },function () {
+                                                         $("#removeSel").attr('disabled',false);
+                                                         var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                                         parent.layer.close(index);  // 关闭layer
+                                                     }
+                                                 );
+                                             } else {
+                                                 layer.msg("操作失败" + data['msg'],
+                                                     {
+                                                         icon : 6,
+                                                         time : 500
+                                                     }, function () {
+                                                         $("#removeSel").attr('disabled', false);
+                                                     });
+                                             }
+                                         }
+                                     });
+                                 });
+                             break;
+                         case 5 :
+                             layer.confirm('该客户存在子公司,如果放弃，该客户的下属公司将被一同放弃',
+                                 {
+                                     btn : ['确定放弃', '返回']
+                                 },
+                                 function () {
+                                     $.ajax({
+                                         type : 'POST',
+                                         url  : controller + "/removeCustomer",
+                                         data : {
+                                             authId : $("#authData").val(),
+                                             cusId : cusData.cusId,
+                                             flag : 5
+                                         },
+                                         success : function (data) {
+                                             if (data['status'] == 1) {
+                                                 layer.msg('操作成功，审核人受理后完毕',
+                                                     {
+                                                         icon : 5,
+                                                         time : 500
+                                                     },function () {
+                                                         $("#removeSel").attr('disabled',false);
+                                                         var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                                         parent.layer.close(index);  // 关闭layer
+                                                     }
+                                                 );
+                                             } else {
+                                                 layer.msg("操作失败 " + data['msg'],
+                                                     {
+                                                         icon : 6,
+                                                         time : 500
+                                                     }, function () {
+                                                         $("#removeSel").attr('disabled', false);
+                                                     });
+                                             }
+                                         }
+                                     });
+                                 });
+                             break;
+                         default :
+                             layer.msg(data.msg, function () {
+                                 $("#removeSel").attr('disabled',false);
+                                 var index = parent.layer.getFrameIndex(window.name); //获取窗口索引
+                                 parent.layer.close(index);  // 关闭layer
+                             })
+                             break;
+
+                     }
+                 }
+             });
+        });
+
+    });
+
+    $(".select-title").on("click",function(){
+        $(".select-list").toggle();
+        return false;
+    });
+    $(".select-list").on("click","li",function(){
+        var txt = $(this).text();
+        $(".select-title").find("span").text(txt);
+    });
+</script>
+</html>

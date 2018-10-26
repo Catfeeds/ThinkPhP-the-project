@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CRM--联系记录详情</title>
+
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color : black;
+        }
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="onlineservice">
+                <div class="ibox-title">
+                    <div><h5>客服联系记录</h5></div>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <h4>客户信息：{$cusName.cname}</h4>
+                        <table class="table table-striped table-bordered table-hover dataTables-example">
+                            <thead>
+                            <tr>
+                                <th>通话时间</th>
+                                <th>通话内容</th>
+                                <th>处理方式</th>
+                                <th>来电人</th>
+                                <th>客服姓名</th>
+                                <th>审核状态</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="data" id="vol">
+                                <tr style="text-align: center;">
+                                    <td>{$vol.addtime|date='Y-m-d H:i',###}</td>
+                                    <td>{$vol.content}</td>
+                                    <td>{$vol.answercontent}</td>
+                                    <td>{$vol.caller}</td>
+                                    <td>{$vol.pname}</td>
+                                    <td>
+                                        <switch name="vol.austatus">
+                                            <case value="1"><span class="noCheckYet">未审核</span></case>
+                                            <case value="2"><span class="checkYes">有效</span></case>
+                                            <case value="3"><span class="checkNot">无效</span></case>
+                                        </switch>
+                                    </td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>电话客服记录添加</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <!--<h4>绩效总金额：&emsp;<input type="text" /></h4>-->
+                        <form method="post" enctype="multipart/form-data" id="onlineSContent">
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>通话内容</th>
+                                    <th>处理方式</th>
+                                    <th>来电人</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td>
+                                        <textarea style="width: 100%;" name="content" id="content"></textarea>
+                                    </td>
+                                    <td>
+                                        <textarea style="width: 100%;" name="answercontent" id="answercontent"></textarea>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="customer_id" value="{$cid}">
+                                        <input type="text" name="caller" id="callerName">
+                                    </td>
+                                    <td><input class="btn btn-outline btn-success" id="submitRecord" type="button" value="提交"/></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script>
+$(document).ready(function()
+{
+    $(".dataTables-example").dataTable({
+        'bFilter' : true,
+        'bLengthChange' : false,
+        'iDisplayLength' :　3
+    });
+
+});
+$(".noCheckYet").css('color','black');
+$(".checkNot").css('color','red');
+$(".checkYes").css('color','blue');
+
+$("#submitRecord").on("click", function () {
+    $("#submitRecord").attr('disabled', "disabled");
+    var onlineQuestion = $("#content").val();
+    var onlineSolve  = $('#answercontent').val();
+    var callerName  = $('#callerName').val();
+
+    if (onlineQuestion == '' || onlineSolve == '' || callerName == '') {
+        layer.alert("请检查要添加的内容");
+        $("#submitRecord").attr('disabled', false);
+        return false;
+    }
+    $.ajax({
+        type : 'POST',
+        url : "__CONTROLLER__/addServiceOk",
+        data : $("#onlineSContent").serializeArray(),
+        success : function (msg) {
+            if (msg != 2) {
+                layer.alert('添加失败！');
+                $("#submitRecord").attr('disabled', false);
+            } else {
+                layer.msg("添加成功",
+                    {
+                        icon : 6,
+                        time : 500
+                    },
+                    function () {
+                    window.location.reload();
+                    $("#submitRecord").attr('disabled', "disabled");
+                });
+            }
+        }
+    });
+});
+
+</script>
+</body>
+</html>

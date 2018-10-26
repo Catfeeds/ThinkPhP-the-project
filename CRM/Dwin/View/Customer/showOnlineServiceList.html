@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--联系记录详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        td{  cursor:pointer;  }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="onlineservice">
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-onlineSale">
+                            <thead>
+                                <tr><td colspan="7"><h4>{$data[0]['cname']}客服联系记录</h4></td></tr>
+                                <tr>
+                                    <th>通话时间</th>
+                                    <th>通话内容</th>
+                                    <th>处理方式</th>
+                                    <th>来电人</th>
+                                    <th>客服姓名</th>
+                                    <th>审核状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="data" id="vol">
+                                <tr style="text-align: center;">
+                                    <td>{$vol.addtime|date='Y-m-d H:i:s',###}</td>
+                                    <td class="descrip mouseOn" data="{$vol.content}">{$vol.content|subtext=10}</td>
+                                    <td class="solvePro mouseOn" data="{$vol.answercontent}">{$vol.answercontent|subtext=10}</td>
+                                    <td>{$vol.caller}</td>
+                                    <td>{$vol.pname}</td>
+                                    <td>
+                                        <switch name="vol.austatus">
+                                            <case value="1"><span class="noCheckYet">未审核</span></case>
+                                            <case value="2"><span class="checkYes">有效</span></case>
+                                            <case value="3"><span class="checkNot">无效</span></case>
+                                        </switch>
+                                    </td>
+                                    <td><input type="checkbox" name="onlineCheckBox" class="checkValue" dat="{$vol.id}"  data="{$vol.rpbid}" value="{$vol.customer_id}" autocomplete="off"></td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="roleOnline" value="{$Think.session.staffId}">
+                        <input class="btn btn-outline btn-success" type="button" id="chOnline" value="选中项审核" onclick="jqchk('onlineCheckBox');" style="width: 10%; text-align: center;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    $(document).ready(function () {
+        dataTabelset('onlineSale', 5);
+    });
+    var controller = "__CONTROLLER__";
+</script>
+<script src="__PUBLIC__/html/js/dwin/customer/online_service.js"></script>
+</body>
+</html>

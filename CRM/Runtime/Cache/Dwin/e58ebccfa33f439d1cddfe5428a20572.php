@@ -1,0 +1,598 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>未排产生产单</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css" rel="stylesheet">
+    <!--<link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <!--<link href="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/css/jquery.dataTables.min.css" rel="stylesheet">-->
+    <link href="/Public/html/css/font-awesome.min93e3.css" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+
+    <link href="/Public/html/css/style.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+            font-size: 12px;
+        }
+        .selected{
+            background-color: #fbec88 !important;
+        }
+        .nav-tabs>li>a{
+            color: #555;
+        }
+        .nav-tabs>.active>a{
+            color: #000!important;
+        }
+        tr{
+            white-space: nowrap!important;
+        }
+        td{
+            padding-top: 2px!important;
+            padding-bottom: 2px!important;
+        }
+        [v-cloak] {
+            display: none;
+        }
+        .el-table{
+            font-size: 12px !important;
+            color:black!important;
+        }
+        .el-table td, .el-table th{
+            padding-top: 1px!important;
+            padding-bottom: 1px!important;
+        }
+        .el-input__inner{
+            height: 30px!important;
+        }
+        .nav-tabs>.active>a {
+            background-color: #1c84c6 !important;
+            color: #fff !important;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="productionDiv">
+                <div class="ibox-title">
+                    <h3>未排产生产单</h3>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-inline">
+                        <button type="button" class="btn btn-info btn-sm refresh">刷新</button>
+                        <button type="button" class="btn btn-info btn-sm btn-push" data-id="1">直接下推</button>
+                        <label for="production_line">产线筛选</label>
+                        <select name="" id="production_line" class="form-control change-data">
+                            <option value="">所有</option>
+                            <?php if(is_array($line)): $i = 0; $__LIST__ = $line;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vol): $mod = ($i % 2 );++$i;?><option value="<?php echo ($vol["production_line"]); ?>"><?php echo ($vol["production_line"]); ?></option><?php endforeach; endif; else: echo "" ;endif; ?>
+                        </select>
+                    </form>
+
+                    <div class="table-responsive1">
+                        <table class="table table-striped table-bordered table-hover table-full-width dataTables-productionList" id="productionPlan">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive1 v-cloak" id="detailsModel">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#material" aria-controls="material" role="tab" data-toggle="tab">齐料登记</a></li>
+                            <li role="presentation"><a href="#order" aria-controls="material" role="tab" data-toggle="tab">下推情况</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="material">
+                                <table class="table table-striped table-bordered table-hover table-full-width dataTables-productionList">
+                                    <thead>
+                                    <tr>
+                                        <th>生产单号</th>
+                                        <th>产品名</th>
+                                        <th>数量</th>
+                                        <th>备注</th>
+                                        <th>库房</th>
+                                        <th>添加人</th>
+                                        <th>更新时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="v in materialTableData">
+                                        <td>{{v.production_order}}</td>
+                                        <td>{{v.product_name}}</td>
+                                        <td>{{v.num}}</td>
+                                        <td>{{v.tips}}</td>
+                                        <td>{{v.warehouse_name}}</td>
+                                        <td>{{v.manager_name}}</td>
+                                        <td>{{v.create_time}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="order">
+                                <table class="table table-striped table-bordered table-hover table-full-width dataTables-productionList">
+                                    <thead>
+                                    <tr>
+                                        <th>生产计划</th>
+                                        <th>计划时间</th>
+                                        <th>计划完工</th>
+                                        <th>计划数量</th>
+                                        <th>计划状态</th>
+                                        <th>添加人</th>
+                                        <th>添加时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="v in orderTableData">
+                                        <td>{{v.production_code}}</td>
+                                        <td>{{v.plan_start_t}}</td>
+                                        <td>{{v.plan_end_t}}</td>
+                                        <td>{{v.plan_number}}</td>
+                                        <td>{{v.warehouse_name}}</td>
+                                        <td>{{v.create_name}}</td>
+                                        <td>{{v.create_time}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+            <div class="ibox float-e-margins v-cloak" id="orders">
+                <el-dialog title="下推生产计划" :visible.sync="dialogTableVisible" width="100%" closed="closeDialog()">
+                    <el-table :data="orderData" :border="true" size="mini">
+                        <el-table-column property="product_no" label="物料编号" min-width="80"></el-table-column>
+                        <el-table-column property="product_name" label="物料名称" min-width="175"></el-table-column>
+                        <el-table-column property="bom_id" label="BOM" min-width="150">
+                            <template slot-scope="scope">
+                                <el-select  v-model="scope.row.bom_id" value-key="id" filterable placeholder="请选择使用的bom">
+                                    <el-option
+                                            v-for="item in scope.row.bom"
+                                            :key="item.id"
+                                            :label="item.bom_id"
+                                            :value="item.id"
+                                    >
+                                    </el-option>
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="数量" min-width="120">
+                            <template slot-scope="scope">
+                                <el-input type="number" v-model="scope.row.plan_number"  @keyup.native="productionNumChange(scope.row,scope.$index)" placeholder="请输入计划数量" ></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column property="production_line_name" label="产线" min-width="70"></el-table-column>
+                        <el-table-column property="plan_pid_string" label="源单" min-width="100"></el-table-column>
+                        <el-table-column label="计划起止日期" min-width="370">
+                            <template slot-scope="scope">
+                                <div class="block">
+                                    <el-date-picker
+                                            v-model="scope.row.timeRangeSetting"
+                                            type="daterange"
+                                            align="right"
+                                            unlink-panels
+                                            range-separator="至"
+                                            start-placeholder="开始生产日期"
+                                            end-placeholder="计划完成日期"
+                                            @change="timeRangeChange(scope.row,scope.$index)">
+                                    </el-date-picker>
+                                </div>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="备注" min-width="120">
+                            <template slot-scope="scope">
+                                <el-input type="textarea" :rows="1" v-model="scope.row.tips" placeholder="请输入备注" ></el-input>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" min-width="80">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" type="danger" @click="delAction(scope.row, scope.$index)">删除</el-button>
+                                </template>
+                        </el-table-column>
+                    </el-table>
+                    <br>
+                    <el-button type="success"  round @click="submitOrder()">生成生产计划</el-button>
+                </el-dialog>
+            </div>
+</div>
+<script src="/Public/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/jquery.form.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<!--<script src="/Public/html/js/plugins/dataTables/jquery.dataTables.js"></script>-->
+<!--<script src="/Public/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/js/jquery.dataTables.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.15/js/dataTables.bootstrap.min.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script src="/Public/html/js/dwin/finance/common_finance.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script>
+    var oTable;
+    var controller = "/Dwin/Production";
+    var tableDiv = $("#productionPlan");
+    var selectedID,selectedOrder;
+
+    $(document).ready(function() {
+        tableDiv.on('mouseenter','tbody td', function () {
+            var tdIndex = $(this).parent()['context']['cellIndex'];
+            if (tdIndex === 9) {
+                var dataTips = $(this).find('span').attr('data');
+                var num = $(this).parent();
+                if (dataTips) {
+                    layer.tips(
+                        dataTips, num, {
+                            tips: [1, '#3595CC'],
+                            area: '900px',
+                            time: 100000
+                        });
+                }
+            } else {
+                return false;
+            }
+        });
+        tableDiv.delegate('tbody td', 'mouseleave',function(e) {
+            layer.closeAll('tips');
+        });
+
+        oTable = tableDiv.DataTable({
+            "scrollY": 400,
+             "scrollX": true,
+            "scrollCollapse": true,
+            "destroy"      : true,
+            "paging"       : true,
+            "autoWidth"	   : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 25, 50, 100],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true, //开启服务器获取数据
+            "ajax"         :{ // 获取数据
+                "url"   : controller + "/productionIndex",
+                "type"  : 'post',
+                "data"  : {
+                    "production_line" : function () {
+                        return document.getElementById('production_line').value;
+                    }
+                }
+            },
+            "order": [[ 7, "desc" ]],
+            "columns": [
+                {data:'product_name'    , title:'型号'},
+                {data:'production_plan_number', title:'下单数量'},
+                {data:'actual_number', title:'已处理数量'},
+                {data:'create_time', title:'下单日期'},
+                {data:'delivery_time', title:'交期要求'},
+                {data:'production_line_name', title:'生产线'},
+                {data:'production_order', title:'生产单号'},
+                {data:'staff_name'      , title:'下单人'},
+                {data:'stock_cate_name' , title:'备货'},
+                {data:'tips' , title:'下单备注'}
+            ],
+            "columnDefs": [ //自定义列
+                {
+                    "targets": 9,
+                    "data": 'tips',
+                    "render": function (data, type, row) {
+                        if (row.tips.length > 14) {
+                            var html = "<span data='" + row.tips + "'>" + row.tips.substring(0,14) + "...</span>";
+                        } else {
+                            var html = "<span>" + row.tips + "</span>";
+                        }
+                        return html;
+                    }
+                }
+            ],
+            "oLanguage": {
+                "sProcessing":   "处理中...",
+                "sLengthMenu":   "显示 _MENU_ 项结果",
+                "sZeroRecords":  "没有匹配结果",
+                "sInfo":         "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty":    "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix":  "",
+                "sSearch":       "搜索:",
+                "sUrl":          "",
+                "sEmptyTable":     "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands":  ",",
+                "oPaginate": {
+                    "sFirst":    "首页",
+                    "sPrevious": "上页",
+                    "sNext":     "下页",
+                    "sLast":     "末页"
+                },
+                "oAria": {
+                    "sSortAscending":  ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            }
+        });
+    });
+    $(".change-data").on('change', function () {
+        oTable.ajax.reload();
+    });
+    $('.refresh').on('click', function () {
+        oTable.ajax.reload();
+    });
+
+    var vm = new Vue({
+        el: '#detailsModel',
+        data: function () {
+            return {
+                auditorTableData:[],
+                materialTableData:[],
+                orderTableData:[],
+            }
+        },
+        filters: {
+            auditType: function (data) {
+                var arr = ['单据审核', '产线确认'];
+                return arr[data-2]
+            },
+            auditResult: function (data) {
+                var arr = ['通过', '不通过'];
+                return arr[data-1]
+            }
+        }
+    });
+
+    var planTBody = $("#productionPlan tbody");
+    planTBody.on("click", "tr", function () {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+        } else {
+            $(this).addClass('selected');
+        }
+        selectedID = oTable.row(this).data().id;
+        selectedOrder = oTable.row(this).data().production_order;
+        $.post('getPrepareRecordAjax', {'production_order': selectedOrder}, function (res) {
+            vm.materialTableData = res;
+        });
+        $.post('getRelationOrderAjax', {'planId': selectedID}, function (res) {
+            vm.orderTableData = res;
+        });
+    });
+
+    var preOrderVm = new Vue({
+        el : '#orders',
+        data : function () {
+            return {
+                preOrderData : [],
+                orderData : [],
+                updData : [],
+                dialogTableVisible :false
+            }
+        },
+        computed : {
+
+        },
+        methods: {
+            timeRangeChange : function (v,k) {
+                this.orderData[k].plan_start_time = this.orderData[k].timeRangeSetting && this.orderData[k].timeRangeSetting[0].valueOf()
+                this.orderData[k].plan_end_time   = this.orderData[k].timeRangeSetting && this.orderData[k].timeRangeSetting[1].valueOf()
+            },
+            productionNumChange :function (v,k) {
+                if (parseInt(v.max_plan_number) < parseInt(v.plan_number)) {
+                    v.plan_number = v.max_plan_number;
+                }
+                if (!v.plan_number) {
+                    v.plan_number = 0;
+                }
+                var tmpPlanNumber = parseInt(v.plan_number);
+                var tmpInArrayData = [];
+                var tmpPlanIdArr = v.plan_pid.split(",");
+
+                for (var m = 0; m < this.updData.length; m++) {
+                    if ($.inArray(this.updData[m].id, tmpPlanIdArr) !== -1) {
+                        tmpInArrayData.push(m);
+                    }
+                }
+
+                for (var n = 0; n < tmpInArrayData.length; n++) {
+                    if (this.updData[tmpInArrayData[n]].plan_num >= tmpPlanNumber) {
+                        this.updData[tmpInArrayData[n]].num = tmpPlanNumber;
+                    } else {
+                        layer.msg('您不能对合并的单据再拆分数量，请重新选择后下推数据');
+                        return false;
+                    }
+                }
+            },
+            delAction: function (val,key) {
+                this.orderData.splice(key, 1);
+            },
+            closeDialog:function () {
+                preOrderVm.orderData = [];
+                preOrderVm.preOrderData = [];
+                preOrderVm.updData = [];
+                oTable.ajax.reload(null, false);
+            },
+            beforeSubmit: function () {
+                if (!this.orderData.length) {
+                    layer.msg('没有下推数据');
+                    return false;
+                }
+                for (var i = 0; i < this.orderData.length; i++) {
+                    if (parseInt(this.orderData[i]['plan_number']) <= 0) {
+                        layer.msg("禁止提交小于0的生产计划数据");
+                        return false;
+                    }
+                    if (!this.orderData[i].plan_start_time || !this.orderData[i].plan_end_time) {
+                        layer.msg("起止时间录入有误");
+                        return false;
+                    }
+                    if (this.orderData[i].plan_start_time >= this.orderData[i].plan_end_time) {
+                        layer.msg("起止时间录入有误，开始时间不能大于等于结束时间");
+                        return false;
+                    }
+                    if (!this.orderData[i].bom_id) {
+                        layer.msg("没有为生产的型号匹配物料BOM，不能下推，如果没有bom,请联系质控处理");
+                        return false;
+                    }
+                    layer.msg(parseInt(this.orderData[i]['plan_number']));
+                }
+                return true;
+            },
+            submitOrder : function () {
+                var flag = this.beforeSubmit();
+                if (flag) {
+                    if (!this.orderData.length) {
+                        layer.msg('没有要提交的数据');
+                        preOrderVm.dialogFormVisible = false;
+                        return false;
+                    }
+                    layer.confirm('确认提交这些生产计划?', {icon: 3, title:'提示'}, function(index){
+
+                        $.post('/Dwin/Production/addProductionOrder', {
+                            data : preOrderVm.orderData,
+                            updData : preOrderVm.updData
+                        },function (res) {
+                            if (res.status == 200) {
+                                layer.msg('提交成功', function () {
+                                    preOrderVm.orderData = [];
+                                    preOrderVm.preOrderData = [];
+                                    preOrderVm.updData = [];
+                                    oTable.ajax.reload(null, false);
+
+                                });
+                            } else {
+                                layer.msg(res.msg)
+                            }
+                        });
+                        layer.close(index);
+                    });
+                } else {
+                    return false;
+                }
+            }
+        }
+    });
+
+
+
+    // 当dataTables变动时取消选中
+    $('table').on('processing.dt', function () {
+        selectedID = undefined;
+        $('tr').removeClass('selected');
+        preOrderVm.orderData = [];
+        preOrderVm.preOrderData = [];
+        preOrderVm.updData = [];
+    });
+
+    var pushBtn = $('.btn-push');
+    pushBtn.on('click', function () {
+        preOrderVm.preOrderData = [];
+        preOrderVm.orderData    = [];
+        preOrderVm.updData      = [];
+        var typeId = $(this).attr('data-id');
+        planTBody.children('tr').each(function () {
+            if ($(this).hasClass('selected')) {
+                preOrderVm.preOrderData.push(oTable.row(this).data());
+            }
+        });
+        if(!preOrderVm.preOrderData.length) {
+            var returnSet = ['','直接下推','拆分下推','合并下推'];
+            var msg = returnSet[typeId];
+            layer.msg('未选中要' + msg + "的生产单");
+        } else {
+            var tmp = [],obj = {},objTmp ={},updTmp ={},upd = {};
+            for (var i = 0; i < preOrderVm.preOrderData.length; i++) {
+                updTmp = {};
+                upd    = {};
+                if (preOrderVm.orderData.length < i + 1) {
+                    tmp = [];
+                    obj = {};
+                    objTmp = {};
+
+                    // obj 要返回的生产计划的预备数据
+                    // preObj == preOrderVm.preOrderData[i] 选中的生产单对应的数据
+                    function getTempObj(obj, preObj) {
+                        obj.product_id = preObj.product_id;
+                        obj.product_no = preObj.product_no;
+                        obj.product_name    = preObj.product_name;
+                        obj.production_line = preObj.production_line;
+                        obj.production_line_name = preObj.production_line_name;
+                        obj.plan_number = 0;
+                        obj.bom = preObj.bom;
+                        obj.bom_id = "";
+                        obj.max_plan_number = 0;// 冗余 最大可输入数据
+                        obj.plan_pid    = "";
+                        obj.plan_pid_string = "";
+                        obj.plan_start_time = Date.parse(new Date("20" + preObj.create_time));
+                        obj.plan_end_time   = Date.parse(new Date("20" + preObj.delivery_time));
+                        obj.production_line_num = 0;
+                        obj.timeRangeSetting = [obj.plan_start_time, obj.plan_end_time];
+                        obj.tips = "";
+                        return obj;
+                    }
+
+
+                    if (preOrderVm.orderData.length === 0) {
+                        objTmp = getTempObj(obj, preOrderVm.preOrderData[i]);
+                        preOrderVm.orderData.push(objTmp);
+                    }
+                    for (var p = 0; p < preOrderVm.orderData.length; p++) {
+                        tmp.push(preOrderVm.orderData[p].product_id);
+                    }
+                    if ($.inArray(preOrderVm.preOrderData[i].product_id, tmp) === -1) {
+                        objTmp = getTempObj(obj, preOrderVm.preOrderData[i]);
+                        preOrderVm.orderData.push(objTmp);
+                    }
+                }
+
+                for (var j = 0; j < preOrderVm.orderData.length; j++) {
+                    if (preOrderVm.orderData[j].product_id === preOrderVm.preOrderData[i].product_id) {
+                        preOrderVm.orderData[j].plan_number     += parseInt(preOrderVm.preOrderData[i].rest_num);
+                        preOrderVm.orderData[j].max_plan_number += parseInt(preOrderVm.preOrderData[i].rest_num);
+                        preOrderVm.orderData[j].plan_pid =
+                            preOrderVm.orderData[j].plan_pid === ""
+                                ? (preOrderVm.orderData[j].plan_pid + preOrderVm.preOrderData[i].id)
+                                : (preOrderVm.orderData[j].plan_pid + ',' + preOrderVm.preOrderData[i].id);
+                        preOrderVm.orderData[j].plan_pid_string =
+                            preOrderVm.orderData[j].plan_pid_string === ""
+                                ? (preOrderVm.orderData[j].plan_pid_string + preOrderVm.preOrderData[i].production_order)
+                                : (preOrderVm.orderData[j].plan_pid_string + ',' + preOrderVm.preOrderData[i].production_order);
+
+                        if (preOrderVm.orderData[j].plan_end_time < Date.parse(new Date("20" + preOrderVm.preOrderData[i].delivery_time))) {
+                            preOrderVm.orderData[j].plan_end_time = Date.parse(new Date("20" + preOrderVm.preOrderData[i].delivery_time));
+                        }
+
+                        if (preOrderVm.orderData[j].production_line !== preOrderVm.preOrderData[j].production_line) {
+                            preOrderVm.orderData[j].production_line_num ++;
+                            if (preOrderVm.orderData[j].production_line_num > 0) {
+                                layer.msg(preOrderVm.orderData[j].plan_pid_string + "产线不同，不能合单！");
+                                preOrderVm.orderData = [];
+                                preOrderVm.preOrderData = [];
+                                preOrderVm.updData = [];
+                                return false;
+                            }
+                        }
+                        break;
+                    }
+                }
+                function getUpdObj(updObj, preObj) {
+                    updObj.id  = preObj.id;
+                    updObj.plan_num = preObj.rest_num;
+                    updObj.num = updObj.plan_num;
+                    return updObj;
+                }
+                upd = getUpdObj(updTmp, preOrderVm.preOrderData[i]);
+                preOrderVm.updData.push(upd);
+
+            }
+            preOrderVm.dialogTableVisible = true;
+        }
+    });
+</script>
+</body>
+</html>

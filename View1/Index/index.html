@@ -1,0 +1,496 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <link rel="Bookmark" href="/Public/favicon.ico">
+    <link rel="Shortcut Icon" href="/Public/favicon.ico"/>
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="/Public/hui/lib/html5shiv.js"></script>
+    <script type="text/javascript" src="/Public/hui/lib/respond.min.js"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="/Public/hui/static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/Public/hui/static/h-ui.admin/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="/Public/hui/lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="/Public/hui/static/h-ui.admin/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="/Public/hui/static/h-ui.admin/css/style.css"/>
+    <link rel="stylesheet" href="__PUBLIC__/html/css/dwin/index/base.css" />
+    <link rel="stylesheet" href="__PUBLIC__/html/css/dwin/index/index.css" />
+    <!--[if IE 6]>
+    <script type="text/javascript" src="/Public/hui/lib/DD_belatedPNG_0.0.8a-min.js"></script>
+    <script>DD_belatedPNG.fix('*');</script>
+    <![endif]-->
+    <title>DWIN_ERP</title>
+    <style>
+        .logo img {
+            vertical-align: top;
+            height: 100%;
+        }
+        .crm-name {
+            font-style: italic;
+            color: #b4d9ff;
+            font-family :"DejaVu Sans Mono";
+            font-weight: 600;
+            font-size: large;
+            /*padding-top:10px;*/
+            display: flex;
+            align-items: center;
+        }
+        .msg-txt{
+            color:white;
+            font-weight: 400;
+        }
+        .msg-txt a:hover {
+            color:red!important;
+        }
+        .navheader {
+            display: flex;
+            justify-content: space-between;
+        }
+        .msg-txt {
+            margin-left: 100px;
+        }
+        .msg-txt:hover{
+            color: red;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<header class="navbar-wrapper">
+    <div class="navbar navbar-fixed-top" style="background: #2a83cf;">
+        <div class="container-fluid navheader">
+
+            <div class="crm-name">            <a class="logo navbar-logo f-l mr-10 hidden-xs" href="javascript:;">
+                <img src="/Public/Admin/images/dwinlogo.png" alt=""></a>
+                <a class="logo navbar-logo-m f-l mr-10 visible-xs" href="/"></a>
+                <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>迪文管理系统</div>
+            <nav id="" class="nav navbar-nav navbar-userbar hidden-xs">
+                <ul class="cl">
+                    <li>
+                        <div class="msg-num1"></div>
+                    </li>
+                    <li style="margin-left: 100px;">({$data.postname}-{$data.deptname})</li>
+                    <li class="dropDown dropDown_hover">
+                        <a href="#" class="dropDown_A">{$data.nickname} <i class="Hui-iconfont">&#xe6d5;</i></a>
+                        <ul class="dropDown-menu menu radius box-shadow">
+                            <li><a href="javascript: ;" class="edit" data-href="__CONTROLLER__/editPhone"  data-title="修改电话">修改电话</a></li>
+                            <li><a href="javascript: ;" class="edit" data-href="__CONTROLLER__/editPwd" data-title="修改密码">修改密码</a></li>
+                            <li><a href="#" class="exit">退出</a></li>
+                        </ul>
+                    </li>
+                    <!--<li id="Hui-msg"><a href="#" title="消息"><span class="badge badge-danger">!</span><i-->
+                            <!--class="Hui-iconfont" style="font-size:18px">&#xe68a;</i></a></li>-->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+<aside class="Hui-aside">
+    <div class="menu_dropdown bk_2">
+        <dl id="cus-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 销售客户关系管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Customer/showBusinessList"
+                           data-title="业务列表">业务列表</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Customer/showOrderList/k/1"
+                           id="orderSel" class="up-select myToggle"
+                           data-title="订单管理">订单管理 <i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></a>
+                        <ul style="display: none">
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/Customer/showOrderList/k/1"
+                                   data-title="个人订单">个人订单</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/Customer/addOrderTest"
+                                   data-title="订单提交">订单提交</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/Customer/showOrderList/k/2"
+                                   data-title="下属订单">下属订单</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/Customer/showPerformanceResult"
+                                   data-title="销售业绩">销售业绩</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Customer/getRecordMsg"
+                           data-title="联系记录管理">联系记录管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Customer/assignCustomer" data-title="客户转移">客户转移</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/cus/common" data-title="公共客户池">公共客户池</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Customer/showCallbackResult" data-title="客户满意度">客户满意度</a>
+                    </li>
+                    <li class="CusAudit">
+                        <a href="javascript:;" data-href="__MODULE__/cus/audit" data-title="客户审核">客户审核</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <dl id="prj-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 研发项目管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Research/addPublicPrj" class="myToggle" data-title="立项管理">立项管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></a>
+                        <ul style="display:none">
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/Research/addPublicPrj" data-title="新项目公示">新项目公示</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/Research/addProject" data-title="新项目立项">新项目立项</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="javascript:;" class="up-select" data-href="__MODULE__/own/doing/1" data-title="项目管理">项目管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/public/all" data-title="项目公示">项目公示</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/public/app" data-title="项目申请">项目申请</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/prj/audit" data-title="项目审核">项目审核</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <dl id="fin-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 财务管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/showCustomer" data-title="客户查询">客户查询</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/showOrderList" data-title="订单列表">订单列表</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/showOrderAudit" data-title="审核管理">审核管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/checkedOrderManagement" data-title="结算管理">结算管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/showPerformanceResult" data-title="业绩统计">业绩统计</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/showProduct" data-title="产品数据管理">产品数据管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/productAudit" data-title="产品数据审核">产品数据审核</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/Finance/myProductAudit" data-title="我的产品数据审核">我的产品数据审核</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <dl id="mrp-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> MRP管理(TEST)<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+
+
+                        <a href="javascript:;" data-href="__MODULE__/Stock/index" class="myToggle" data-title="库存管理系统">产品库存管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></a>
+                        <ul style="display:none">
+                            <li><a data-href="/dwin/stock/index" data-title="库存管理" href="javascript:;">库存查询</a></li>
+                            <li><a data-href="/dwin/stock/alarm" data-title="成品库存报警" href="javascript:;">库存报警</a></li>
+                            <li><a data-href="/dwin/stock/showPendingOrderList" data-title="出库管理" href="javascript:;">产品出库管理</a></li>
+                            <li><a data-href="/dwin/stock/showRecord" data-title="出入库记录" href="javascript:;">物料出入库记录</a></li>
+                            <li><a data-href="/dwin/stock/showStockOutAuditList" data-title="出入库审核" href="javascript:;">出库审核</a></li>
+                            <li><a data-href="/dwin/stock/auditList" data-title="出入库审核" href="javascript:;">入库审核</a></li>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a data-href="/dwin/" data-title="" href="javascript:;"></a>
+
+                        <a href="javascript:;" data-href="__MODULE__/Production/productionPlan" class="myToggle" data-title="生产任务管理">生产任务管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></a>
+                        <ul style="display:none">
+                            <li><a data-href="/dwin/Production/productionPlan" data-title="生产任务管理" href="javascript:;">生产任务管理</a></li>
+
+                            <li><a data-href="/dwin/production/showCompleteProductionPlan" data-title="完工生产任务单" href="javascript:;">完工生产任务单</a></li>
+
+                            <li><a data-href="/dwin/production/statistics" data-title="生产报表统计" href="javascript:;">生产报表统计</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a data-href="/dwin/stock/showWarehouse" data-title="仓库管理" href="javascript:;">仓库管理</a>
+
+                </ul>
+            </dd>
+        </dl>
+        <dl id="online-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 客户服务中心<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/OnlineService/showCustomer"
+                           data-title="客服记录添加">客服记录添加</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/OnlineService/showServiceList" data-title="客服记录">近期客服记录</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/OnlineService/showCallbackInfo" data-title="满意度调查">满意度调查</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/OnlineService/getCallbackCustomer"
+                           data-title="客户回访">客户回访</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/OnlineService/countServicePerformance"
+                           data-title="客服数据统计">客服数据统计</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <dl id="sale-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 售后管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a data-href="__MODULE__/Product/getProduct" data-title="产品管理" href="javascript:;">产品管理</a>
+                    </li>
+                    <li>
+                        <a data-href="__MODULE__/Product/getEditRequest" data-title="产品审核" href="javascript:;">产品审核</a>
+                    </li>
+                    <li>
+                        <a data-href="__MODULE__/Product/getMyEditRequest" data-title="我的产品申请" href="javascript:;">我的产品申请</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/SaleService/showCustomer" data-title="客户查询">客户查询</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" class="myToggle" data-href="__MODULE__/SaleService/showSaleRepairing" data-title="售后服务">售后服务<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></a>
+                        <ul style="display: none">
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/SaleService/showSaleRepairing"
+                                   data-title="维修单维护">维修单维护</a>
+                            </li>
+                            <li>
+                                <a href="javascript:;" data-href="__MODULE__/SaleService/showAllUnrecord"
+                                   data-title="未审核单据">未审核单据</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <dl id="admin-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 行政人事管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/showStaff" data-title="员工管理">员工管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/calendar" data-title="工作日编辑">工作日编辑</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+        <dl id="sys-module">
+            <dt><i class="Hui-iconfont">&#xe616;</i> 系统管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+            <dd>
+                <ul>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/showDept" data-title="部门管理">部门管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/showPosition" data-title="职位管理">职位管理</a>
+                    </li>
+
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/editRole" data-title="审核权限管理">审核权限管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/editRecordTime"
+                           data-title="记录可查看时间">记录可查看时间</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/showCusIndus" data-title="行业编辑">行业编辑</a>
+                    </li>
+
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/stockIoCate" data-title="出入库分类管理">出入库分类管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/stockCate" data-title="备货方式管理">备货方式管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/productionCompany"
+                           data-title="生产公司管理">生产公司管理</a>
+                    </li>
+                    <li>
+                        <a href="javascript:;" data-href="__MODULE__/System/productionLine" data-title="生产线管理">生产线管理</a>
+                    </li>
+                </ul>
+            </dd>
+        </dl>
+    </div>
+</aside>
+<div class="dislpayArrow hidden-xs"><a class="pngfix" href="javascript:;;" onClick="displaynavbar(this)"></a>
+</div>
+<section class="Hui-article-box">
+    <div id="Hui-tabNav" class="Hui-tabNav hidden-xs">
+        <div class="Hui-tabNav-wp">
+            <ul id="min_title_list" class="acrossTab cl">
+                <li class="active">
+                    <span title="我的桌面" data-href="welcome.html">我的桌面</span>
+                    <em></em></li>
+            </ul>
+        </div>
+        <div class="Hui-tabNav-more btn-group"><a id="js-tabNav-prev" class="btn radius btn-default size-S"
+                                                  href="javascript:;"><i class="Hui-iconfont">&#xe6d4;</i></a><a
+                id="js-tabNav-next" class="btn radius btn-default size-S" href="javascript:;"><i class="Hui-iconfont">&#xe6d7;</i></a>
+        </div>
+    </div>
+    <div id="iframe_box" class="Hui-article">
+        <div class="show_iframe">
+            <div style="display:none" class="loading"></div>
+            <iframe scrolling="yes" frameborder="0" src="crmhome"></iframe>
+        </div>
+    </div>
+</section>
+
+<div class="contextMenu" id="Huiadminmenu">
+    <ul>
+        <li id="closethis">关闭当前</li>
+        <li id="closeall">关闭全部</li>
+    </ul>
+</div>
+<!--_footer 作为公共模版分离出去-->
+<script type="text/javascript" src="/Public/hui/lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="/Public/hui/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="/Public/hui/static/h-ui/js/H-ui.min.js"></script>
+<script type="text/javascript" src="/Public/hui/static/h-ui.admin/js/H-ui.admin.js"></script> <!--/_footer 作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/Public/hui/lib/jquery.contextmenu/jquery.contextmenu.r2.js"></script>
+<script type="text/javascript">
+    var moduleSys    =  $("#sys-module");
+    var moduleAdmin  =  $("#admin-module");
+    var moduleSale   =  $("#sale-module");
+    var moduleOnline =  $("#online-module");
+    var moduleMRP    =  $("#mrp-module");
+    var moduleFin    =  $("#fin-module");
+    var modulePrj    =  $("#prj-module");
+    var moduleCus    =  $("#cus-module");
+    $('.myToggle').on('click', function () {
+        $(this).next('ul').slideToggle();
+    });
+    function getMsgCount() {
+        //ajax
+        //当前控制器是Index
+        $.get("{:U('Index/getMsgCount')}", function (data) {
+            //修改未读数量的显示
+            if (data != "") {
+                var innerHtml = '';
+                if (data['cusCount']) {
+                    innerHtml += '<a class="msg-txt  cusCount" date_src="__MODULE__/Customer/showCustomerAudit" href="javascript:;">待审核客户：' + data['cusCount'] + '</a>';
+                }
+                if (data['prjCount']) {
+                    innerHtml += '<a class="msg-txt  prjCount" date_src="__MODULE__/Research/showPrjAudit" href="javascript:;">待审核项目：' + data['prjCount'] + ' </a>';
+                }
+                if (data['orderCount']) {
+                    innerHtml += '<a class="msg-txt  orderCount" date_src="__MODULE__/Finance/showOrderAudit" href="javascript:;">待审订单：' + data['orderCount'] + ' </a>';
+                }
+                if (data['prjProgressCount']) {
+                    innerHtml += '<a class="msg-txt  prjAudit" date_src="__MODULE__/Research/showProgressAuditList" href="javascript:;">待审项目进度：' + data['prjProgressCount'] + '</a>';
+                }
+                if (data['saleCount']) {
+                    innerHtml += '<a class="msg-txt  saleCount" href="javascript:;" date_src="__MODULE__/Customer/showUnCheckServiceList">待审售后记录：' + data['saleCount'] + '</a>';
+                }
+                if (data['onlineCount']) {
+                    innerHtml += '<a class="msg-txt  onlineCount" href="javascript:;" date_src="__MODULE__/Customer/showUnCheckOnlineList">待审客服记录：' + data['onlineCount'] + '</a>';
+                }
+                if (data['prjUNum']) {
+                    innerHtml += '<a class="msg-txt  selPrjCount" href="javascript:;" date_src="__MODULE__/Research/showPublicPrj">研发可申请项目数：' + data['prjUNum'] + '</a>';
+                }
+                if (data['editCusCount']) {
+                    innerHtml += '<a class="msg-txt  editCusCount" href="javascript:;" date_src="__MODULE__/Customer/showCusEditApply">客户名修改申请：' + data['editCusCount'] + '</a>';
+                }
+                if (data['repairCount']) {
+                    innerHtml += '<a class="msg-txt  repairCount" href="javascript:;" date_src="__MODULE__/SaleService/showOwnUnrecord">客户售后单：' + data['repairCount'] + '</a>';
+                }
+            }
+            $('.msg-num1').html("");
+            $(".msg-num1").append(innerHtml);
+        });
+
+        $(".msg-num1").off('click').on('click', 'a', function () {
+            layer.open({
+                type: 2,
+                area: ['90%', '90%'],
+                shadeClose: true,
+                title: "待办事项",
+                content: $(this).attr('date_src')
+            });
+        });
+    }
+    $(function () {
+        //声明反复性定时器
+       //  setInterval('getMsgCount()',5000);
+    });
+
+    // 退出登录
+    $('.exit').click(function(){
+        layer.confirm('确定退出系统?',
+            {
+                icon : 6
+            },
+            function(){
+                window.location.href = "__MODULE__/Public/logout";
+            });
+    });
+    $('.edit').on('click', function () {
+        layer.open({
+            type: 2,
+            area: ['50%', '70%'],
+            title: $(this).attr('data-title'),
+            content: $(this).attr('data-href')
+        });
+    });
+
+    // 判断权限
+    $(document).ready(function() {
+        $.ajax({
+            type: 'POST',
+            url: '__CONTROLLER__/checkPostInfo',
+            data: {flag: 1},
+            success: function (ajaxData) {
+                if (ajaxData['sys'] == 1) { moduleSys.html('');}
+                if (ajaxData['saleservice'] == 1) { moduleSale.html('');}
+                if (ajaxData['online'] == 1) { moduleOnline.html('');}
+                if (ajaxData['finance'] == 1) { moduleFin.html('');}
+                if (ajaxData['project'] == 1) { modulePrj.html('');}
+                if (ajaxData['customer'] == 1) { moduleCus.html('');}
+                if (ajaxData['production'] == 1) { moduleMRP.html('');}
+                if (ajaxData['admin'] == 1) { moduleAdmin.html('');}
+            }
+        });
+    });
+</script>
+</body>
+</html>

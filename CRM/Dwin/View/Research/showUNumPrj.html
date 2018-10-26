@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可申请项目</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        td {  cursor:pointer;  }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>可申请项目列表</h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>选择</th>
+                            <th>项目名称</th>
+                            <th>项目需求</th>
+                            <th>研发类型</th>
+                            <th>绩效分配及参与人情况</th>
+                            <th>项目起止时间</th>
+                            <th>立项人</th>
+                            <th>客户</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <volist name="idPrj" id="vol">
+                            <tr class="gradeX">
+                                <td class="center">
+                                    <input type="hidden" name="nId" id="nId" value="{$Think.get.n}">
+                                    <input type="hidden" name="staffId" id="staffId" value="{$Think.session.staffId}">
+                                    <input type="checkbox" name="prjCheckBox2" class="checkValue" data="{$vol.auditorid}" value="{$vol.proid}" >
+                                </td>
+                                <td>{$vol.proname}</td>
+                                <td class="updLayer mouseOn" data="{$vol.proneeds}">{$vol.proneeds}</td>
+                                <td  data="{$vol.proid}">{$vol.pname}</td>
+                                <td class="performOfPrj mouseOn" data="{$vol.proid}">绩效总金额{$vol.performbonus}元</td>
+                                <td >{$vol.protime|date='Y-m-d',###}--{$vol.deliverytime|date='Y-m-d',###}</td>
+                                <td class="center">{$vol.buildname}</td>
+                                <td>{$vol.keyword}</td>
+                            </tr>
+                        </volist>
+                        </tbody>
+                    </table>
+                    <input class="btn btn-outline btn-success" type="button" id="selectPrj" value="项目申请" onclick="jqchk2('prjCheckBox2');" style="width: 10%; text-align: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var co;
+    $(document).ready(function() {
+        $(".dataTables-example").dataTable({
+            'bFilter' : true,
+            'bLengthChange' : true,
+            'bInfo' :　true,
+            'bAutoWidth': false,
+            'iDisplayLength' :　10
+        });
+    });
+    $("td").on('mouseover',function() {
+        co = $(this).css('background-color');
+        return co;
+    });
+    $(".mouseOn").on('mouseover', function () {
+        co = $(this).css('background-color');
+        $(this).css('color', 'blue');
+        $(this).css('background-color', 'yellow');
+        return co;
+    });
+    $(".mouseOn").on('mouseout', function () {
+        $(this).css('color', 'black');
+        $(this).css('background-color', co);
+    });
+    $("tr").click(function(){
+        var check = $(this).find("input[type='checkbox']");
+        if(check[0] != undefined){
+            var flag = check[0].checked;
+            if(flag){
+                check[0].checked = false;
+                $(this).css('background-color', co);
+            }else{
+                check[0].checked = true;
+                $(this).css('background-color',"yellow");
+            }
+        }
+    });
+    var chk_value = [], chk_data = [], chk_dat = [];
+    function jqchk2(checkName)
+    {
+        chk_value = [];
+        chk_data = [];
+        chk_dat = [];
+        $("input[name=" + checkName + "]:checked").each(function() {
+            chk_value.push($(this).val());
+            chk_data.push($(this).attr('data'));
+            chk_dat.push($(this).attr('dat'));
+        });
+    }
+    function buttonAction1(checkName, method2, layertitle) {
+        if ($("input:checkbox[name='" + checkName + "']").is(':checked')) {
+            //id : 登录人 auid：审核人 pid 项目id
+            var pid = chk_value[0];
+            layer.open({
+                type : 2,
+                title : layertitle,
+                area : ['90%', '80%'],
+                end        : function () {
+                    location.reload();
+                },
+                content : controller + "/" + method2 + "/id/" + pid //iframe的url
+            });
+        } else {
+            layer.alert('请选中项目');return false;
+        }
+    }
+    $("#selectPrj").on('click', function () {
+        buttonAction1('prjCheckBox2', 'selectPrj','项目申请');
+    });
+    var controller = "__CONTROLLER__";
+</script>
+<script src="__PUBLIC__/html/js/dwin/research/research.js"></script>
+</body>
+</html>

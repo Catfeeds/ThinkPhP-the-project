@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>公共客户录入</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <script src="__PUBLIC__/Admin/js/jsAddresss.js"></script>
+    <style type="text/css">
+        body {
+            color: black;}
+        select {
+            background: rgba(0, 0, 0, 0) url("__PUBLIC__/Admin/images/inputbg.png") repeat-x scroll 0 0;
+            border: 1px solid #c5d6e0;
+            height: 28px;
+            outline: medium none;
+            padding: 0 8px;
+            width: 170px;
+        }
+        .main p input {
+            float:none;
+            background: rgba(0, 0, 0, 0) url("__PUBLIC__/Admin/images/inputbg.png") repeat-x scroll 0 0;
+            border: 1px solid #c5d6e0;
+            height: 28px;
+            outline: medium none;
+            padding: 0 8px;
+            width: 150px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="iform">
+                <div class="col-sm-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-content">
+                            <h3>公共客户录入</h3>
+                            <div class="form-group">
+                                <div>
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="7"><span style="color: black;">客户基本信息</span></th>
+                                        </tr>
+                                        <tr>
+                                            <td>客户名称<input name="cname" id="cName" type="text" placeholder="客户全称..." class="form-control proName"/></td>
+                                            <td>行业分类<select name="cusType" id="cusType"  data-placeholder="..." class="form-control" tabindex="2">
+                                                        <option value="">请选择行业分类</option>
+                                                        <volist name="indus" id="vol">
+                                                            <option name="{$vol.name}" value="{$vol.id}" hassubinfo="true">{$vol.level|str_repeat="&emsp;&emsp;",###*2}{$vol.name}</option>
+                                                        </volist>
+                                                    </select></td>
+                                            <td>客户来源<select id="csource" name="csource" class="form-control">
+                                                        <option value="">请选择</option>
+                                                        <option value="促销活动">促销活动</option>
+                                                        <option value="Email">Email</option>
+                                                        <option value="客户介绍">客户介绍</option>
+                                                        <option value="独立开发">独立开发</option>
+                                                        <option value="媒体宣传">媒体宣传</option>
+                                                        <option value="老客户">老客户</option>
+                                                        <option value="客服">客服</option>
+                                                        <option value="网站">网站</option>
+                                                        <option value="展会">展会</option>
+                                                    </select></td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                
+                                        <tr>
+                                            <td>公司网址<input class="form-control" name="website" id="website" type="text" placeholder="请输入公司网址，没有填无..." /></td>
+                                            <td>首要联系人<input  class="form-control" type="text" name="cusfcontact" id="cPhoneName"></td>
+                                            <td>电话<input class="form-control" name="cphonenumber" id="cPhone" type="number"/></td>
+                                        </tr>
+                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th colspan="2"><span style="color: black;">地址信息</span></th>
+                                        </tr>
+                                        <tr>
+                                            <td>公司所在地：<input  class="form-control" style="width: 50%;" type="text" name="city" id="cusCityValue"></td>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>详细地址1 <input  class="form-control" type="text"  name="street1" id="street1"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>详细地址2<input  class="form-control" type="text" name="street2" id="street2"></td>
+                                        </tr>
+                                        <tr>
+                                            <td>详细地址3<input  class="form-control" type="text" name="street3" id="street3"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                    <h4 style="color: black;">备注信息</h4>
+                                    <div class="form-group">
+                                        <textarea style=" height: 75px; width:100%; font-size: 14px;" name="detail" id="proNeeds"></textarea>
+                                    </div>
+                                    <input type="button" id="btnSubmit" value="提交">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/area.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+
+
+<script type="text/javascript">
+    var controller = "__CONTROLLER__";
+    $(function(){
+        $('#btnSubmit').on('click',function(){
+            if ($("#cName").val() == "") { layer.msg('客户名称为空！', {icon: 5});return false;}
+            if ($("#cusType").val() == "") { layer.msg('请选择客户行业分类', {icon: 5});return false;}
+            if ($("#csource").val() == "") { layer.msg('客户来源未选！', {icon: 5});return false;}
+            if ($("#cusCityValue").val() == "") { layer.msg('公司所在地必须填写', {icon: 5});return false;}
+            if ($("#cPhoneName").val() == "") { layer.msg('客户首要联系人不能为空！', {icon: 5});return false;}
+            if ($("#cPhone").val() == "") { layer.msg('客户联系电话为空,请填写!', {icon: 5});return false;}
+            var uName = $("#cName").val(),  uPhone = $("#cPhone").val();
+
+            var flag1 =  $("#street1").val();
+            var flag2 =  $("#street1").val();
+            var flag3 =  $("#street1").val();
+            if (flag1 == '' && flag2 == "" && flag3 == "") {
+                layer.msg('地址至少填写一个!', {icon: 5});return false;
+            }
+            $.ajax({
+                type : 'POST',
+                url : controller + "/checkCusMsg",
+                data : {
+                    name : uName,
+                    cPhone  : uPhone
+                },
+                success : function (msg2) {
+                    if (msg2['status'] == 1) {
+                        console.log(msg2['content']);
+                        layer.confirm('发现近似名称客户:'+ msg2['content'] + '是否继续添加',{
+                            btn : ['继续添加','返回'],
+                            icon: 5
+                        }, function (){
+                            var data = $('form').serializeArray();
+                            layer.confirm('确定提交？不要录入重复客户',{
+                                btn : ['添加','返回'],
+                                icon:5
+                            },function () {
+                                $.ajax({
+                                    type : 'POST',
+                                    url  : controller + '/addCommonCustomer',
+                                    data : data,
+                                    success : function(msg1) {
+                                        if (msg1 == 1) {
+                                            var index = parent.layer.getFrameIndex(window.name);
+                                            layer.msg('添加成功', {icon: 6});
+                                            parent.layer.close(index);
+                                        } else {
+                                            layer.alert('添加失败', {icon: 5});
+                                        }
+                                    }
+                                });
+                            });
+                        }, function (){
+                            layer.msg('ok，继续编辑再提交吧！', {icon: 6});
+                            return false;
+                        });
+                    } else if (msg2['status'] == 3) {
+                        layer.alert('该网址已存在注册为某客户网址,请检查', {icon: 5});
+                        return false;
+                    } else if (msg2['status'] == 4) {
+                        layer.alert('该客户可能已有人登记', {icon: 5});
+                        return false;
+                    }else if (msg2['status'] == 5) {
+                        layer.alert('用户名称不合法', {icon: 5});
+                        return false;
+                    }
+                    else {
+                        layer.confirm('确定录入客户信息？',
+                            {
+                                btn : ['确定','返回']
+                            }, function() {
+                                var data = $('form').serializeArray();
+                                $.ajax({
+                                    type : 'POST',
+                                    url  : controller + '/addCommonCustomer',
+                                    data : data,
+                                    success : function(msg1) {
+                                        if (msg1 == 1) {
+                                            var index = parent.layer.getFrameIndex(window.name);
+                                            layer.msg('添加成功', {icon: 6});
+                                            parent.layer.close(index);
+                                        } else {
+                                            layer.alert('添加失败', {icon: 5});
+                                        }
+                                    }
+                                });
+                            }, function() {
+                                layer.msg('ok，继续编辑再提交吧！', {icon: 6});
+                                return false;
+                            });
+                    }
+                }
+            });
+        });
+    });
+
+    $(".select-title").on("click",function(){
+        $(".select-list").toggle();
+        return false;
+    });
+    $(".select-list").on("click","li",function(){
+        var txt = $(this).text();
+        $(".select-title").find("span").text(txt);
+    });
+
+
+</script>
+</html>

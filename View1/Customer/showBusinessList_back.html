@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>客户列表-数据表格</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+        td{  cursor:pointer;  }
+
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>客户列表</h5>
+                    <div class="fa-hover col-md-2 col-sm-4"><a href="javascript:;" id="cusAdd"><i class="fa fa-plus"></i> 新客户</a></div>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="cus-24"><i class="fa fa-tv">今日记录</i></a></div>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="cus-7"><i class="fa fa-tv">近七日记录</i></a></div>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-wrench"></i></a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-Business">
+                        <thead>
+                            <tr>
+                                <th>选择</th>
+                                <th>客户名称</th>
+                                <th>行业</th>
+                                <th>联系记录</th>
+                                <th>项目进度</th>
+                                <th>客服记录</th>
+                                <th>售后记录</th>
+                                <th>近4月采购金额</th>
+                                <th>客户级别</th>
+                                <th>业务负责人</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <volist name="data1" id="vol">
+                            <tr class="gradeX">
+                                <td class="checkValue" data="{$vol.cid}"><input type="checkbox" name="checkBox" value="{$vol.cid}" autocomplete="off"></td>
+
+                                <td class="mouseOn cusDetail" data="{$vol.cid}">{$vol.cname}</td>
+                                <td>{$vol.indus}</td>
+                                <td class="mouseOn contactRecord" data="{$vol.cid}"  serNum="{$vol.countrecord}">{$vol.countrecord}条</td>
+                                <td class="mouseOn prjRecord" data="{$vol.cid}"  serNum="{$vol.prosum}">{$vol.prosum}条</td>
+                                <td class="mouseOn onlineList" data="{$vol.cid}" serNum="{$vol.sumonline}"><span class="unCheck">{$vol.uncheckonline}</span>/<span class="allRecord">{$vol.sumonline}</span>条</td>
+                                <td class="mouseOn serviceList" data="{$vol.cid}" serNum="{$vol.sumservice}"><span class="unCheck">{$vol.uncheckservice}</span>/<span class="allRecord">{$vol.sumservice}</span>条</td>
+                                <td class="mouseOn saleList" data="{$vol.cid}" serNum="{$vol.titotal}">{$vol.titotal}元</td>
+                                <td>{$vol.clevel}级</td>
+                                <td>{$vol.uname}</td>
+                            </tr>
+                        </volist>
+                        <input type="hidden" name="k" id="k" value="{$Think.get.k}">
+                        </tbody>
+                    </table>
+                    <input class="btn btn-outline btn-success" type="button" id="removeSel" value="放弃客户" onclick="jqchk('checkBox');" style="width: 10%; text-align: center;">&emsp;
+                    <input class="btn btn-outline btn-success" type="button" id="addOrder" value="添加订单" onclick="jqchk('checkBox');">&emsp;
+                    <input class="btn btn-outline btn-success" type="button" id="addContact" value="添加业务记录" onclick="jqchk('checkBox');"style="width: 10%; text-align: center;">&emsp;
+                    <input class="btn btn-outline btn-success" type="button" id="addContacter" value="添加联系人" onclick="jqchk('checkBox');"style="width: 10%; text-align: center;">&emsp;
+                    <input class="btn btn-outline btn-success" type="button" id="changeCus" value="修改客户信息" onclick="jqchk('checkBox');"style="width: 10%; text-align: center;">
+                </div>
+            </div>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>待审核列表</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>选择</th>
+                            <th>客户名称</th>
+                            <th>行业</th>
+                            <th>近4月采购金额</th>
+                            <th>客户创建时间</th>
+                            <th>客户级别</th>
+                            <th>申请人</th>
+                            <th>待审核类型</th>
+                            <th>审核人</th>
+                            <th>审核进度</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <volist name="data2" id="vol">
+                            <tr class="gradeX">
+                                <td class="center"><input type="checkbox" name="checkBox2" class="checkValue" dat="{$vol.cid}" data="{$vol.auditorid}" value="{$vol.cid}" ></td>
+
+                                <td class="mouseOn cusDetail" data="{$vol.cid}">{$vol.cname}</td>
+                                <td  data="{$vol.cid}">{$vol.indus}</td>
+                                <td class="mouseOn saleList" data="{$vol.cid}" serNum="{$vol.total}">{$vol.total}元</td>
+                                <td>{$vol.addtime|date='Y-m-d H:i:s',###}</td>
+                                <td>{$vol.clevel}级</td>
+                                <td>{$vol.uname}</td>
+                                <td class="center">
+                                    <switch name="vol.type">
+                                        <case value="1">新客户创建</case>
+                                        <case value="2">老客户申请</case>
+                                        <case value="3">信息修改</case>
+                                    </switch>
+                                </td>
+                                <td class="center">{$vol.auditorname}</td>
+                                <td class="center">
+                                    <switch name="vol.auditstatus">
+                                        <case value="1">审核人未审核</case>
+                                        <case value="2">总经理未审核</case>
+                                        <case value="4">审核不通过</case>
+                                    </switch>
+                                </td>
+
+                            </tr>
+                        </volist>
+                        </tbody>
+                    </table>
+                    <input class="btn btn-outline btn-success" type="button" id="removeSel2" value="客户放弃" onclick="jqchk('checkBox2');" style="width: 10%; text-align: center;">
+                    <input class="btn btn-outline btn-success" type="button" id="changeCus2" value="修改客户信息" onclick="jqchk('checkBox2');"style="width: 10%; text-align: center;">
+                    <input class="hidden" type="hidden" id="role" value="{$Think.session.staffId}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    $(document).ready(function() {
+        $(".dataTables-Business").dataTable({
+            'bFilter' : true,
+            'bLengthChange' : false,
+            'bInfo' :　true,
+            'bAutoWidth': false,
+            'iDisplayLength' :　5
+            "processing": true,
+            "searching": true, //是否开启搜索
+            "serverSide": true,//开启服务器获取数据
+            "order": [[ 0, "desc" ]], //默认排序
+            "ajax":{ // 获取数据
+                "url":controller + "/showBusinessList",
+                "dataType":"json" //返回来的数据形式
+            },
+            "columns":[ //定义列数据来源
+                {'title':"选择",'data':"teacher_id"},
+                {'title':"客户名称",'data':"cname"},
+                {'title':"行业",'data':"indus"},//隐藏
+                {'title':"联系记录",'data':"prosum"},
+                {'title':"项目进度",'data':"prosum"},
+                {'title':"客服记录",'data':"prosum"},
+                {'title':"售后记录",'data':'prosum'}, // 自定义列
+                {'title':"近4月采购金额",'data':null,'class':"align-center"} ,// 自定义列
+                {'title':"客户级别",'data':null,'class':"align-center"}, // 自定义列
+                {'title':"负责人",'data':null,'class':"align-center"} // 自定义列   {'title':"负责人",'data':null,'class':"align-center"} // 自定义列
+               /* {'title':"负责人",'data':null,'class':"align-center"} // 自定义列   {'title':"负责人",'data':null,'class':"align-center"} // 自定义列*/
+            ],
+            "columnDefs": [ //自定义列
+                {
+                    "targets": -1, //改写哪一列
+                    "data": "teacher_id",
+                    "render": function(data, type, row) {
+                        // return "<a href='"+full.teacher_id+"'>look at my href</a>";
+                        var html = "<button class='btn btn-info' onclick='edit("+row.teacher_id+")'>修改</button>" + "   <button name='btn-del' class='btn btn-danger' onclick='del("+row.teacher_id+")'>删除</button>";
+                        return html;
+                    }
+                },
+                {
+                    "targets":2,
+                    "visible":false //隐藏列
+                },
+                {
+                    "targets":[-1,-2],
+                    "orderable":false  //禁止排序
+                },
+                {
+                    "targets":[-1,-3],
+                    "searchable":false //禁止搜索
+                }
+            ],
+            "language":{ // 定义语言
+                "sProcessing":"加载中...",
+                "sLengthMenu":"每页显示 _MENU_ 条记录",
+                "sZeroRecords":"没有匹配的结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上一页",
+                    "sNext": "下一页",
+                    "sLast": "末页"
+                },
+                "oAria": {
+                    "sSortAscending": ": 以升序排列此列",
+                    "sSortDescending": ": 以降序排列此列"
+                }
+            },
+            "createdRow":function(row,data,index){ //行回调函数
+                if(data.teacher_id % 2 == 0){
+                    $('td',row).eq(0).css({"color":"#00A8FF","font-weight":"bold"});
+                }
+            }
+
+        });//table end
+
+        return table;
+    } //inintTable END
+        });
+    });
+
+    $(".unCheck").css('color','red');
+    $(".allRecord").css('color','blue');
+    $(".noCheckYet").css('color','black');
+    $(".checkNot").css('color','red');
+    $(".checkYes").css('color','blue');
+
+</script>
+<script src="__PUBLIC__/html/js/dwin/customer/customer.js"></script>
+</body>
+</html>

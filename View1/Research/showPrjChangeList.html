@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+
+<!-- Mirrored from www.zi-han.net/theme/hplus/grid_options.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:19:53 GMT -->
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CRM--项目变更列表</title>
+    <meta name="keywords" content="业务">
+    <meta name="description" content="响应式">
+    <link rel="stylesheet" href="__PUBLIC__/Admin/css/base.css" />
+    <link rel="stylesheet" href="__PUBLIC__/Admin/css/info-mgt.css" />
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        .prjChanges span {color:red;}
+    </style>
+    <style type="text/css">
+        body {
+            color: black;
+        }
+    </style>
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>项目变更记录</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tr>
+                                <th>项目变更时间</th>
+                                <th>变更人</th>
+                                <th>变更内容</th>
+                                <th>审核人</th>
+                            </tr>
+                            <volist name="data" id="vol">
+                                <tr style="text-align: center;">
+                                    <td>{$vol.changetime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.postname}</td>
+                                    <td class="prjChanges">
+                                        <present name="vol.olddeliverytime">
+                                            项目验收时间由:&emsp;{$vol.olddeliverytime|date='Y-m-d',###}&emsp;变为:&emsp;
+                                            <span>{$vol.newdeliverytime|date='Y-m-d',###}</span><br/>
+                                        </present>
+                                        <present name="vol.oldprjneeds">
+                                            项目需求由:<br/>&emsp;{$vol.oldprjneeds}<br/>变为:<br/>&emsp;
+                                            <span>{$vol.newprjneeds}</span><br/>
+                                        </present>
+                                        <present name="vol.oldbonus">
+                                            项目总绩效由:&emsp;{$vol.oldbonus}元，&emsp;变为:&emsp;<span>{$vol.newbonus}</span>元<br/>
+                                        </present>
+                                        <present name="vol.newpartner">
+                                            参与人及绩效变更情况：
+                                            <foreach name="vol.oldpartname" item="num1">
+                                                {$num1}&emsp;
+                                            </foreach>对应绩效
+                                            <foreach name="vol.oldjxval" item="num2">
+                                                {$num2}%&emsp;
+                                            </foreach>
+                                            变为：
+                                            <foreach name="vol.newpartname" item="num1">
+                                                {$num1}&emsp;
+                                            </foreach>对应绩效
+                                            <foreach name="vol.newjxval" item="num2">
+                                                {$num2}%&emsp;
+                                            </foreach>
+                                        </present>
+                                    </td>
+                                    <td>{$vol.auditname}</td>
+                                </tr>
+                            </volist>
+                        </table>
+                        <div class="pagination ue-clear">
+                            <div class="pagin-list">
+                                {$page}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script>
+    //$(document).ready(function(){$(".i-checks").iCheck({checkboxClass:"icheckbox_square-green",radioClass:"iradio_square-green",})});
+</script>
+</body>
+</html>

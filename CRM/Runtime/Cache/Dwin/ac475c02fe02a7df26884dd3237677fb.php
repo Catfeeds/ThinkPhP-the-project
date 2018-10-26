@@ -1,0 +1,638 @@
+<?php if (!defined('THINK_PATH')) exit();?><!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="/Public/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+
+    <style>
+        body{
+            color:black;
+        }
+        .selected{
+            background: #d0d27e!important;
+        }
+        #staff th,td{
+            white-space: nowrap!important;
+        }
+        .el-table thead{
+            color:black!important;
+        }
+
+        .el-table td, .el-table th{
+            padding-top: 2px!important;
+            padding-bottom: 2px!important;
+        }
+        .el-pagination__jump{
+            color:black!important;
+        }
+        /*.table-responsive{*/
+            /*height: 400px;*/
+            /*overflow: auto;*/
+        /*}*/
+        .dataTables_scroll{
+            overflow: auto !important;
+        }
+        .dataTables_scrollHead{
+            overflow: initial !important;
+        }
+        .dataTables_scrollBody{
+            overflow:initial !important;
+        }
+        .table2000{
+            width: 2000px;
+        }
+        #staff_wrapper{
+            overflow: hidden;
+        }
+        .dataTables_scrollBody thead{
+            visibility: hidden;
+        }
+        div.dataTables_scrollBody table{
+            margin-top: -25px!important;
+            margin-left: 1px;
+        }
+        .tab-pane{
+            overflow: auto;
+        }
+        .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+            padding:3px!important;
+        }
+        .el-dialog__body{
+            text-align: center
+        }
+        /* 上传 */
+        .uploadResume .el-upload .el-upload__input{
+           display: none !important;
+       }
+       .float-e-margins .btn {
+            margin-bottom: 3px !important;
+        }
+       .ele-BUT{
+            color: #1c84c6;
+            border: 1px solid #1c84c6;
+            border-radius:3px;
+            height: 21px;
+       }
+       .notSelectData{
+            color:#e4393c;text-align: center;font-size: 15px
+       }
+       li.active > a{
+            background-color: #1c84c6 !important;
+            color: #fff !important;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="title">
+                <h4>湖南迪文有限公司其他出库单列表</h4>
+                <div>
+                    <button class="btn btn-xs btn-outline btn-success refresh">刷 新</button>
+                    <button class="btn btn-xs btn-outline btn-success audit_staff"><span class="glyphicon glyphicon-adjust"></span>审 核</button>
+                    <button class="btn btn-xs btn-outline btn-success revamp_staff"><span class="glyphicon glyphicon-align-justify"></span>修 改</button>
+                    <button class="btn btn-xs btn-outline btn-success details_staff"><span class="glyphicon glyphicon-check"></span>下 推</button>
+                    <button class="btn btn-xs btn-outline btn-success indent_staff"><span class="glyphicon glyphicon-remove"></span>删 除</button>
+                    <select name="" id="select_button" class="btn-outline ele-BUT push_down">
+                        <option value="1" class="btn btn-xs btn-outline btn-success">未下推</option>
+                        <option value="2" class="btn btn-xs btn-outline btn-success">已下推</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="staff" class="table table-bordered table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>申请单编号</th>
+                            <th>领料类型</th>
+                            <th>申领部门</th>
+                            <th>申请时间</th>
+                            <th>出库状态</th>
+                            <th>审核人</th>
+                            <th>审核状态</th>
+                            <th>是否已下推</th>
+                            <th>申请理由</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="ibox-content" id="app">
+                <ul class="nav nav-tabs" role="tablist"  v-if="unData">
+                    <li role="presentation" class="active"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab">物料清单</a></li>
+                </ul>
+                <div class="tab-content"  v-if="unData">
+                    <div role="tabpanel" class="tab-pane active" id="contact">
+                        <table class="table table-striped table-hover table-border">
+                            <tr>
+                                <th>物料编号</th>
+                                <th>物料型号</th>
+                                <th>物料名称</th>
+                                <th>申请数量</th>
+                                <th>需求时间</th>
+                                <th>更新时间</th>
+                                <th>备 注</th>
+                            </tr>
+                            <tr v-for="(item,index) in bomInfo">
+                                <td>{{item.product_no  || ''}}</td>
+                                <td>{{item.product_name  || ''}}</td>
+                                <td>{{item.product_number  || ''}}</td>
+                                <td>{{item.num  || ''}}</td>
+                                <td>{{formatDateTime(item.demand_time) || ''}}</td>
+                                <td>{{formatDateTime(item.update_time) || ''}}</td>
+                                <td>{{item.tips || ''}}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="notSelectData"  v-else>
+                    当前您没有选中数据或无数据
+                </div>
+                <!-- 审核 下载Execl -->
+                <el-dialog title="导出BOM EXECL：" class="selsctDialog" :visible.sync="dialogUpdataExecl" width="50%">
+                    <div>
+                                <span>BOM编号：</span>
+                                <el-select v-model="dialog.bomNumber" multiple filterable placeholder="请选择BOM编号">
+                                    <el-option
+                                        v-for="item in BomNUM"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                                
+                                <span  style="margin-left: 10%"> 审核状态：</span>
+                                <el-select v-model="dialog.auditMSG" placeholder="请选择">
+                                    <el-option
+                                        v-for="item in options_audit"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                        </div>
+                        <div   style="margin-top: 20px">
+                               <span> 是否删除：</span>
+                                <el-select v-model="dialog.del_status" placeholder="请选择">
+                                    <el-option
+                                        v-for="item in options_del"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+
+                                <span   style="margin-left: 10%">BOM组别：</span>
+                                <el-select v-model="dialog.groung_status" placeholder="请选择">
+                                    <el-option
+                                        v-for="item in options_status"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                    </el-option>
+                                </el-select>
+                        </div>
+                     
+                        <div  style="margin-top: 20px">
+                            <el-button type="primary" @click="updataExeclBUT">下载 Execl</el-button>
+                        </div>
+                        
+                </el-dialog>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="/Public/html/js/jquery.form.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="/Public/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+
+<script>
+    var stockOutMap = <?php echo (json_encode($stockOutMap)); ?>;
+    var pickingType = <?php echo (json_encode($pickingType)); ?>;
+    var stock_out_type1
+    var table = $('#staff'). DataTable({
+        ajax: {
+            type: 'post',
+            data: {
+                stockOutType() {
+                    var select = document.getElementById('select_button')
+                    return Number(select.value)
+                },      
+                flag: 1
+            }
+            // success:res =>console.log(res)
+        },
+        "scrollY": 440,
+        "scrollX": false,
+        "scrollCollapse": true,
+        "destroy"      : true,
+        "paging"       : true,
+        "autoWidth"	   : false,
+        "pageLength": 25,
+        serverSide: true,
+        // order:[[21, 'desc']],
+        columns: [
+            {searchable: true, data: 'apply_id'},
+            {searchable: true, data: 'picking_kind',render: function(data){
+                if(pickingType[+data]){
+                    return pickingType[+data]
+                }else{
+                    return ''
+                }
+            }},
+            {searchable: true, data: 'apply_dept_name'},
+            {searchable: true, class:'son_Nexe', data:  'apply_time',render: function(data){return vm.formatDateTime(data)}},
+            {searchable: true, data: 'stock_status',render:function(data){return stockOutMap[+data]}},
+            {searchable: true, data: 'audit_name'},
+            {searchable: false, data: 'audit_status',render: function (data){return ['未审核', '不通过','通过'][+data]}},
+            {searchable: false, data: 'stock_out_type'},
+            {searchable: true, data: 'apply_reason',render:function (value,a, row) {
+                if (value){
+                    value =  value.replace(/\r\n|\n/g, '<br>')
+                    var allData = table.data();
+                    var index = allData.indexOf(row);
+                    var className = 'complain_reason' + index;
+                    var str = ''
+                    if (value.length > 15){
+                        str = value.slice(0, 15) + '...'
+                    } else {
+                        str = value
+                    }
+                    return "<span class='complain_reason' id='" + className + "'>" + str + "</span>"
+                }
+                return value
+            }},
+        ],
+        'fnRowCallback':function(nRow,aData,iDisplayIndex,iDisplayIndexFull){
+            /*
+                nRow:每一行的信息 tr  是Object
+                aData：行 index
+            */
+            for(let key in nRow){
+                var ADataStatus = nRow['childNodes'][7].innerText
+                var ADaudit_status = nRow['childNodes'][6].innerText
+                var ADstock_status = nRow['childNodes'][4].innerText
+                if(ADaudit_status == '未审核'){
+                    $(nRow['childNodes'][6]).css('color','blue')
+                }else if(ADaudit_status == '不通过'){
+                    $(nRow['childNodes'][6]).css('color','red')
+                }else{
+                    $(nRow['childNodes'][6]).css('color','green')
+                }
+                if(ADstock_status == '未处理'){
+                    $(nRow['childNodes'][4]).css('color','blue')
+                }else if(ADstock_status == '出库中'){
+                    $(nRow['childNodes'][4]).css('color','red')
+                }else{
+                    $(nRow['childNodes'][4]).css('color','green')
+                }
+                if(ADataStatus == '未下推'){
+                    $(nRow['childNodes'][7]).css("color",'red')
+                }else if(ADataStatus == '已下推'){
+                    $(nRow['childNodes'][7]).css("color",'green') 
+                }
+            }
+        },
+        oLanguage: {
+            "oAria": {
+                "sSortAscending": " - click/return to sort ascending",
+                "sSortDescending": " - click/return to sort descending"
+            },
+            "LengthMenu": "显示 _MENU_ 记录",
+            "ZeroRecords": "对不起，查询不到任何相关数据",
+            "EmptyTable": "未有相关数据",
+            "LoadingRecords": "正在加载数据-请等待...",
+            "Info": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录。",
+            "InfoEmpty": "当前显示0到0条，共0条记录",
+            "InfoFiltered": "（数据库中共为 _MAX_ 条记录）",
+            "Processing": "<img src='../resources/user_share/row_details/select2-spinner.gif'/> 正在加载数据...",
+            "Search": "搜索：",
+            "Url": "",
+            "Paginate": {
+                "sFirst": "首页",
+                "sPrevious": " 上一页 ",
+                "sNext": " 下一页 ",
+                "sLast": " 尾页 "
+            }
+        }
+    })
+    var ApplyId
+    var bom_id
+    var contractId
+    var Apply_status
+    var ApplyData
+    $('tbody').on('click', 'tr', function () {
+        var tips_Array = []
+        var value
+        // this.unData = true;
+        if(table.row(this).data()){
+            ApplyData = table.row(this).data();
+            ApplyId = ApplyData.id;   // 订单主键
+            bom_id = ApplyData.bom_id      //订单编号
+            Apply_status = ApplyData.audit_status
+            $('tr').removeClass('selected')
+            $(this).addClass('selected')
+            $.post('/Dwin/Stock/getOtherStockOutApplyMaterial', {id: ApplyId}, function (res) {
+                vm.bomInfo = res.data
+            })
+            layer.closeAll();
+        }
+    })
+    $('.BomInfoTips').on('mouseenter', function (event) {
+        var dataS = event.innerText
+         layer.tips(dataS, $(this), {time: 9999999})
+    })
+    // layer tips
+    $('#staff').on('mouseenter', 'td', function () {
+        var that = $(this).children('span');
+        if (that.hasClass('complain_reason') || that.hasClass('research') || that.hasClass('processes') || that.hasClass('processes_validity') || that.hasClass('liable')) {
+            var data = table.cell(that.parents('td')).data()
+            layer.tips(data, $(this), {time: 9999999})
+        }
+
+    })
+    // $('#staff').on('mouseenter','tr', function () {
+    //     layer.closeAll();
+    // })
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                bomInfo:[],
+                unData:false,
+                dialogVisible_delete:false,
+                dialogUpdataExecl:false,
+                dialog:{
+                    bom_id:'',
+                    auditMSG:2,
+                    groung_status:1,
+                    del_status:0,
+                    bomNumber:[]
+                },
+                BomNUM: [],
+                options_status:[],
+                options_del:[],
+                options_audit:[],
+                upLoadData:{
+                    id:''
+                }
+            }
+        },
+        watch:{
+            bomInfo:function(newValue){
+                if(newValue[0]){
+                    this.unData = true
+                }else{
+                    this.unData = false
+                }
+            }
+        },
+        methods: {
+            // 获取编号
+            getBomNumber_num:function(item) {
+                $.get('createBomId',function (res) {
+                    if(res.status==200){
+                        vm.dialog.bom_id=res.data.bomIdString
+                        vm.$message({
+                            showClose: true,
+                            message: res.msg,
+                            type: 'success'
+                        });
+                    }else{
+                        vm.$message({
+                            showClose: true,
+                            message: res.msg,
+                            type: 'error'
+                        });
+                    }
+                    
+                })
+            },
+            // 下载 Execl
+            updataExeclBUT () {
+                var data = {
+                    'bom_status':vm.dialog.auditMSG,
+                    'is_del':vm.dialog.del_status,
+                    'bomArr' : vm.dialog.bomNumber,
+                    'bom_type':vm.dialog.groung_status
+                }
+                var index = layer.load('正在生成xlsx文件');
+                $.post('exportToExcel', data, function (res) {
+                    layer.close(index);
+                    if (res.status != 200) {
+                        vm.$message({
+                            showClose:true,
+                            message:res.msg,
+                            type:'success'
+                        })
+                    } else {
+                        if (res.data.file_url) {
+                            window.open(res.data.file_url);
+                        } else {
+                            vm.$message({
+                                showClose:true,
+                                message:res.msg,
+                                type:'success'
+                            })
+                        }
+                    }
+                })
+            },
+            // 上传 EXECL =>
+            papersUploadSuccess: function (res) {
+                layer.msg(res.msg)
+            },
+            // 上传 Execl 失败
+            uploadError (res) {
+                layer.msg(res.msg)
+            },
+            // 时间戳转化为时间
+            formatDateTime:function (timeStamp) {
+                if(timeStamp != ''&&timeStamp != 0){
+                    var date = new Date();
+                    date.setTime(timeStamp * 1000);
+                    var y = date.getFullYear();    
+                    var m = date.getMonth() + 1;    
+                    m = m < 10 ? ('0' + m) : m;    
+                    var d = date.getDate();    
+                    d = d < 10 ? ('0' + d) : d;    
+                    var h = date.getHours();  
+                    h = h < 10 ? ('0' + h) : h;  
+                    var minute = date.getMinutes();  
+                    var second = date.getSeconds();  
+                    minute = minute < 10 ? ('0' + minute) : minute;    
+                    second = second < 10 ? ('0' + second) : second;   
+                    // return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;  
+                    return y + '-' + m + '-' + d;  
+                }else{
+                    return ''
+                }
+            }
+        }
+    })
+    // delete 申请单
+    $('.indent_staff').on('click', function () {
+        $.post('<?php echo U("Dwin/Stock/delOtherApply");?>', {applyId:ApplyId} , function (res) {
+            if(res.status == 200){
+                table.ajax.reload()
+            }
+            layer.msg(res.msg)
+        })
+    })
+    // 出库单下推
+    $('.details_staff').on('click', function () {
+        if (ApplyId === undefined || !ApplyId){
+            layer.msg('请选择一个出库申请单')
+        } else {
+            if(Apply_status == '1'){
+                layer.msg('当前生请单没通过审核不能下推！')
+            }else if(Apply_status == '0'){
+                layer.msg('当前生请单未通过审核不能下推申请单！')
+            }else{
+                var index = layer.open({
+                    type: 2,
+                    title: '湖南迪文有限公司其他出库单下推',
+                    content: '/Dwin/Stock/createOtherStockOut?id=' + ApplyId,
+                    area: ['90%', '90%'],
+                    shadeClose:true,
+                    end: function () {
+                        table.ajax.reload()
+                    }
+                }) 
+            } 
+        }
+    })
+    // 出库单下推
+    $('.push_down').on('change', function () {
+        table.ajax.reload()
+    })
+    
+    // BOM  修改
+    $('.revamp_staff').on('click', function () {
+        if(ApplyId == undefined || !ApplyId){
+            layer.msg('请选择一个出库申请单')
+        }else{
+            if(Apply_status == '2'){
+                layer.msg('当前项已通过，不能修改！')
+            }else{
+                var index = layer.open({
+                    type: 2,
+                    title: '湖南迪文有限公司出库申请单修改',
+                    content: '/Dwin/Stock/editOtherStockOutApply?id='+ ApplyId,
+                    // content: '/Dwin/Stock/editOtherStockOutApply?id='+ ,
+                    area: ['90%', '90%'],
+                    shadeClose:true,
+                    end: function () {
+                        table.ajax.reload()
+                    }
+                }) 
+            }
+        }
+    })
+    // BOM  新增
+    $('.edit_staff').on('click', function () { 
+        var index = layer.open({
+            type: 2,
+            title: '湖南迪文有限公司新增出库申请单',
+            content: '/Dwin/Stock/createOtherStockOutApply',
+            area: ['90%', '90%'],
+            shadeClose:true,
+            end: function () {
+                table.ajax.reload()
+            }
+        }) 
+    })
+    // 刷新
+    $('.refresh').on('click', function () {
+        table.order([[5, 'desc']])
+        table.ajax.reload()
+    })
+    // 审核
+    $('.audit_staff').on('click', function () {
+        if (ApplyId === undefined || !ApplyId){
+            layer.msg('请选择出库申请单')
+        } else {
+            if(Apply_status == '0'){
+                layer.confirm('其他出库单审核：',{
+                    btn:['通过','不通过']
+                },function(){
+                    var data = {
+                        'id': ApplyId,
+                        'status':2
+                    }
+                    $.post('<?php echo U("/Dwin/Stock/auditOtherStockOutApply");?>', data , function (res) {
+                        if(res.status == 200){
+                            table.ajax.reload()
+                        }
+                        layer.msg(res.msg)
+                    })
+                },function () {
+                    var data = {
+                        'id': ApplyId,
+                        'status':1
+                    }
+                    $.post('<?php echo U("/Dwin/Stock/auditOtherStockOutApply");?>', data , function (res) {
+                        if(res.status == 200){
+                            table.ajax.reload()
+                        }
+                        layer.msg(res.msg)
+                    })
+                })
+            }else if(Apply_status == '1'){
+                vm.$message({
+                    showClose: true,
+                    message: '该项审核不通过,请去修改！',
+                    type: 'warning'
+                });
+            }else if(Apply_status == '2'){
+                vm.$message({
+                    showClose: true,
+                    message: '该项审核已通过,不能再次审核！',
+                    type: 'warning'
+                });
+            }
+        }
+    })
+    // 删除出库申请单
+    $('.delete_staff').on('click', function () {
+        if (ApplyId === undefined || !ApplyId){
+            layer.msg('请选择出库申请单')
+        } else {
+            if(Apply_status == '2'){
+                layer.msg('该订单审核已通过,不能删除BOM！')
+            }else{
+                var data = {
+                    'applyId' : ApplyId,
+                }
+                layer.confirm('确认删除?', function (aaa) {
+                    $.post('<?php echo U("/Dwin/Stock/createOtherStockOut");?>', data, function (res) {
+                        if (res.status == 200) {
+                            table.ajax.reload()
+                        }
+                        layer.msg(res.msg)
+                    })
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

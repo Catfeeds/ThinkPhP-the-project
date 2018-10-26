@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        input {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+        .el-table .warning-row {
+             background: oldlace;
+        }
+
+        .el-table .success-row {
+            background: #f0f9eb;
+        }
+        .head_thead{
+            height: 40px;
+            line-height: 40px;
+            text-align: left;
+            padding-left: 10px;
+            font-size: 15px;
+        }
+        .el-autocomplete{
+            width: 100%;
+        }
+        /* .el-button--primary {
+            float: left;
+        } */
+        .add_button_new {
+            text-align: left
+        }
+    </style>
+</head>
+<body>
+    <div id="app" style="text-align: center">
+        <h1>入库申请单编辑</h1>
+        <br><br><br>
+        <el-form ref="form" :model="form" label-width="170px" size="medium" @submit.native.prevent v-loading="loading">
+            <el-row>
+                <el-col :span="22" :offset="1">
+                        <el-row>
+                            <el-col :span="8" :offset="1">
+                                <el-form-item label="源单编号：">
+                                    <el-input v-model="form.storage_former_number" style="width: 100%;" readonly></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="8" :offset="1">
+                                <el-form-item label="入库类型：">
+                                        <!-- <el-input v-model="form.picking_kind" style="width: 100%;" readonly></el-input> -->
+                                    <el-select v-model="form.storage_type" placeholder="请选择" style="width: 100%;">
+                                        <el-option
+                                            v-for="(inde,item) in selectInfo.stockInCate"
+                                            disabled
+                                            :key="item.value"
+                                            :label="item.value"
+                                            :value="item.key">
+                                        </el-option>
+                                    </el-select>
+                                </el-form-item> 
+                            </el-col>
+                            <el-col :span="8" :offset="5">
+                                <el-form-item label="制单时间：">
+                                        <el-input v-model="form.single_time" readonly></el-input>
+                                </el-form-item> 
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="8" :offset="1">
+                                <el-form-item label="入库部门：">
+                                        <el-input v-model="form.storage_division" style="width: 100%;" readonly></el-input>
+                                        <el-input v-show="false" v-model="form.storage_division_id" style="width: 100%;" readonly></el-input>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="8" :offset="5">
+                                <el-form-item label="制单人：">
+                                    <el-input v-model="form.single_name" style="width: 100%;" placeholder="请填写用途"></el-input>
+                                </el-form-item>                        
+                            </el-col>
+                            
+                        </el-row>
+                        <el-row>
+                        </el-row>
+                        
+                        <el-row :gutter="20">
+                            <el-col :span="24">
+                                    <table class="table table-striped table-hover table-bordered" border style="margin-bottom: 0">
+                                            <div class="head_thead">一、产品名称、型号、入库数量</div>
+                                            <tbody>
+                                                <tr  class="deal_cent">
+                                                    <th v-show="false">source_id</th>      
+                                                    <th v-show="false">ID</th>      
+                                                    <th >物料名称</th>      
+                                                    <th >物料型号</th>      
+                                                    <th >物料编号</th>     
+                                                    <th>入库数</th>
+                                                    <th>入库仓库</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                                <tr v-for="(item, index) in materialData">
+                                                    <td v-show="false">
+                                                        <el-input v-model="item.source_id" ></el-input>
+                                                    </td>
+                                                    <td v-show="false">
+                                                        <el-input v-model="item.product_id" ></el-input>
+                                                    </td>
+                                                    <td>
+                                                        <!-- <el-input v-model="item.product_number" readonly="readonly"></el-input> -->
+                                                        {{item.product_number}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.product_name}}
+                                                    </td>
+                                                    <td>
+                                                        {{item.product_no}}
+                                                        <!-- <el-input v-model="item.product_no"  placeholder="型号"></el-input> -->
+                                                    </td>
+                                                    <td>
+                                                        {{item.shipment_num}}
+                                                        <!-- <el-input v-model="item.num" @keyup.native="calculationAmount(index)" placeholder="数量" onkeypress="return event.keyCode >= 48 && event.keyCode <= 57 || event.keyCode==46" ></el-input> -->
+                                                    </td>
+                                                    <td>
+                                                        <el-select v-model="item.default_rep_id" filterable placeholder="请选择">
+                                                            <el-option
+                                                                v-for="datum in selectInfo.warehouse"
+                                                                :key="datum.warehouse_id"
+                                                                :label="datum.warehouse_name"
+                                                                :value="datum.warehouse_id"
+                                                                >
+                                                            </el-option>
+                                                        </el-select>
+                                                    </td>
+                                                    <td>
+                                                        <el-input type="textarea" v-model="item.shipment_tips"></el-input>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                <br>
+                                <br>
+                                <br>
+                        <el-button type="success" @click="onSubmit()">修<span>&nbsp;&nbsp;</span>改</el-button>
+                        <br><br>
+                            </el-col>
+                        </el-row>
+                </el-col>
+            </el-row>
+        </el-form>
+    </div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+
+    var applyData = {$applyData|json_encode}, materialData = {$materialData|json_encode};
+
+
+    var vm = new Vue({
+        el: '#app',
+        data : function(){
+            return {
+                loading:true,
+                serial_Number:'1',  //序号
+                form :{
+                    storage_former_number:'',
+                    storage_type:'',
+                    storage_division:'',
+                    single_name:'',
+                    single_time:'',
+                    storage_status:'',
+
+                    keeper_name:'',
+                    keeper_id:'',
+                    audit_name:'',
+                    audit_id:'',
+                    accept_name:'',
+                    accept_id:'',
+                },
+                initial_row:[],
+                selectInfo : [],
+                c: []
+                
+            }
+        },
+        created : function () {
+            $.post('/Dwin/Stock/getSelectInfo', {
+                type : 'getDept'
+            },function (res) {
+                if (res.status !== 200) {
+                    layer.msg(res.msg);
+                    return false;
+                }
+                vm.selectInfo = [];
+                vm.selectInfo   = res.data;
+
+            });
+            this.loading = false
+            this.initial_row.length = 0
+
+            this.materialData = materialData
+            this.form = applyData
+        },
+        mounted: function() {
+
+        },
+        methods :{
+            // 提交
+            onSubmit: function(){
+                var judge_up = true
+                if(judge_up){
+                    var data = {
+                        'material' : vm.materialData
+                    };
+
+                    $.post('{:U("Dwin/Stock/editStockInApply")}', data , function (res) {
+                        if(res.status == 200){
+                            // 关闭弹框 刷新父页面
+                            layer.msg(res.msg)
+                            vm.$message({
+                                showClose:true,
+                                message:res.msg,
+                                type:'success'
+                            })
+                        } else {
+                            vm.$message({
+                                showClose:true,
+                                message:res.msg,
+                                type:'warning'
+                            })
+                        }
+                    })
+                }
+            }
+        }
+    })
+</script>
+</html>

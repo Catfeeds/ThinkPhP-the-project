@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>员工信息编辑</title>
+    <link rel="shortcut icon" href="favicon.ico"> <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+</head>
+
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>员工部门及职位变更</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="signupForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">姓名：</label>
+                            <div class="col-sm-4">
+                                <input id="firstname" name="firstname" class="form-control" type="text" value="{$data.uname}" readonly="readonly">
+                                <input id="uid" class="form-control" type="hidden" value="{$data.uid}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">当前职位：</label>
+                            <div class="col-sm-4">
+                                <input id="deptName" name="dname" class="form-control" type="text" value="{$data.postname}({$data.deptname})" readonly="readonly">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">修改职位：</label>
+                            <div class="col-sm-4">
+                                <select name="department" id="uSysPost" data-placeholder="选择职位" class="form-control">
+                                    <option value="">请选择</option>
+                                    <volist name="sysPostInfo" id="vol">
+                                        <option value="{$vol.role_id}">{$vol.pid|str_repeat="&emsp;&emsp;",###*2}{$vol.role_name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">职位所属部门：</label>
+                            <div class="col-sm-4">
+                                <select name="department" id="usersysDept" data-placeholder="选择部门" class="form-control">
+                                    <option value="">请选择</option>
+                                    <volist name="sysDeptInfo" id="vol">
+                                        <option value="{$vol.id}">{$vol.level|str_repeat="&emsp;&emsp;",###*2}{$vol.name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-primary" type="button" id="addStaffSubmit">提交职位变更</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/demo/form-advanced-demo.min.js"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script type="text/javascript">
+    $("#addStaffSubmit").on('click', function () {
+        var userDept = $("#usersysDept").val();
+        var userPost = $("#uSysPost").val();
+        var uid = $("#uid").val();
+        if ( userDept == "") { layer.alert("部门不能为空", { icon : 5 }); return false; }
+        if ( userPost == "") { layer.alert("职位不能为空", { icon : 5 }); return false; }
+        $("#addStaffSubmit").attr("disabled",'disabled');
+        var indexLoad = layer.load(1, {shade : [0.1, '#fff']});
+        $.ajax({
+            type : 'POST',
+            url  : '__CONTROLLER__/changePosition',
+            data : {
+                uid : uid,
+                userDept : userDept,
+                userPost : userPost
+            },
+            success : function (msg) {
+                if(msg == 2) {
+                    layer.msg(
+                        '职位修改成功',
+                        {
+                            icon : 6,
+                            time : 1000
+                        },
+                        function () {
+                            window.location.reload();
+                            layer.close(indexLoad);
+                        }
+                    );
+                } else {
+                    layer.alert("提交出错");
+                    layer.close(indexLoad);
+                    $("#addStaffSubmit").attr("disabled", false);
+                    return false;
+
+                }
+            },
+            error   : function (error) {
+                layer.alert(error);
+                $("#addStaffSubmit").attr('disabled', true);
+            }
+        });
+    });
+</script>
+</html>

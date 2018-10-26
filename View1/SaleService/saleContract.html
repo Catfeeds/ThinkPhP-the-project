@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维修合同</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        select {
+            /*Chrome和Firefox里面的边框是不一样的，所以复写了一下*/
+            border: solid 1px #000;
+            /*很关键：将默认的select选择框样式清除*/
+            appearance:none;
+            -moz-appearance:none;
+            -webkit-appearance:none;
+            /*为下拉小箭头留出一点位置，避免被文字覆盖*/
+            padding-right: 14px;
+        }
+        /*清除ie的默认选择框样式清除，隐藏下拉箭头*/
+        select::-ms-expand { display: none; }
+    </style>
+    <style type="text/css">
+        body {color:black;}
+        table {border:1px solid blackei;}
+        td{text-align: center;font-weight: bold;font-family:  "宋体";
+        }
+        .small{
+            font-size: 12px;
+        }
+        .big{
+            font-size: 14px;
+        }
+    </style>
+    <style media="print">
+        @page {
+            size: A4;  /* auto is the initial value */
+            margin: 0mm; /* this affects the margin in the printer settings */
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <table class="table table-bordered" id="table1">
+        <tr>
+            <td colspan="12">
+                <div style="text-align: left; float: left;"><img src="__PUBLIC__/Admin/images/printlogo.png" alt="DoubleWin"></div>
+                <div style="float: left;font-style: italic; font-weight:bold;margin-top: 5px;margin-left: 15px;">迪文科技</div>
+                <div style="float: left;font-style: italic; font-weight:bold;margin-top: 5px; margin-left: 15px;">www.dwin.com.cn 400 018 9008</div>
+                <div style="float: right;font-style: italic; font-weight:bold;margin-top: 5px; margin-right: 25px;">专业素养 诚实守信 追求卓越</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="12">
+                <h3>
+                    <select style="border:none;" id="companyName" onchange="company();">
+                        <option style="text-align: center" value="2">湖南迪文科技有限公司</option>
+                        <option style="text-align: center" value="1">北京迪文科技有限公司</option>
+                    </select>
+                </h3>
+            </td>
+        </tr>
+        <tr style="height: 30%;width: 100%">
+            <td style="width: 100px;"></td>
+            <td style="width: 150px;"></td>
+            <td rowspan="2" colspan="2" style="width: 200px;"><span class="big">维修合同</span></td>
+            <td style="width: 100px;"><span class="small">合同编号：</span></td>
+            <td style="width: 150px;"><input value="{$num}" style="border:none;"></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;"></td>
+            <td style="width: 150px;"></td>
+            <td style="width: 100px;"><span class="samll">签约地点：</span></td>
+            <td style="width: 150px;"><input value="湖南" style="border:none;"></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">甲 &nbsp; 方：</td>
+            <td colspan="2" style="width: 150px;text-align: left" id="name">湖南迪文科技有限公司</td>
+            <td style="width: 100px;">乙 &nbsp; 方：</td>
+            <td colspan="2" style="width: 150px;text-align: left"><input id="yifangname" onchange="yfname();" style="resize:none;overflow:hidden;margin: 0px;width: 100%;height: 100%;border: none;" value="{$saleRecordInfo.cusname}"></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">地 &nbsp; 址：</td>
+            <td colspan="2" style="width: 150px;text-align: left" id="address">常德市桃源县漳江镇漳江创业园创业大道8号</td>
+            <td style="width: 100px;">地 &nbsp; 址：</td>
+            <td colspan="2" style="width: 150px;text-align: left;margin: 0px;"><textarea style="resize:none;overflow:hidden;margin: 0px;width: 100%;height: 100%;border: none">
+                {$saleRecordInfo.reback_address}
+            </textarea></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">授权代表：</td>
+            <td colspan="2" style="width: 150px;text-align: left">{$saleRecordInfo.salename}</td>
+            <td style="width: 100px;">授权代表：</td>
+            <td colspan="2" style="width: 150px;text-align: left"><input value="{$saleRecordInfo.cphonename}" onchange="changedaibiao();" id="daibiao" style="border:none;"></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">电 &nbsp; 话：</td>
+            <td colspan="2" style="width: 150px;text-align: left">{$saleRecordInfo.phone}</td>
+            <td style="width: 100px;">电 &nbsp; 话：</td>
+            <td colspan="2" style="width: 150px;text-align: left"><input value="{$saleRecordInfo.cphonenumber}" style="border:none;"></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">传 &nbsp; 真：</td>
+            <td colspan="2" style="width: 150px;text-align: left"><input type="text" style="border: none;"></td>
+            <td style="width: 100px;">传 &nbsp; 真：</td>
+            <td colspan="2" style="width: 150px;text-align: left"><input type="text" style="border: none;"></td>
+        </tr>
+        <tr>
+            <td colspan="12" style="text-align: left"><div style="margin-left: 15px;">&nbsp;&nbsp;根据《中国人民共和国合同法》的有关规定，依平等互利，诚实信用的原则，双方就甲方给乙方提供维修服务，同意维修更换部件名称、规格型号、数量、单价、总金额等信息如下：</div></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">产品名称</td>
+            <td style="width: 150px;">规格型号</td>
+            <td style="width: 50px;">数量</td>
+            <td style="width: 100px;">单价</td>
+            <td style="width: 100px;">小计（RMB）</td>
+            <td style="width: 150px;">备注</td>
+        </tr>
+        <volist name="result1" id="vol">
+            <input type="hidden" name="pid" id="pid" value="{$vol.pid}">
+        <tr>
+            <td style="width: 100px;"></td>
+            <td style="width: 150px;">{$vol.product_name}</td>
+            <td style="width: 50px;">{$vol.re_num}</td>
+            <td style="width: 100px;">{$vol.danjia}</td>
+            <td style="width: 100px;">{$vol.piece_wage}{$vol.fault_info}</td>
+            <td style="width: 150px;">{$vol.re_mode}{$vol.mode_info}</td>
+        </tr>
+        </volist>
+        <tr>
+            <td style="width: 100px;">运费：</td>
+            <td style="width: 150px;">
+                <select style="border:none;" id="test" onchange="changemethod();">
+                    <option>到付</option>
+                    <option>寄付</option>
+                    <option>0</option>
+                </select>
+            </td>
+            <td style="width: 100px">人工费</td>
+            <td style="width: 100px">{$rgmoney | default='0.00'}</td>
+            <td colspan="1" style="width: 100px;">金额总计</td>
+            <td colspan="1" style="width: 150px;">{$sum1}</td>
+        </tr>
+        <tr>
+            <td colspan="3" style="width: 250px;text-align: right;">大写总金额</td>
+            <td colspan="3" style="width: 250px;">{$jine}</td>
+        </tr>
+        <tr>
+            <td style="width: 100px;text-align: center;">1.付款方式</td>
+            <td colspan="5" style="width: 500px;text-align: left" id="test1">到付</td>
+        </tr>
+        <tr>
+            <td style="width: 100px;text-align: center;">2.到货地址</td>
+            <td colspan="5" style="width: 500px;text-align: left">{$saleRecordInfo.reback_address}</td>
+        </tr>
+        <tr>
+            <td style="width: 100px;text-align: center;">3.售后服务</td>
+            <td colspan="5" style="width: 500px;text-align: left">产品售出7天内非人为损坏可包退换，1年内保修<br>售后服务请先联系供方相应业务员，供方安排FAE工程师确认非软件配置或操作不当问题后，寄至供方指定售后地址，以免耽误时间。<br>售后地址为：湖南省常德市桃源县漳江镇漳江创业园创业大道8号，湖南迪文科技有限公司售后维修中心，0736-296007。</td>
+        </tr>
+        <tr>
+            <td colspan="6" style="width: 500px;text-align: left;"><div style="margin-left: 15px;"><span id="div1">湖南迪文科技有限公司汇款信息</span><br>开户行：<span id="div2">中国工商银行股份有限公司桃源支行</span><br>户&nbsp;名：<span id="div3">迪文科技有限公司</span><br>账&nbsp;号：<span id="div4">1908078309201004506</span><br><sapn id="div5">行&nbsp;号：1025 5850 0125</sapn></div></td>
+        </tr>
+        <tr>
+            <td colspan="6" style="width: 500px;text-align: left"><div style="margin-left: 15px;">本合同一式两份，经双方签字盖章后生效，传真与扫描件均有效。<br>--以上--</div></td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">甲方盖章：</td>
+            <td colspan="2" style="width: 150px;text-align: left" id="gaizhang">湖南迪文科技有限公司</td>
+            <td style="width: 100px;">乙方盖章：</td>
+            <td colspan="2" style="width: 150px;text-align: left" id="test2">{$saleRecordInfo.cusname}</td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">授权代表：</td>
+            <td colspan="2" style="width: 150px;text-align: left">{$saleRecordInfo.salename}</td>
+            <td style="width: 100px;">授权代表：</td>
+            <td colspan="2" style="width: 150px;text-align: left" id="test3">{$saleRecordInfo.cphonename}</td>
+        </tr>
+        <tr>
+            <td style="width: 100px;">签订日期：</td>
+            <td colspan="2" style="width: 150px;text-align: left">{$time|date='Y/m/d',###}</td>
+            <td style="width: 100px;">签订日期：</td>
+            <td colspan="2" style="width: 150px;text-align: left">{$time|date='Y/m/d',###}</td>
+        </tr>
+    </table>
+    <input type="button" class="btn btn-outline btn-success" value="打印" id="print">
+</div>
+<script src="__PUBLIC__/html/js/jquery.min.js?v=2.1.4"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script type="text/javascript">
+    //渲染合同基本信息
+    function company() {
+        var id = $("#companyName").val();
+        $.ajax({
+            type:"post",
+            url :"__CONTROLLER__/contractInfo",
+            data:{
+                id : id,
+            },
+            success : function (msg) {
+                if(msg.hang_num){
+                    $("#name").html("");
+                    $("#name").html(msg.name);
+                    $("#address").html("");
+                    $("#address").html(msg.address);
+                    $("#gaizhang").html("");
+                    $("#gaizhang").html(msg.name);
+                    $("#div1").html("");
+                    $("#div1").html(msg.money_info);
+                    $("#div2").html("");
+                    $("#div2").html(msg.account_address);
+                    $("#div3").html("");
+                    $("#div3").html(msg.account_name);
+                    $("#div4").html("");
+                    $("#div4").html(msg.account_num);
+                    $("#div5").html("");
+                    $("#div5").html( '行&nbsp;号：'+ msg.hang_num);
+                }else{
+                    $("#name").html("");
+                    $("#name").html(msg.name);
+                    $("#address").html("");
+                    $("#address").html(msg.address);
+                    $("#gaizhang").html("");
+                    $("#gaizhang").html(msg.name);
+                    $("#div1").html("");
+                    $("#div1").html(msg.money_info);
+                    $("#div2").html("");
+                    $("#div2").html(msg.account_address);
+                    $("#div3").html("");
+                    $("#div3").html(msg.account_name);
+                    $("#div4").html("");
+                    $("#div4").html(msg.account_num);
+                    $("#div5").html("");
+                }
+            },
+        });
+    }
+    //onchange 渲染运费信息
+    function changemethod() {
+        var a = $('#test option:selected').val();
+        $("#test1").html("");
+        $("#test1").html(a);
+    }
+    //onchange 渲染乙方name
+    function yfname() {
+        var c = $("#yifangname").val();
+        $("#test2").html("");
+        $("#test2").html(c);
+    }
+    //onchange渲染乙方授权代表
+    function changedaibiao() {
+        var c = $("#daibiao").val();
+        $("#test3").html("");
+        $("#test3").html(c);
+    }
+    //打印更改主表字段
+    $("#print").on('click', function (){
+        var pid = $("#pid").val();
+        $.ajax({
+            type:"post",
+            url :"__CONTROLLER__/changeContract",
+            data:{
+                pid  : pid,
+                flag : 1,
+            },
+            success : function (msg) {
+                if(msg == 1){
+
+                }
+            }
+        });
+        $("#print").css('display', 'none');
+        window.print();
+    });
+</script>
+</body>
+</html>
+
+

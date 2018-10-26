@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP--添加新物料</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>物料信息</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="addSonDeptForm" action="{:U('postAddProductRequest')}" method="post">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">产品规格型号:</label>
+                            <div class="col-sm-4">
+                                <input id="addProductId" name="product_name" class="form-control" type="text" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">产品名：</label>
+                            <div class="col-sm-4">
+                                <input id="addCategoryName" name="product_number" class="form-control" type="text" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">系统唯一物料代码:</label>
+                            <div class="col-sm-4">
+                                <input name="product_no" class="form-control" type="text" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">所属分类：</label>
+                            <div class="col-sm-4">
+                                <select name="parent_id" id="parent_id" class="form-control" required>
+                                    <option value="">请选择</option>
+                                    <volist name="screenData" id="vol"> 
+                                        <option value="{$vol.id}">{$vol.level|str_repeat="&emsp;&emsp;",###*2}{$vol.name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">默认仓库：</label>
+                            <div class="col-sm-4">
+                                <select name="warehouse_num" id="warehouse_num" class="form-control" required>
+                                    <option value="">请选择</option>
+                                    <volist name="repoList" id="vol">
+                                        <option value="{$vol.id}">{$vol.name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                            <input type="hidden" name="warehouse_name" id="warehouse_name" value="">
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">物料属性：</label>
+                            <div class="col-sm-4">
+                                <select name="material_type_new" id="material_type_new" class="form-control" required>
+                                    <option value="">请选择</option>
+                                    <option value="1">生产</option>
+                                    <option value="2">外购</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">请选择审核人：</label>
+                            <div class="col-sm-4">
+                                <select name="auditor" id="" class="form-control" required>
+                                    <option value="" hidden>请选择审核人</option>
+                                    <foreach name="auditor" item="item">
+                                        <option value="{$item.id}_{$item.name}">{$item.name}</option>
+                                    </foreach>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-primary" type="submit" id="addCategoryButton">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $("#warehouse_num").on('change', function () {
+        var te = $(this).find('option:selected').text();
+        $("#warehouse_name").val(te);
+    });
+    $('form').ajaxForm({
+        type: 'post',
+        success: function (res) {
+            console.log(res);
+            layer.msg(res.msg, function () {
+                if (res.status > 0){
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                }
+            });
+        }
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <h3 style="padding: 20px;">联系方式</h3>
+    <table class="table table-striped table-hover table-bordered">
+        <tr>
+            <th>个人电话</th>
+            <th>个人邮箱</th>
+            <th>家庭主要成员</th>
+            <th>家庭主要成员联系方式</th>
+            <th>操作</th>
+        </tr>
+        <tr v-for="(item, index) in contact" v-if='item.flag!=="del"'>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.phone}}
+                </span>
+                <el-input v-model="item.phone" placeholder="个人电话" v-else></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.mail}}
+                </span>
+                <el-input v-model="item.mail" placeholder="个人邮箱" v-else></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.member}}
+                </span>
+                <el-input v-model="item.member" placeholder="请输入成员" v-else></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.contact}}
+                </span>
+                <el-input v-model="item.contact" placeholder="请输入成员联系方式" v-else></el-input>
+            </td>
+            <td>
+                <button class="btn btn-warning" @click="delContact(index)" v-if="item.flag == 'get'">删除</button>
+                <button class="btn btn-info" @click="editContact(index)" v-if="item.flag == 'get' && addAble">修改</button>
+                <button class="btn btn-primary" @click="saveContact(index)" v-if="item.flag != 'get'">保存</button>
+            </td>
+        </tr>
+    </table>
+    <button class="btn btn-info" @click="addContact" style="margin-left: 50px;" v-if="addAble">新增联系方式项</button>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var id = {$id | json_encode};
+    var vm = new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                contact: [],
+                loading: true,
+                id: id
+            }
+        },
+        created: function () {
+            this.getData()
+        },
+        computed: {
+            addAble: function () {
+                return this.contact.every(function (value) {
+                    return value.flag == 'get'
+                })
+            }
+        },
+        methods: {
+            getData: function () {
+                var vm = this;
+                this.loading = true;
+                $.post('', {}, function (res) {
+                    vm.loading = false
+                    vm.contact = res.data
+                })
+            },
+            delContact: function (index) {
+                var vm = this
+                layer.confirm('确认删除?', function (aaa) {
+                    $.post('{:U("delContact")}', {id: vm.contact[index].id}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                        layer.close(aaa)
+                    })
+                })
+            },
+            editContact: function(index){
+                this.contact[index].flag = 'put'
+            },
+            // 提交数据
+            saveContact: function (index) {
+                var vm = this
+                var data = this.contact[index]
+                if (data.flag == 'add'){
+                    data.employee_id = vm.id
+                    $.post('{:U("addContact")}', {data: data}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+                if (data.flag == 'put'){
+                    $.post('{:U("putContact")}', {data: vm.contact}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+            },
+            // 新增一行空数据
+            addContact: function () {
+                var obj = {
+                    flag: 'add'
+                }
+                this.contact.push(obj)
+            },
+            submit: function () {
+                var vm = this;
+                layer.confirm('确认提交?', function (index) {
+                    this.loading = true;
+                    $.post('', {data: vm.contact, method: 'put'}, function (res) {
+                        layer.msg(res.msg)
+                        vm.getData();
+                    })
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

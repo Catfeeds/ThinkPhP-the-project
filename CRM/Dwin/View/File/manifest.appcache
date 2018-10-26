@@ -1,0 +1,4 @@
+CACHE MANIFEST
+#version 1.0
+CACHE:
+    /Public/pdfjs/build/pdf.worker.js

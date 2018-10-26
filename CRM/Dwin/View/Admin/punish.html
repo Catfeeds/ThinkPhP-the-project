@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body{
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <h3 style="padding: 20px;">奖惩记录</h3>
+    <button class="btn btn-xs btn-info" @click="addPunish" v-if="addAble">添加记录</button>
+    <table class="table table-striped table-hover table-bordered">
+        <tr>
+            <th>类别</th>
+            <th>日期</th>
+            <th>事由</th>
+            <th>罚金/奖金</th>
+            <th>扣分</th>
+            <th>操作</th>
+        </tr>
+        <tr v-for="(item, index) in punish">
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.type}}
+                </span>
+                <el-select v-model="item.type" placeholder="请选择" v-else>
+                    <el-option
+                            :key="'奖励'"
+                            :label="'奖励'"
+                            :value="'奖励'">
+                    </el-option>
+                    <el-option
+                            :key="'处罚'"
+                            :label="'处罚'"
+                            :value="'处罚'">
+                    </el-option>
+                </el-select>
+            </td>
+            <td>
+                <el-date-picker
+                        v-model="item.record_time"
+                        type="date"
+                        placeholder="选择日期"
+                        value-format="timestamp"
+                        :readonly="item.flag == 'get'"
+                >
+                </el-date-picker>
+            </td>
+            <td>
+                 <span v-if="item.flag == 'get'">
+                    {{item.reason}}
+                </span>
+                <el-input v-model="item.reason" type="textarea" placeholder="事由" v-else></el-input>
+            </td>
+            <td>
+                 <span v-if="item.flag == 'get'">
+                    {{item.fee}}
+                </span>
+                <el-input v-model="item.fee" placeholder="罚金/奖金" v-else></el-input>
+            </td>
+            <td>
+                 <span v-if="item.flag == 'get'">
+                    {{item.score}}
+                </span>
+                <el-input v-model="item.score" placeholder="加分/扣分" v-else></el-input>
+            </td>
+            <td>
+                <button class="btn btn-warning" @click="delPunish(index)" v-if="item.flag == 'get'">删除</button>
+                <button class="btn btn-info" @click="editPunish(index)" v-if="item.flag == 'get' && addAble">修改</button>
+                <button class="btn btn-primary" @click="savePunish(index)" v-if="item.flag != 'get'">保存</button>
+            </td>
+        </tr>
+    </table>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var id = {$id|json_encode};
+    var vm = new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                punish: [],
+                loading: true,
+                id: id
+            }
+        },
+        created: function () {
+            this.getData();
+        },
+        computed: {
+            addAble: function () {
+                return this.punish.every(function (value) {
+                    return value.flag == 'get'
+                })
+            }
+        },
+        methods: {
+            getData: function () {
+                this.loading = true
+                var vm = this;
+                $.post('', {}, function (res) {
+                    vm.punish = res.data;
+                    vm.loading = false
+                })
+            },
+            delPunish: function(index){
+                var vm = this
+                layer.confirm('确认删除?', function (aaa) {
+                    $.post('{:U("delPunish")}', {id: vm.punish[index].id}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                        layer.close(aaa)
+                    })
+                })
+            },
+            editPunish: function(index){
+                this.punish[index].flag = 'put'
+            },
+            savePunish: function (index) {
+                var vm = this
+                var data = this.punish[index]
+                data.record_time /= 1000
+                if (data.flag == 'add'){
+                    data.employee_id = vm.id
+                    $.post('{:U("postPunish")}', {data: data}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+                if (data.flag == 'put'){
+                    $.post('{:U("putPunish")}', {data: data}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+            },
+            addPunish: function(){
+                var obj = {
+                    flag: 'add'
+                }
+                this.punish.unshift(obj)
+            },
+            submit: function () {
+                var vm = this;
+                layer.confirm('确认提交?', function (index) {
+                    vm.loading = true
+                    $.post('', {data: vm.punish,method: 'put'}, function (res) {
+                        layer.msg(res.msg)
+                        this.getData();
+                    })
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

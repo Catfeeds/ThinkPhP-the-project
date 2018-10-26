@@ -1,0 +1,103 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存管理</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/Public/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="/Public/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .hiddenDiv{
+            display: none;
+        }
+        .ibox-title{
+            padding-top:7px;
+        }
+    </style>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <div class="fa-hover col-sm-4 col-sm-2">
+                        <button type="button" class="btn btn-info btn-outline" name="warehouseManage" id="warehouseManager">仓库管理</button>
+                    </div>
+                </div>
+
+                <!--
+                <div class="ibox-content" style="overflow: hidden;">
+                    <form action="" class="form-inline" style="display: flex;align-items: center;">
+                        <label for="" class="col-xs-1">新增库房</label>
+                        <input type="text" class="form-control col-xs-2" id="warehouseNumber" placeholder="输入库房编号" style="margin-right: 20px;" required>
+                        <input type="text" class="form-control col-xs-2" id="warehouseName" placeholder="输入库房名" style="margin-right: 20px;" required>
+                        <button class="btn btn-info" id="addWarehouse">新增库房</button>
+                    </form>
+                </div>-->
+                <div class="ibox-content">
+                    <div class="ibox-content" style="margin-top: 15px;">
+                        <table id="table" class="table table-striped table-bordered table-full-width" width="100%">
+                            <thead>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script>
+    var tableDiv = $("#table");
+    var oTable;
+    var controller = "/Dwin/Stock";
+    $(document).ready(function () {
+        oTable = tableDiv.DataTable({
+            "paging"       : true,
+            "autoWidth"    : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 20, 35, 50],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true,//开启服务器获取数据
+            "ajax"         : { // 获取数据
+                "url"   : controller + "/showWarehouse",
+                "type"  : 'post'
+            },
+            "columns" :[ //定义列数据来源
+                {'title' : "库房编号",   'data' : 'rep_id','class' : 'repertoryList'},
+                {'title' : "库房名称",'data' : 'repertory_name'},
+                {'title' : "库管员",     'data' : "manager_name"},
+                {'title' : "物流员",  'data' : "logistics_staff_name"},
+                {'title' : "库房级别",       'data' : "display_level"}            ]
+        });
+    });
+    $("#warehouseManager").on('click', function () {
+        layer.open({
+            type: 2,
+            area: ['100%', '90%'],
+            end : function () {
+                oTable.ajax.reload();
+            },
+            title: '库房管理',
+            content: controller + '/warehouseManager'
+        });
+    });
+</script>
+</body>
+</html>

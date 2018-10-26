@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>单据</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {color:black;}
+        table .invoice-table1 thead tr th{text-align: left;}
+    </style>
+</head>
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox-content p-xl">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h4>订单基本信息</h4>
+                            <table class="table invoice-table1">
+                                <thead >
+                                <tr style="text-align: left;">
+                                    <th>
+                                        <strong>单据编号：</strong>{$data.order_id}
+                                    </th>
+                                    <th>订单时间：{$data.otime|date='Y-m-d H:i:s',###}</th>
+                                    <th>销货单类型：
+                                        <switch name="data.order_type">
+                                            <case value="1">正常销货</case>
+                                            <case value="2">预收</case>
+                                            <case value="3">应收借物</case>
+                                            <case value="4">免费样品</case>
+                                            <case value="5">借物退库</case>
+                                            <case value="6">借物销货</case>
+                                            <case value="7">退货</case>
+                                            <case value="8">退款</case>
+                                        </switch>
+                                    </th>
+                                    <th>业绩类型：
+                                        <switch name="data.static_type">
+                                            <case value="1">技术服务费</case>
+                                            <case value="2">市场拓展业绩</case>
+                                            <case value="3">价值业绩</case>
+                                        </switch>
+                                    </th>
+
+                                    <th>业务员：{$data.pic_name}</th>
+                                    <th>业务电话:{$data.pic_phone}</th>
+                                </tr>
+                                <tr> <th>客户名称：{$data.cus_name}</th>
+                                    <th>
+                                        快递方式：
+                                        <switch name="data.logistics_type">
+                                            <case value="1">顺丰航空</case>
+                                            <case value="2">顺丰陆运</case>
+                                            <case value="3">德邦陆运</case>
+                                            <case value="4">德邦快递</case>
+                                            <case value="6">跨越普运</case>
+                                            <case value="7">跨越次日达</case>
+                                        </switch>
+                                    </th>
+                                    <th>运费支付方式：
+                                        <switch name="data.freight_payment_method">
+                                            <case value="1">到付</case>
+                                            <case value="2">寄付</case>
+                                        </switch>
+                                    </th>
+                                    <th>发货仓库：{$data.ware_house}</th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        收货人：{$data.receiver}<!--receiver-->
+                                    </th>
+                                    <th>收货人联系方式：{$data.receiver_phone}</th><!--receiver_phone-->
+                                    <th colspan="3">订单收货地址：{$data.receiver_addr}</th>
+                                </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="well m-t"><strong>订单备注：</strong> {$data.logistices_tip}
+                    </div>
+                    <div class="table-responsive m-t">
+                        <h4>订单产品信息</h4>
+                        <table class="table invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>产品</th>
+                                    <th>系统编号</th>
+                                    <th>型号</th>
+                                    <th>单价</th>
+                                    <th>数量</th>
+                                    <th>总价</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="prod" id="vol">
+                                <tr>
+                                    <td>
+                                        <div><strong>{$vol.prodtype}</strong></div>
+                                    </td>
+                                    <td>{$vol.product_id}</td>
+                                    <td>{$vol.product_name}</td>
+                                    <td>&yen;{$vol.product_price}</td>
+                                    <td>{$vol.product_num}</td>
+                                    <td>&yen;{$vol.product_total_price}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /table-responsive -->
+
+                    <table class="table invoice-total">
+                        <tbody>
+                            <tr>
+                                <td><strong>总计：</strong></td>
+                                <td>&yen;{$data.oprice}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h4>发票情况</h4>
+                    <table class="table invoice-table1">
+                        <thead >
+                        <tr style="text-align: left;">
+                            <th>
+                                <strong>票货情况：</strong>
+                                <switch name="data.invoice_situation">
+                                    <case value="6">现开</case>
+                                    <case value="5">换货</case>
+                                    <case value="4">发票待开</case>
+                                    <case value="3">累开</case>
+                                </switch>
+                            </th>
+                            <th>付款方式：
+                                <switch name="data.invoice_type">
+                                    <case value="1">增票</case>
+                                    <case value="2">普票</case>
+                                    <case value="3">换货</case>
+                                    <case value="4">营业税票</case>
+                                    <case value="5">收据</case>
+                                </switch>
+                            </th>
+                            <th>发票收件人：{$data.invoice_contact}</th><!--invoice_contact invoice_phone-->
+                            <th>收件人电话：{$data.invoice_phone}</th>
+                            <th>发票接收地址：{$data.invoice_addr}</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="well m-t"><strong>财务备注：</strong> {$data.finance_tip}
+                    </div>
+                    <h4>财务情况</h4>
+                    <table class="table invoice-table1">
+                        <thead >
+                        <tr style="text-align: left;">
+                            <th>
+                                <strong>订单类别：</strong>
+                                <switch name="data.invoice_situation">
+                                    <case value="6">现开</case>
+                                    <case value="5">换货</case>
+                                    <case value="4">发票待开</case>
+                                    <case value="3">累开</case>
+                                </switch>
+                            </th>
+                            <th>结算方式：
+                                <switch name="data.invoice_type">
+                                    <case value="1">增票</case>
+                                    <case value="2">普票</case>
+                                    <case value="3">换货</case>
+                                    <case value="4">营业税票</case>
+                                    <case value="5">收据</case>
+                                </switch>
+                            </th>
+                            <th>结算日期：{$data.invoice_contact}</th><!--invoice_contact invoice_phone-->
+                            <th>订单流程：{$data.invoice_phone}</th>
+                            <th>发票接收地址：{$data.invoice_addr}</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <input type="button" value="打印" id="print">
+        </div>
+    </div>
+    <script src="__PUBLIC__/html/js/jquery.min.js?v=2.1.4"></script>
+    <script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+    <script type="text/javascript">
+        $("#print").on('click', function (){
+            $("#print").css('display', 'none');
+            window.print();
+        });
+        //window.print();
+    </script>
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <!-- Data Tables -->
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+    <el-row>
+        查找方式:
+        <el-radio v-model="flag" label="1" @change="changeFlag">按期查看</el-radio>
+        <el-radio v-model="flag" label="2" @change="changeFlag">按时间区间查看</el-radio>
+    </el-row>
+    <el-row>
+        <el-col v-if="flag == 1">
+            <el-select v-model="where.assign_times" @change="getData" placeholder="请选择时间批次">
+                <el-option
+                        v-for="item in timeBatch"
+                        :key="item.assign_times"
+                        :label="item.assign_times"
+                        :value="item.assign_times">
+                </el-option>
+            </el-select>
+        </el-col>
+        <el-col v-if="flag == 2">
+            <el-date-picker
+                    @change="getData"
+                    v-model="where.start"
+                    type="date"
+                    value-format="yyyy-MM-dd"
+                    placeholder="开始时间">
+            </el-date-picker>
+            <el-date-picker
+                    @change="getData"
+                    v-model="where.end"
+                    type="date"
+                    value-format="yyyy-MM-dd"
+                    placeholder="结束时间">
+            </el-date-picker>
+        </el-col>
+    </el-row>
+</div>
+<div class="col-xs-12 col-md-4" id="main" style="height:400px;"></div>
+<div class="col-xs-12 col-md-4" id="main_1" style="height:400px;"></div>
+<div class="col-xs-12 col-md-4" id="main_2" style="height:400px;"></div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.4/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0.rc2/echarts.js"></script>
+<script>
+    var batch = {$assignT | json_encode};
+    var data = [];
+    var char0 = echarts.init(document.getElementById('main'));
+    var char1 = echarts.init(document.getElementById('main_1'));
+    var char2 = echarts.init(document.getElementById('main_2'));
+
+    var vm = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                timeBatch: batch,
+                flag: '1',
+                where: {},
+                data: []
+            }
+        },
+        methods: {
+            getData: function () {
+                this.where.flag = this.flag
+                $.post('', {
+                    data: this.where
+                }, function (res) {
+                    graphData = [];
+
+                    data = res.data;
+                    var graphData;
+                    var obj = new Object();
+                    for (var p = 0; p < data.length; p++) {
+                        graphData[p] = [];
+                        data[p].name.forEach((v,i) => {
+                            obj = {
+                                value : data[].value[i],
+                                name  : v
+                            }
+                        });
+                        graphData[p].push(obj);
+
+                    }
+                    console.log(graphData);
+                    char[p].setOption({
+                        series: [{
+                            // 根据名字对应到相应的系列
+                            name: data.p.question,
+                            type: 'pie',
+                            data: graphData[p]
+                        }]
+                    });
+
+                })
+            },
+            changeFlag: function () {
+                if (this.flag == 1){
+                    this.where = {
+                        assign_times : ''
+                    }
+                }
+                if (this.flag == 2){
+                    this.where = {
+                        start: '',
+                        end: ''
+                    }
+                }
+            }
+        }
+    })
+
+
+</script>
+</body>
+</html>

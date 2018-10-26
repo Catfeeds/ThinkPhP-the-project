@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CRM--订单列表</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .selected{
+            background-color: #2a83cf !important;
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>订单列表</h5>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="changeOrder" id="order_1"><i class="fa fa-tv">审核中订单</i></a></div>
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="changeOrder" id="order_2"><i class="fa fa-tv">已审核订单</i></a></div> 
+                    <div class="fa-hover col-md-2 col-sm-4 "><a href="javascript:;" class="changeOrder" id="order_3"><i class="fa fa-tv">不合格订单</i></a></div>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                    <input type="hidden" name="orderType" id="orderType" value="order_1">
+                    <input type="hidden" name="orderNum" id="orderNum" value="{:I('get.k')}">
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-orderTable">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+				                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+				                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div>
+                            <span id="changeOrderButton"></span>
+                            <span id="delOrderButton"></span>
+                            <button id="copy" class="btn btn-primary">复制订单</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/finance/common_finance.js"></script>
+<script>
+    var controller = "__CONTROLLER__";
+    var orderTableDiv = $(".dataTables-orderTable");
+    var orderTableTBodyDiv = $(".dataTables-orderTable tbody");
+    var changeOrderBtn = $(".changeOrder");
+    var changeOrderDiv = $("#changeOrderButton");
+    var delOrderDiv = $("#delOrderButton");
+    var oTable;
+    $(document).ready(function () {
+        oTable = orderTableDiv.dataTable({
+            "paging"       : true,
+            "autoWidth"    : false,
+            "pagingType"   : "full_numbers",
+            "lengthMenu"   : [10, 20, 35, 50],
+            "bDeferRender" : true,
+            "processing"   : true,
+            "searching"    : true, //是否开启搜索
+            "serverSide"   : true,//开启服务器获取数据
+            "ajax"         : { // 获取数据
+                "url"   : controller + "/showOrderList",
+                "type"  : 'post',
+                "data"  : {
+                    "orderType": function () {
+                    return document.getElementById('orderType').value;
+                    },
+                    'orderNum' : function () {
+                    return document.getElementById('orderNum').value;
+                    },
+                }
+            },
+            "columns" :[ //定义列数据来源
+                {'title' : "订单编号",   'data' : 'cpo_id'},
+                {'title' : "订单时间",   'data' : 'time', 'class' : "mouseOn cusDetail"},
+                {'title' : "业务员",     'data' : "staname"},
+                {'title' : "业务员电话", 'data' : "staff_phone"},
+                {'title' : "客户名",     'data' : "cusname"},
+                {'title' : "结算方式",   'data' : 'settle_name'},
+                {'title' : "票货情况",   'data' : "inv_situation"},
+                {'title' : "付款方式",   'data' : "inv_type"},
+                {'title' : "快递方式",   'data' : "log_type"},
+                {'title' : "发货仓库",   'data' : "ware_house"},
+                {'title' : "K3单据编号", 'data' : 'k3_id'},
+                {'title' : '金额',       'data' : 'cur_num'},
+                {'title' : "审核进度",   'data' : 'audit_status'} // 自定义列   {'title':"负责人",'data':null,'class':"align-center"}
+            ]
+        });
+    });
+
+    orderTableTBodyDiv.on('click', 'td', function (e) {
+        var index = $(this)[0]['cellIndex'];
+        if (index == 10) {
+            e.stopPropagation();
+            var id = $(this).parent().attr('id');
+            layer.open({
+                type   : 2,
+                title  : '销售单据',
+                area   : ['100%', '100%'],
+                content: controller + "/showInvoiceDetail/orderId/" + id //iframe的url
+            })
+        }
+    });
+
+    var orderType;
+    var oTable;
+ changeOrderBtn.on('click', function() {
+        changeOrderBtn.css('color', '#337ab7');
+        $(this).css('color','red');
+        var kElement =  document.getElementById("orderType");
+        var id = $(this).attr('id');
+        kElement.value = id;
+        var html = "";
+       changeOrderDiv.html(html);
+        orderType = document.getElementById('orderType').value;
+        if (orderType == "order_3") {   
+        // 渲染按钮
+            var html = "<input type='button' class='btn btn-outline btn-success changeBtn' id='changeButton' value='修改选中订单'/>";
+           changeOrderDiv.html(html);
+            var html2 = "<input type='button' class='btn btn-outline btn-success deleteBtn' id='deleteButton' value='删除不合格订单'/>";
+           delOrderDiv.html(html2);
+        }
+        oTable = orderTableDiv.DataTable();
+        oTable.ajax.reload();
+    });
+
+    // 点击高亮
+    orderTableTBodyDiv.on( 'click', 'tr', function () {
+        orderType = document.getElementById('orderType').value;
+        oTable = orderTableDiv.DataTable();
+        if (orderType == "order_3") {
+            if ( $(this).hasClass('selected') ) {
+                $(this).removeClass('selected');
+            }
+            else {
+                oTable.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        }
+    });
+
+
+    // 点击修改按钮修改订单，未选中提示
+    $(document).on('click', "#changeButton", function() {
+        $(this).attr('disabled', 'disabled');
+        var orderId = orderTableTBodyDiv.find('.selected').attr('id');
+        if (orderId) {
+            $.ajax({
+                type : "post",
+                url  : controller + '/checkOrderOwner',
+                data : {
+                    order_id : orderId
+                },
+                success : function (ajaxData) {
+                    if (ajaxData == 2) {
+                        layer.open({
+                            type    : 2,
+                            title   : '修改订单',
+                            end     : function (){
+                                $('#changeButton').attr('disabled', false);
+                                Table = orderTableDiv.DataTable();
+                                oTable.ajax.reload();
+                            },
+                            area    : ['100%', '100%'],
+                            content : controller + "/editOrderTest/orderId/" + orderId
+                        });
+                    } else {
+                        layer.alert("您不是该订单的负责人");
+                        $('#changeButton').attr('disabled', false);
+                    }
+                }
+            });
+        } else {
+            layer.alert('未选择要修改的订单');
+            $(this).attr('disabled', false);
+            return false;
+        }
+    });
+    $(document).on('click', "#deleteButton", function() {
+        $(this).attr('disabled', 'disabled');
+        var orderId = orderTableTBodyDiv.find('.selected').attr('id');
+        if (orderId) {
+            $.ajax({
+                type : "post",
+                url  : controller + '/delUnqualifiedOrder',
+                data : {
+                    order_id : orderId
+                },
+                success : function (ajaxData) {
+                    layer.msg(ajaxData['msg'], {
+                        time : 500
+                    });
+                    if (ajaxData['status'] == 200) {
+                        oTable = orderTableDiv.DataTable();
+                        oTable.ajax.reload();
+                    }
+                    $("#deleteButton").attr('disabled', false);
+                }
+            });
+        } else {
+            layer.msg("没选中要删除的订单", {
+                time : 500
+            }, function () {
+                $("#deleteButton").attr('disabled', false);
+            });
+
+            return false;
+        }
+    });
+    var id;
+    $(document).on('click', 'tr', function () {
+        $('tr').each(function (k, v) {
+            $(v).removeClass('selected');
+        });
+        $(this).addClass('selected');
+        id = oTable.row(this).data().id;
+    });
+    $('#copy').on('click', function () {
+        $.ajax({
+            type : "post",
+            url  : controller + '/checkOrderOwner',
+            data : {
+                order_id : id
+            },
+            success : function (ajaxData) {
+                if (ajaxData == 2) {
+                    layer.open({
+                        type    : 2,
+                        title   : '修改订单',
+                        end     : function (){
+                            $('#changeButton').attr('disabled', false);
+                            Table = orderTableDiv.DataTable();
+                            oTable.ajax.reload();
+                        },
+                        area    : ['100%', '100%'],
+                        content : controller + "/editOrderTest/orderId/" + id + '?is_copy=1'
+                    });
+                } else {
+                    layer.alert("您不是该订单的负责人");
+                    $('#changeButton').attr('disabled', false);
+                }
+            }
+        });
+    });
+    changeCss('orderTable', 10);
+    changeCss('orderTable', 12);
+    showNumDetail('orderTable', controller + "/showUnqualified", 12);
+</script>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>维修单转移</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+        .selected{
+            background: #fbec88 !important;
+        }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="ibox-content" style="margin-top: 15px;">
+    <table id="table" class="table table-striped table-bordered table-full-width" width="100%">
+        <thead>
+        </thead>
+        <tbody>
+        <tr>
+            <td colspan="2">待转移维修单编号:{$saleRecord.sale_number}</td>
+            <input type="hidden" id="change_id" value="{$saleRecord.sid}">
+
+
+        </tr>
+        <tr>
+            <td>原负责人:{$saleRecord.salename}</td>
+            <td>
+                <div class="input-group">
+                    <label for="user_id">现负责人</label>
+                    <select name="user_id" id="user_id" class="form-control chosen-select" style="width:100%">
+                        <option value="">请选择</option>
+                        <volist name="staff" id="vo">
+                            <option value="{$vo.id}">{$vo.name}</option>
+                        </volist>
+                    </select>
+                </div>
+
+            </td>
+        </tr>
+        <tr>
+            <td>{$changeName}</td>
+            <td><button type="button" id="assignBtn" class="btn btn-info">确认修改</button></td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+<script src="__PUBLIC__/Admin/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $(document).ready(function () {
+        var assignBtn = $('#assignBtn');
+        assignBtn.on('click', function() {
+            assignBtn.attr('disabled', true);
+            var a_num = 0;
+            if($("#user_id").val()) {
+                layer.confirm('是否确认修改负责人？',
+                    {
+                        btn: ['是', '否'],
+                        icon: 6
+                    }, function () {
+                        a_num += 1;
+                        if (a_num == 1) {
+                            $.ajax({
+                                type: 'POST',
+                                url: "__CONTROLLER__/assignSale",
+                                data: {
+                                    change_id: $("#change_id").val(),
+                                    user_id: $("#user_id").val()
+                                },
+                                success: function (msg) {
+                                    layer.msg(msg['msg'], function () {
+                                        assignBtn.attr('disabled', false);
+                                        layer.closeAll();
+                                    });
+                                }
+                            });
+                        }
+                    });
+            } else {
+                layer.msg("请您选择要把该维修单转移给哪位业务员");
+                assignBtn.attr('disabled', false);
+            }
+        });
+        $(".chosen-select").chosen({
+            no_results_text : "该产品名不存在",//搜索无结果时显示的提示
+            search_contains : true,   //关键字模糊搜索，设置为false，则只从开头开始匹配
+            allow_single_deselect:true, //是否允许取消选择
+            width : '100%'
+        });
+    });
+</script>
+</body>
+</html>

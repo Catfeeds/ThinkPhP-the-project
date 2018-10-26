@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--联系记录详情</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {  color: black;  }
+    </style>
+</head>
+<body class="gray-bg"<div>    <button type="button" class="btn btn-default refresh-btn" aria-label="Left Align">        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>    </button></div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <div class="table-responsive1">
+                        <table class="table table-bordered table-striped dataTables-busRecordList">
+                            <thead>
+                            <tr><td colspan="6"><h5>{$data[0]['cname']}联系记录</h5></td></tr>
+                                <tr>
+                                    <th>联系时间</th>
+                                    <th>主题</th>
+                                    <th>联系内容</th>
+                                    <th>联系类型</th>
+                                    <th>提交时间</th>
+                                    <th>提交人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <volist name="data" id="vol">
+                                <tr>
+                                    <td>{$vol.ctime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.theme}</td>
+                                    <td class="prjUpdContent mouseOn" data="{$vol.content}">{$vol.content|subtext=30}</td>
+                                    <td>
+                                        <switch name="vol.ctype">
+                                            <case value="1">电话</case>
+                                            <case value="2">拜访</case>
+                                            <case value="3">会议</case>
+                                            <case value="4">即时通讯（qq,微信）</case>
+                                            <case value="5">邮件</case>
+                                            <case value="6">其他</case>
+                                        </switch>
+                                    </td>
+                                    <td>{$vol.posttime|date='Y-m-d H:i:s',###}</td>
+                                    <td>{$vol.pname}</td>
+                                </tr>
+                            </volist>
+                            </tbody>
+                        </table>
+                        <input class="hidden" type="hidden" id="roleCon" value="{$Think.session.staffId}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="__PUBLIC__/html/js/dwin/customer/common_func.js"></script>
+<script>
+    var layera;
+    $(document).ready(function() {
+        dataTabelset('example',10);
+        showAllcontent(layera, 'busRecordList', 'prjUpdContent');
+    });
+
+</script>
+</body>
+</html>

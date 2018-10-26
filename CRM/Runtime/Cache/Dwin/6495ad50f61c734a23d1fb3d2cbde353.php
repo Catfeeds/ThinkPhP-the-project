@@ -1,0 +1,295 @@
+<?php if (!defined('THINK_PATH')) exit();?><!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--添加客户维修单</title>
+    <link href="/Public/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/Public/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="/Public/html/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="/Public/html/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="/Public/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="/Public/html/css/animate.min.css" rel="stylesheet">
+    <link href="/Public/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="/Public/html/css/plugins/select2/select2.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        } 
+        .chosen-select{ 
+            color : black!important;
+        }   
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins" id="orders">
+                <div class="ibox-title">
+                    <h5>售后单基本信息编辑</h5>
+                    <div class="ibox-tools"><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></div>
+                </div>
+                <div class="ibox-content" id="app">
+                    <div class="table-responsive1">
+                        <form id="addSaleRepairingForm1" method="post">
+                            <h5>售后单基本信息</h5>
+                            <el-table
+                                :data="recordData_Array"
+                                stripe
+                                size="mini"
+                                style="border:1px solid #ccc"
+                                style="width: 100%">
+                                <el-table-column
+                                label="售后单号："
+                                >
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.sale_number"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="快递单号："
+                                >
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.courier_number"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="是否有售后维修单："
+                                >
+                                <template slot-scope="scope">
+                                    <el-select v-model="scope.row.is_repairorder" placeholder="请选择">
+                                        <el-option
+                                          v-for="item in options_yesNo"
+                                          :key="item.name"
+                                          :label="item.name"
+                                          :value="item.name">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="客户："
+                                >
+                                <template slot-scope="scope">
+                                    <el-select v-model="scope.row.cusname" filterable remote reserve-keyword placeholder="请输入客户名称" :remote-method="addr" ref="relateMovie">
+                                        <el-option v-for="item in results" :key="item.id" :label="item.text" :value="item.text">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="业务员:"
+                              >
+                                <template slot-scope="scope">
+                                    <el-select v-model="scope.row.salename" filterable placeholder="请选择">
+                                        <el-option
+                                            v-for="item in res"
+                                            :key="item.id"
+                                            :label="item.name"
+                                            :value="item.id">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <div style="margin: 10px 0 20px 0;">
+                            <span>返回地址：</span><el-input
+                                style="display: inline-block;"
+                                type="textarea"
+                                :rows="2"
+                                placeholder="请输入内容"
+                                v-model="recordData_Array[0].reback_address">
+                            </el-input>
+                        </div>                                                                                                
+                        <el-table
+                            :data="productMsg"
+                            stripe
+                            size="mini"
+                            style="border:1px solid #ccc"
+                            style="width: 100%">
+                            <el-table-column label="产品类别" width="100">
+                                <template slot-scope="scope">
+                                    <el-select v-model="scope.row.product_category_id" :disabled="flag_boolend" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in proCate"
+                                            :key="item.id"
+                                            :label="item.name"
+                                            :value="item.id">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="产品型号"
+                                width="200">
+                                <template slot-scope="scope">
+                                    <el-select v-model="scope.row.product_name" :disabled="flag_boolend" filterable placeholder="请选择">
+                                        <el-option
+                                            v-for="item in productCate"
+                                            :key="item.product_id"
+                                            :label="item.product_name"
+                                            :value="item.product_id">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="数量（件）"
+                                width="100">
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.num" :disabled="flag_boolend"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="条码日期"
+                                width="180">
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.barcode_date"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="客户反馈问题"
+                                >
+                                <template slot-scope="scope">
+                                    <el-input type="textarea" v-model="scope.row.customer_question"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="售后方式"
+                                width="160">
+                                <template slot-scope="scope">
+                                    <el-select v-model="scope.row.sale_way" placeholder="请选择">
+                                        <el-option
+                                            v-for="item in shmethod"
+                                            :key="item.id"
+                                            :label="item.name"
+                                            :value="item.id">
+                                        </el-option>
+                                    </el-select>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        </form>
+                        <h4>维修单信息</h4>
+                        <el-table
+                                :data="recordData_Array"
+                                stripe
+                                size="mini"
+                                style="border:1px solid #ccc"
+                                style="width: 100%">
+                                <el-table-column
+                                label="人工费用(元)："
+                                width="150"
+                                >
+                                <template slot-scope="scope">
+                                    <el-input v-model="scope.row.rgmoney"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column
+                                label="备注信息："
+                                >
+                                <template slot-scope="scope">
+                                    <el-input type="textarea" v-model="scope.row.note"></el-input>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                        <br>
+                        <div style="width:100%;text-align: center">
+                            <el-button @click="submit" type="success">保存提交</el-button><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/html/js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<script src="/Public/html/js/plugins/chosen/chosen.jquery.js"></script>
+<script src="/Public/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/Public/html/js/content.min.js?v=1.0.0"></script>
+<script src="/Public/html/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/Public/html/js/plugins/validate/messages_zh.min.js"></script>
+<script src="/Public/html/js/plugins/layer/layer.js"></script>
+<script src="/Public/html/js/dwin/WdatePicker.js"></script>
+<script src="/Public/html/js/dist/js/select2.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+var recordData = <?php echo (json_encode($recordData)); ?>;
+var flag = <?php echo (json_encode($flag)); ?>;
+console.log(flag)
+var productData = <?php echo (json_encode($productData)); ?>;
+var shmethod = <?php echo (json_encode($shmethod)); ?>;
+var res = <?php echo (json_encode($res)); ?>;
+var proCate = <?php echo (json_encode($proCate)); ?>;
+var product = <?php echo (json_encode($product)); ?>;
+var productCate = <?php echo (json_encode($productCate)); ?>;
+var vm = new Vue({
+    el: '#app',
+    data: function () {
+        return {
+            productMsg:productData,
+            shmethod:shmethod,
+            proCate:proCate,
+            product:product,
+            flag_boolend:false,  
+            res:res,
+            productCate:productCate,
+            loading:true,
+            results:[],
+            recordData_Array:[],
+            options_yesNo:[
+                {name:'是'},
+                {name:'否'}
+            ]
+        }
+    },
+    created() {
+        this.recordData_Array = []
+        this.recordData_Array.push(recordData)
+        if(flag){
+            this.flag_boolend = false
+        }else{
+            this.flag_boolend = true
+        }
+    },
+    watch:{
+        
+    },
+    methods: {
+        //读取客户地址
+        addr (vul){
+            $.get('/Dwin/SaleService/addSelect', {q:vul}, function (res) {
+                if(res.results){
+                    vm.results = res.results
+                }
+            })
+        },
+        submit(){
+            var data = {
+                baseMsg:this.recordData_Array[0],
+                productMsg:this.productMsg
+            }
+            console.log(data)
+            $.post('/Dwin/SaleService/editSaleBaseMsg', data, function (res) {
+                layer.msg(res.msg)
+                if(res.status == 200){
+                    setTimeout(function(){
+                        var index=parent.layer.getFrameIndex(window.name);//获取窗口索引
+                        parent.layer.close(index)
+                    },1500)
+                }
+            })
+        }
+    }
+})
+
+</script>
+</body>
+</html>

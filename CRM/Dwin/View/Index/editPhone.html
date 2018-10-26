@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--个人信息修改</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$data.name}联系方式修改</h5>
+                </div>
+                <div class="ibox-content">
+                    <form class="form-horizontal m-t" id="signupForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" id="oldInput">原手机号码：</label>
+                            <div class="col-sm-4">
+                                <input id="oldPhone" name="oldPhone" class="form-control" type="text" readonly value="{$data.phone}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" id="newInput">新手机号码：</label>
+                            <div class="col-sm-4">
+                                <input id="newPhone" name="newPhone" class="form-control" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-8 col-sm-offset-3">
+                                <button class="btn btn-primary" type="button" id="eidtPhoneSubmit">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/dwin/WdatePicker.js"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script>
+    $("#eidtPhoneSubmit").on('click', function () {
+        $('#eidtPhoneSubmit').attr('disabled', 'disabled');
+        var newphone = $("#newPhone").val();
+        console.log(newphone);
+        if (newphone == "") {
+            $('#eidtPhoneSubmit').attr('disabled', false);
+            layer.alert('新的电话不能为空');
+            return false;
+        }
+        $.ajax({
+            type : 'POST',
+            url : '__CONTROLLER__/editPhone',
+            data : {
+                newphone : newphone
+            },
+            success : function (msg) {
+                if (msg == 2) {
+                    layer.msg('修改成功',
+                        {
+                            icon : 6,
+                            time : 500
+                        },
+                        function () {
+                            window.location.reload();
+                        }
+                    );
+                } else {
+                    layer.alert("修改失败");
+                    $('#eidtPhoneSubmit').attr('disabled', false);
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

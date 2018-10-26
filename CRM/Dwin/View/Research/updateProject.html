@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM--项目进度更新</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <style type="text/css">
+        body {
+            color: black;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <!--<h5>项目进度更新</h5>-->
+                    <h5>项目：&emsp;{$data.proname}({$data.prjid})</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+
+                        <form>
+                            <table class="table table-bordered table-striped">
+                                <tr>
+                                    <th>项目状态
+                                        <switch name="data.prostatus">
+                                            <case value="1">进展中</case>
+                                            <case value="2">验收中</case>
+                                            <case value="3">完成</case>
+                                            <case value="4">失败</case>
+                                        </switch>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        更新主题<input type="text" class="form-control" name="theme" id="updTheme" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        项目进展<textarea name="updContent" id="updContent" style="width:100%;height: 100px;"></textarea>
+                                    </td>
+                                </tr>
+                                <tr style="text-align: center;">
+                                    <td colspan="3">
+                                        <input type="hidden" id="hiddenPrj" value="{$data.prjid}">
+                                        <input class="btn btn-success" type="button" value="提交" id="submitContent"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script> 
+    var controller = "__CONTROLLER__";
+    $(".unCheck").css('color','red');
+    $(".allPro").css('color','blue');
+    $(".noCheckYet").css('color','black');
+    $(".checkNot").css('color','red');
+    $(".checkYes").css('color','blue');
+
+$('#submitContent').on('click',function(){
+    var _theme   = $("#updTheme").val();
+    var _content = $('#updContent').val();
+    var _proid   = $('#hiddenPrj').val();
+    if (!_theme) {
+        layer.alert("进展的主题不能为空，请填写");
+        return false;
+    }
+    if (_theme.length <= 1) {
+        layer.alert("太短了，多输入几个字吧");
+        return false;
+    }
+    if (!_content) {
+        layer.alert('进度内容为空！');
+        return false;
+    }
+    if (_content.length <= 20) {
+        layer.alert("填写的内容不要少于20，但不要多余2000字");
+        return false;
+    }
+    $.ajax({
+        type : 'POST',
+        data : {
+            content : _content,
+            proid   : _proid,
+            theme   : _theme
+        },
+        url : controller + "/updateProjectOk",
+        success : function(msg){
+            $("input[type=button]").attr('disabled',true);
+            if (msg['status'] == 2) {
+                layer.msg(
+                    '提交成功',
+                    {
+                        icon : 6,
+                        time : 500
+                    },
+                    function () {
+                        window.parent.location.reload();
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
+                    });
+
+            } else if (msg['status'] == 3) {
+                layer.msg(
+                    '提交失败',
+                    {
+                        icon : 5,
+                        time : 1000
+                    },
+                    function() {
+                        window.location.reload();
+                    }
+                );
+            }
+        },
+        error : function(){
+            layer.msg(
+                '提交失败',
+                {
+                    icon : 5,
+                    time : 1000
+                },
+                function() {
+                    window.location.reload();
+                }
+            );
+        }
+    });
+});
+</script>
+</body>
+</html>

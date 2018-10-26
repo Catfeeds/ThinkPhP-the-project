@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="cn-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link href="__PUBLIC__/html/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/animate.min.css" rel="stylesheet">
+    <link href="__PUBLIC__/html/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/theme-chalk/index.css" rel="stylesheet">
+    <style>
+        body{
+            padding: 20px;
+        }
+        input[type=file]{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div id="app" v-loading="loading">
+    <h3 style="padding: 20px;">教育经历</h3>
+    <table class="table table-bordered table-hover table-striped">
+        <tr>
+            <th>毕业学校</th>
+            <th>时间期间</th>
+            <th>专业</th>
+            <th>学历</th>
+            <th>外语水平</th>
+            <th>计算机水平</th>
+            <th>其他证书水平</th>
+            <th>证件资料上传</th>
+            <th>操作</th>
+        </tr>
+        <tr v-for="(item,index) in education" v-if="item.flag!='del'">
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.graduate_school}}
+                </span>
+                <el-input v-else v-model="item.graduate_school" placeholder="毕业学校"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.period}}
+                </span>
+                <el-input v-else v-model="item.period" placeholder="时间期间"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.major}}
+                </span>
+                <el-input v-else v-model="item.major" placeholder="专业"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.education}}
+                </span>
+                <el-input v-else v-model="item.education" placeholder="学历"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.language_level}}
+                </span>
+                <el-input v-else v-else v-model="item.language_level" placeholder="外语水平"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.computer_level}}
+                </span>
+                <el-input v-else v-model="item.computer_level" placeholder="计算机水平"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    {{item.other_level}}
+                </span>
+                <el-input v-else v-model="item.other_level" placeholder="其他证书水平"></el-input>
+            </td>
+            <td>
+                <span v-if="item.flag == 'get'">
+                    点击编辑按钮修改
+                </span>
+                <el-upload
+                        v-else
+                        class="uploadResume"
+                        action="{:U('uploadEmployeeFile')}"
+                        :data="{flag:'uploadPapers',index: index}"
+                        :on-success="papersUploadSuccess"
+                        :before-upload="validateDocument"
+                        :limit="1"
+                >
+                    <el-button size="small" type="primary" v-if="!item.papers_upload">上传相关资料文件</el-button>
+                    <el-button size="small" type="primary" v-else>更新相关资料文件</el-button>
+                </el-upload>
+                <el-button size="small" type="primary" v-if="item.papers_upload">查看相关资料</el-button>
+            </td>
+            <td>
+                <button class="btn btn-warning" @click="delEducation(index)" v-if="item.flag == 'get'">删除</button>
+                <button class="btn btn-info" @click="editEducation(index)" v-if="item.flag == 'get' && addAble">修改</button>
+                <button class="btn btn-primary" @click="saveEducation(index)" v-if="item.flag != 'get'">保存</button>
+            </td>
+        </tr>
+    </table>
+    <button class="btn btn-info" @click="addEducation" v-if="addAble" style="margin-left: 50px;">新增教育经历</button>
+</div>
+<script src="__PUBLIC__/html/js/jquery-1.11.3.min.js"></script>
+<script src="/Public/html/js/vue.js"></script>
+<script src="__PUBLIC__/html/js/jquery.form.js"></script>
+<script src="__PUBLIC__/html/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="__PUBLIC__/html/js/plugins/jeditable/jquery.jeditable.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/jquery.dataTables.js"></script>
+<script src="__PUBLIC__/html/js/plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="__PUBLIC__/html/js/content.min.js?v=1.0.0"></script>
+<script src="__PUBLIC__/html/js/plugins/layer/layer.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.3.6/index.js"></script>
+<script>
+    var id = {$id|json_encode};
+    var name = {$name|json_encode};
+    var vm = new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                education: [],
+                loading: true,
+                id: id,
+                name: name
+            }
+        },
+        created: function () {
+            this.getData()
+        },
+        computed: {
+            addAble: function () {
+                return this.education.every(function (value) {
+                    return value.flag == 'get'
+                })
+            }
+        },
+        methods: {
+            getData: function () {
+                this.loading = true
+                var vm = this;
+                $.post('', {method: 'get'}, function (res) {
+                    vm.education = res.data;
+                    vm.loading = false
+                })
+            },
+            papersUploadSuccess: function (res) {
+                if (res.status == 200){
+                    Vue.set(this.education[res.data.index], 'papers_upload', res.data.filePath)
+                }
+                layer.msg(res.msg)
+            },
+            delEducation: function(index){
+                var vm = this
+                layer.confirm('确认删除?', function (aaa) {
+                    $.post('{:U("delEducation")}', {id: vm.education[index].id}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                        layer.close(aaa)
+                    })
+                })
+            },
+            editEducation: function(index){
+                this.education[index].flag = 'put'
+            },
+            saveEducation: function (index) {
+                var vm = this
+                var data = this.education[index]
+                data.employee_id = this.id
+                data.name = this.name
+                if (data.flag == 'add'){
+                    data.employee_id = vm.id
+                    $.post('{:U("addEducation")}', {data: data}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+                if (data.flag == 'put'){
+                    $.post('{:U("putEducation")}', {data: vm.education}, function (res) {
+                        if (res.status == 200) {
+                            vm.getData();
+                        }
+                        layer.msg(res.msg)
+                    })
+                }
+            },
+            addEducation: function(){
+                var obj = {
+                    flag: 'add'
+                }
+                this.education.push(obj)
+            },
+            validateDocument: function (file) {
+                var arr = ['gif', 'jpg', 'jpeg', 'bmp', 'doc', 'docx','pdf']
+                var current = file.type.split('/')[1]
+                if(arr.indexOf(current) === -1){
+                    layer.msg('文件类型只能是' + arr.join(','))
+                    return false
+                }
+                return true
+            },
+            submit: function () {
+                var vm = this
+                layer.confirm('确认提交?', function (index) {
+                    vm.loading = true
+                    $.post('', {data: vm.education, method: 'put'}, function (res) {
+                        layer.msg(res.msg)
+                        vm.getData()
+                    })
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>
